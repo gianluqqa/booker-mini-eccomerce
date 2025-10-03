@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import { AppDataSource } from './data-source'; 
 
 dotenv.config();
 
@@ -13,8 +14,18 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
+// Inicializar TypeORM antes de levantar el servidor
+AppDataSource.initialize()
+  .then(() => {
+    console.log('✅ DB conectada y sincronizada');
+
+    // Solo levanta el servidor si la DB se conectó
+    app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+  })
+  .catch((err) => {
+    console.error('❌ Error al conectar DB', err);
+  });
+
 app.get('/', (req, res) => {
   res.send('Booker Backend funcionando ✅');
 });
-
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
