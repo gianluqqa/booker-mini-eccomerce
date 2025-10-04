@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from "typeorm";
 import { Order } from "./Order";
 import { Cart } from "./Cart";
 import { UserRole } from "../enums/UserRole";
@@ -16,6 +23,21 @@ export class User {
 
   @Column()
   name!: string;
+
+  @Column()
+  surname!: string;
+
+  @Column({ type: "varchar", nullable: true })
+  address!: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  country!: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  city!: string | null;
+
+  @Column({ type: "varchar", nullable: true })
+  phone!: string | null;
 
   @Column({
     type: "enum",

@@ -1,11 +1,9 @@
 import express from "express";
-import { AppDataSource } from "./config/data-source";
-
+import userRoutes from "./routes/userRoutes"; 
 
 const app = express();
 app.use(express.json());
 
 // Rutas
-app.use("/users",);
-
-export default app;
+app.use("/users", userRoutes);
+app.get("/ping", (req, res) => res.send("pong"));
