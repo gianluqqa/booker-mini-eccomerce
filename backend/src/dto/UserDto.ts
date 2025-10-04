@@ -17,3 +17,8 @@ export interface RegisterUserDTO {
   city?: string;
   phone?: string;
 }
+
+export interface LoginUserDTO {
+  email: string;
+  password: string;
+}

@@ -1,6 +1,6 @@
 import { RegisterUserDTO } from "../dto/UserDto";
 
-export const validateUser = (user: RegisterUserDTO) => {
+export const validateRegisterUser = (user: RegisterUserDTO) => {
   const errors: string[] = [];
 
   const {
