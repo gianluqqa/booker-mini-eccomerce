@@ -8,6 +8,6 @@ export const registerUserController = async (req: Request, res: Response) => {
     const newUser = await registerUserService(user);
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ message: "Error al registrar el usuario" });
+    res.status(409).json({ message: "User with that email already exists" });
   }
 };

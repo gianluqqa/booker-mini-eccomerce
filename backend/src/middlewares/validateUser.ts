@@ -1,4 +1,4 @@
-import { RegisterUserDTO } from "../dto/UserDto";
+import { LoginUserDTO, RegisterUserDTO } from "../dto/UserDto";
 
 export const validateRegisterUser = (user: RegisterUserDTO) => {
   const errors: string[] = [];
@@ -73,4 +73,25 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
   }
 
   return errors;
+};
+
+export const validateLoginUser = (user: LoginUserDTO) => {
+  const errors: string[] = [];
+
+  const { email, password } = user;
+
+  // Email validation
+  if (!email) {
+    errors.push("Email is required");
+  } else {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errors.push("Email format is invalid");
+    }
+  }
+
+  // Password validation
+  if (!password) {
+    errors.push("Password is required");
+  }
 };
