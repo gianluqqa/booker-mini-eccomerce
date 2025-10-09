@@ -10,7 +10,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
 
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
-  if (existingUser) throw new Error("Email already exists");
+  if (existingUser) throw new Error("User with that email already exists");
 
   const hashedPassword = await bcrypt.hash(user.password, 10);
 

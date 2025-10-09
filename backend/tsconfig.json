@@ -3,19 +3,20 @@
     // Target y módulos para Node
     "target": "ES2020",
     "module": "commonjs",
+    "lib": ["ES2020"],
 
     // Carpeta de salida
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
 
     // Metadatos necesarios para TypeORM
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
 
-    // Estrictas
+    // Configuración menos estricta para testing
     "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
 
     // Mapas de fuente y declaraciones
     "sourceMap": true,
@@ -24,8 +25,18 @@
 
     // Compatibilidad con Node
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+
+    // Resolución de módulos
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+
+    // Tipos para testing
+    "types": ["node", "jest"]
   },
-  "include": ["src"]
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist", "coverage", "**/*.test.ts", "**/*.spec.ts"]
 }

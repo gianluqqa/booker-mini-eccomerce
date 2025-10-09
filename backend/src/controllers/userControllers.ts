@@ -8,6 +8,14 @@ export const registerUserController = async (req: Request, res: Response) => {
     const newUser = await registerUserService(user);
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(409).json({ message: "User with that email already exists" });
+    // Devolver el mensaje de error específico
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    // 400 para errores de validación, 409 solo para recursos duplicados
+    if (errorMessage.includes("already exists")) {
+      res.status(409).json({ message: errorMessage });
+    } else {
+      res.status(400).json({ message: errorMessage });
+    }
   }
 };

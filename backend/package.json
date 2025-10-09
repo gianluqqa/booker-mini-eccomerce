@@ -6,7 +6,12 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.ts",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:verbose": "jest --verbose",
+    "test:users": "jest test/users/automated/user.test.ts",
+    "test:debug": "jest --detectOpenHandles --forceExit"
   },
   "keywords": [],
   "author": "",
