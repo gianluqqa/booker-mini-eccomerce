@@ -1,5 +1,6 @@
 # Test Case: User Module
 
+
 ## TC-001: Successful new user registration
 
 **Date:** 2025-01-08  
@@ -76,6 +77,8 @@
 - **File:** `TC001-register-succesfully.png`
 - **Location:** `evidences/TC001-register-succesfully.png`
 
+
+
 ## TC-002: Registration with duplicate email
 
 **Date:** 2025-01-08  
@@ -148,3 +151,129 @@
 
 - **File:** `TC002-duplicate-email-fixed.png`
 - **Location:** `evidences/TC002-duplicate-email-fixed.png`
+
+
+
+## TC-003: Validation of short country field
+
+**Date:** 2025-01-09  
+**Tester:** Gian Luca Caravone  
+**Priority:** Medium  
+**Type:** Manual Test (Edge Case)
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/register`
+2. Include JSON body with country field containing only 1 character
+3. Verify server response and validation behavior
+
+### Test Data
+
+```json
+{
+  "email": "test-country@example.com",
+  "password": "StrongPass123",
+  "confirmPassword": "StrongPass123",
+  "name": "Test User",
+  "surname": "Country",
+  "country": "A"
+}
+```
+
+### Expected Result
+
+- Status Code: 400 Bad Request
+- Error message: "Country must be at least 2 characters long"
+- No new user created
+
+### Actual Result
+
+- **Status Code:** 400 Bad Request ✅
+- **Response Body:**
+```json
+{
+  "message": "Country must be at least 2 characters long"
+}
+```
+
+### Result
+
+**✅ PASS** - Validation working correctly
+
+### Observations
+
+- Edge case validation for optional field
+- Proper error message returned
+- Field length validation functioning as expected
+
+### Evidence
+
+- **File:** `TC003-short-country-validation.png`
+- **Location:** `evidences/TC003-short-country-validation.png`
+
+## TC-004: Validation of short city field
+
+**Date:** 2025-01-09  
+**Tester:** Gian Luca Caravone  
+**Priority:** Medium  
+**Type:** Manual Test (Edge Case)
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/register`
+2. Include JSON body with city field containing only 1 character
+3. Verify server response and validation behavior
+
+### Test Data
+
+```json
+{
+  "email": "test-city@example.com",
+  "password": "StrongPass123",
+  "confirmPassword": "StrongPass123",
+  "name": "Test User",
+  "surname": "City",
+  "city": "A"
+}
+```
+
+### Expected Result
+
+- Status Code: 400 Bad Request
+- Error message: "City must be at least 2 characters long"
+- No new user created
+
+### Actual Result
+
+- **Status Code:** 400 Bad Request ✅
+- **Response Body:**
+```json
+{
+  "message": "City must be at least 2 characters long"
+}
+```
+
+### Result
+
+**✅ PASS** - Validation working correctly
+
+### Observations
+
+- Edge case validation for optional field
+- Proper error message returned
+- Field length validation functioning as expected
+
+### Evidence
+
+- **File:** `TC004-short-city-validation.png`
+- **Location:** `evidences/TC004-short-city-validation.png`

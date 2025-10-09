@@ -9,7 +9,7 @@ import { app } from "../../../src/server";
 
 describe("User registration tests", () => {
 
-  //! TC001: Create a new user successfully
+  //! TC001: Successful new user registration
 
   it("should create a new user successfully", async () => {
     // Paso 1: Preparar datos de prueba con email único
@@ -64,7 +64,7 @@ describe("User registration tests", () => {
     expect(response.status).toBe(409);
   });
 
-  //! TC003: Validaciones básicas (400 Bad Request)
+  //! TC003: Basic validations (400 Bad Request)
 
   it("should reject incomplete data", async () => {
     const userData = {
@@ -112,6 +112,106 @@ describe("User registration tests", () => {
 
     expect(response.status).toBe(400);
     expect(response.body.message).toContain("Passwords do not match");
+  });
+
+  //! TC004: Optional fields validations (400 Bad Request)
+
+  it("should reject invalid phone format", async () => {
+    const userData = {
+      email: `test-${Date.now()}@example.com`,
+      password: "Password123",
+      confirmPassword: "Password123",
+      name: "John",
+      surname: "Doe",
+      phone: "invalid-phone",
+    };
+
+    const response = await request(app)
+      .post("/users/register")
+      .send(userData);
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain("Phone number must contain only digits");
+  });
+
+  it("should reject short address", async () => {
+    const userData = {
+      email: `test-${Date.now()}@example.com`,
+      password: "Password123",
+      confirmPassword: "Password123",
+      name: "John",
+      surname: "Doe",
+      address: "AB", // Muy corto
+    };
+
+    const response = await request(app)
+      .post("/users/register")
+      .send(userData);
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain("Address must be at least 3 characters long");
+  });
+
+  it("should reject short country", async () => {
+    const userData = {
+      email: `test-${Date.now()}@example.com`,
+      password: "Password123",
+      confirmPassword: "Password123",
+      name: "John",
+      surname: "Doe",
+      country: "A", // Muy corto
+    };
+
+    const response = await request(app)
+      .post("/users/register")
+      .send(userData);
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain("Country must be at least 2 characters long");
+  });
+
+  it("should reject short city", async () => {
+    const userData = {
+      email: `test-${Date.now()}@example.com`,
+      password: "Password123",
+      confirmPassword: "Password123",
+      name: "John",
+      surname: "Doe",
+      city: "A", // Muy corto
+    };
+
+    const response = await request(app)
+      .post("/users/register")
+      .send(userData);
+
+    expect(response.status).toBe(400);
+    expect(response.body.message).toContain("City must be at least 2 characters long");
+  });
+
+  //! TC005: Success with optional fields (201 Created)
+
+  it("should accept valid optional fields", async () => {
+    const userData = {
+      email: `test-${Date.now()}@example.com`,
+      password: "Password123",
+      confirmPassword: "Password123",
+      name: "John",
+      surname: "Doe",
+      address: "123 Main Street",
+      country: "USA",
+      city: "New York",
+      phone: "1234567890",
+    };
+
+    const response = await request(app)
+      .post("/users/register")
+      .send(userData);
+
+    expect(response.status).toBe(201);
+    expect(response.body.address).toBe("123 Main Street");
+    expect(response.body.country).toBe("USA");
+    expect(response.body.city).toBe("New York");
+    expect(response.body.phone).toBe("1234567890");
   });
 });
 
