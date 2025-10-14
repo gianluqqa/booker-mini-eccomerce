@@ -1,10 +1,19 @@
-# Test Case: User Module
+# Test Case: Registration (Users Module)
+
+## Objective
+
+Este documento contiene los casos de prueba manuales para el módulo de usuarios, específicamente enfocado en el proceso de registro de nuevos usuarios. El objetivo es validar que el sistema maneje correctamente diferentes escenarios de registro, incluyendo casos exitosos, validaciones de datos duplicados y formatos de email inválidos.
 
 ## TC-001: Successful new user registration
 
-**Date:** 2025-01-08  
+**Date:** 08-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
+**Module:** Users
+
+### Description
+
+Verifica el registro exitoso de un nuevo usuario con datos válidos.
 
 ### Prerequisites
 
@@ -76,13 +85,16 @@
 - **File:** `TC-001-register-succesfully.png`
 - **Location:** `evidences/TC-001-register-succesfully.png`
 
-
-
 ## TC-002: Registration with duplicate email
 
-**Date:** 2025-01-08  
+**Date:** 08-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
+**Module:** Users
+
+### Description
+
+Valida el manejo de emails duplicados durante el registro.
 
 ### Prerequisites
 
@@ -135,8 +147,8 @@
 
 ### Correction History
 
-- **2025-01-08 (Initial):** Endpoint returned 500 Internal Server Error ❌
-- **2025-01-08 (Fixed):** Endpoint now returns 409 Conflict ✅
+- **08-10-2025 (Initial):** Endpoint returned 500 Internal Server Error ❌
+- **08-10-2025 (Fixed):** Endpoint now returns 409 Conflict ✅
 - **Bug reported in:** BUG-002-duplicate-email.md
 
 ### Observations
@@ -151,14 +163,16 @@
 - **File:** `TC-002-duplicate-email-fixed.png`
 - **Location:** `evidences/TC-002-duplicate-email-fixed.png`
 
+## TC-003: Registration with invalid email format
 
-
-## TC-003: Validation of short country field
-
-**Date:** 2025-01-09  
+**Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
-**Priority:** Medium  
-**Type:** Manual Test (Edge Case)
+**Priority:** Medium
+**Module:** Users
+
+### Description
+
+Verifica la validación de formato de email inválido.
 
 ### Prerequisites
 
@@ -168,59 +182,67 @@
 ### Execution Steps
 
 1. Send POST request to `http://localhost:5000/users/register`
-2. Include JSON body with country field containing only 1 character
-3. Verify server response and validation behavior
+2. Include JSON body with invalid email format
+3. Verify server response
 
 ### Test Data
 
 ```json
 {
-  "email": "test-country@example.com",
+  "email": "invalidemail.com",
   "password": "StrongPass123",
   "confirmPassword": "StrongPass123",
-  "name": "Test User",
-  "surname": "Country",
-  "country": "A"
+  "name": "Invalid Email",
+  "surname": "Test",
+  "address": "Av. Siempre Viva 742",
+  "country": "Argentina",
+  "city": "Rosario",
+  "phone": "541112345678"
 }
 ```
 
 ### Expected Result
 
 - Status Code: 400 Bad Request
-- Error message: "Country must be at least 2 characters long"
-- No new user created
+- Error message: "Email format is invalid"
+- User is not created in the database
 
 ### Actual Result
 
-- **Status Code:** 400 Bad Request ✅
+- **Status Code:** 400 Bad Request
 - **Response Body:**
+
 ```json
 {
-  "message": "Country must be at least 2 characters long"
+  "message": "Email format is invalid"
 }
 ```
 
 ### Result
 
-**✅ PASS** - Validation working correctly
+**✅ PASS** - Test executed successfully
 
 ### Observations
 
-- Edge case validation for optional field
-- Proper error message returned
-- Field length validation functioning as expected
+- Email validation works as expected
+- Error messages are clear and user-friendly
+- No user data persisted in the database
 
 ### Evidence
 
-- **File:** `TC003-short-country-validation.png`
-- **Location:** `evidences/TC003-short-country-validation.png`
+- **File:** `TC-003-invalid-email.png`
+- **Location:** `evidences/TC-003-invalid-email.png`
 
-## TC-004: Validation of short city field
+## TC-004: Password and confirmPassword do not match
 
-**Date:** 2025-01-09  
+**Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
-**Priority:** Medium  
-**Type:** Manual Test (Edge Case)
+**Priority:** Medium
+**Module:** Users
+
+### Description
+
+Valida la integridad de contraseñas ingresadas por el usuario cuando no coinciden.
 
 ### Prerequisites
 
@@ -230,49 +252,130 @@
 ### Execution Steps
 
 1. Send POST request to `http://localhost:5000/users/register`
-2. Include JSON body with city field containing only 1 character
-3. Verify server response and validation behavior
+2. Include JSON body with different password and confirmPassword values
+3. Verify server response
 
 ### Test Data
 
 ```json
 {
-  "email": "test-city@example.com",
+  "email": "password&confirmpassword@donotmatch.com",
   "password": "StrongPass123",
-  "confirmPassword": "StrongPass123",
-  "name": "Test User",
-  "surname": "City",
-  "city": "A"
+  "confirmPassword": "StrongPass124",
+  "name": "Password and C-Password NO",
+  "surname": "Test",
+  "address": "Av. Siempre Viva 742",
+  "country": "Argentina",
+  "city": "Rosario",
+  "phone": "541112345678"
 }
 ```
 
 ### Expected Result
 
 - Status Code: 400 Bad Request
-- Error message: "City must be at least 2 characters long"
-- No new user created
+- Error message: "Passwords do not match"
+- User is not created in the database
 
 ### Actual Result
 
-- **Status Code:** 400 Bad Request ✅
+- **Status Code:** 400 Bad Request
 - **Response Body:**
+
 ```json
 {
-  "message": "City must be at least 2 characters long"
+  "message": "Passwords do not match"
 }
 ```
 
 ### Result
 
-**✅ PASS** - Validation working correctly
+**✅ PASS** - Test executed successfully
 
 ### Observations
 
-- Edge case validation for optional field
-- Proper error message returned
-- Field length validation functioning as expected
+- El endpoint devuelve 400 Bad Request ante errores de validación (por ejemplo, contraseñas que no coinciden)
+- En un entorno de producción más formal, podría refinarse a 422 Unprocessable Entity, pero para esta demo se prioriza la simplicidad y la claridad del flujo de pruebas
+- Evita registros defectuosos y reduce tickets de soporte
 
 ### Evidence
 
-- **File:** `TC004-short-city-validation.png`
-- **Location:** `evidences/TC004-short-city-validation.png`
+- **File:** `TC-004-passwords-no-match.png`
+- **Location:** `evidences/TC-004-passwords-no-match.png`
+
+## TC-005: Registration with missing required fields
+
+**Date:** 14-10-2025
+**Tester:** Gian Luca Caravone  
+**Priority:** High
+**Module:** Users
+
+### Description
+
+Valida el manejo de campos requeridos faltantes durante el registro.
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/register`
+2. Include JSON body with empty required fields (email, password, confirmPassword)
+3. Verify server response
+
+### Test Data
+
+```json
+{
+  "email": "",
+  "password": "",
+  "confirmPassword": "",
+  "name": "Password and C-Password NO",
+  "surname": "Test",
+  "address": "Av. Siempre Viva 742",
+  "country": "Argentina",
+  "city": "Rosario",
+  "phone": "541112345678"
+}
+```
+
+### Expected Result
+
+- Status Code: 400 Bad Request
+- Error message: "Email, password, confirmPassword, name and surname are required"
+- User is not created in the database
+
+### Actual Result
+
+- **Status Code:** 400 Bad Request
+- **Response Body:**
+
+```json
+{
+  "message": "Email, password, confirmPassword, name and surname are required"
+}
+```
+
+### Result
+
+**✅ PASS** - Test executed successfully after bug fix
+
+### Correction History
+
+- **14-10-2025 (Initial):** Endpoint returned technical error message ❌
+- **14-10-2025 (Fixed):** Endpoint now returns proper validation message ✅
+- **Bug reported in:** BUG-005-missing-required-fields.md
+
+### Observations
+
+- El endpoint ahora devuelve 400 Bad Request con un mensaje de validación claro y user-friendly
+- El mensaje indica específicamente qué campos son requeridos
+- La validación se ejecuta correctamente antes del procesamiento de la solicitud
+- Bug original exitosamente corregido
+
+### Evidence
+
+- **File:** `BUG-005-missing-required-field.png`
+- **Location:** `bugs/BUG-005-missing-required-field.png`
