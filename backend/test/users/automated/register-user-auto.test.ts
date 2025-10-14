@@ -11,7 +11,7 @@ describe("User registration tests", () => {
 
   //! AUTO-001: Successful new user registration
 
-  it("should create a new user successfully", async () => {
+  it("1. should create a new user successfully", async () => {
     // Paso 1: Preparar datos de prueba con email único
     const userData = {
       email: `test-${Date.now()}@example.com`, // Email único usando timestamp
@@ -32,7 +32,7 @@ describe("User registration tests", () => {
 
   //! AUTO-002: Reject duplicate email
 
-  it("should reject duplicate email", async () => {
+  it("2. should reject duplicate email", async () => {
     // Usar un email único para esta prueba
     const uniqueEmail = `duplicate-${Date.now()}@example.com`;
 
@@ -66,7 +66,7 @@ describe("User registration tests", () => {
 
   //! AUTO-003: Basic validations (400 Bad Request)
 
-  it("should reject incomplete data", async () => {
+  it("3. should reject incomplete data", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`
       // Faltan campos requeridos
@@ -80,7 +80,7 @@ describe("User registration tests", () => {
     expect(response.body.message).toContain("Password is required");
   });
 
-  it("should reject invalid email format", async () => {
+  it("4. should reject invalid email format", async () => {
     const userData = {
       email: "invalid-email-format",
       password: "Password123",
@@ -97,7 +97,7 @@ describe("User registration tests", () => {
     expect(response.body.message).toContain("Email format is invalid");
   });
 
-  it("should reject mismatched passwords", async () => {
+  it("5. should reject mismatched passwords", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`,
       password: "Password123",
@@ -116,7 +116,7 @@ describe("User registration tests", () => {
 
   //! AUTO-004: Optional fields validations (400 Bad Request)
 
-  it("should reject invalid phone format", async () => {
+  it("6. should reject invalid phone format", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`,
       password: "Password123",
@@ -134,7 +134,7 @@ describe("User registration tests", () => {
     expect(response.body.message).toContain("Phone number must contain only digits");
   });
 
-  it("should reject short address", async () => {
+  it("7. should reject short address", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`,
       password: "Password123",
@@ -152,7 +152,7 @@ describe("User registration tests", () => {
     expect(response.body.message).toContain("Address must be at least 3 characters long");
   });
 
-  it("should reject short country", async () => {
+  it("8. should reject short country", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`,
       password: "Password123",
@@ -170,7 +170,7 @@ describe("User registration tests", () => {
     expect(response.body.message).toContain("Country must be at least 2 characters long");
   });
 
-  it("should reject short city", async () => {
+  it("9. should reject short city", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`,
       password: "Password123",
@@ -190,7 +190,7 @@ describe("User registration tests", () => {
 
   //! AUTO-005: Success with optional fields (201 Created)
 
-  it("should accept valid optional fields", async () => {
+  it("10. should accept valid optional fields", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`,
       password: "Password123",
