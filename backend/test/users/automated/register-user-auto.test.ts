@@ -9,7 +9,7 @@ import { app } from "../../../src/server";
 
 describe("User registration tests", () => {
 
-  //! TC001: Successful new user registration
+  //! AUTO-001: Successful new user registration
 
   it("should create a new user successfully", async () => {
     // Paso 1: Preparar datos de prueba con email único
@@ -30,7 +30,7 @@ describe("User registration tests", () => {
     expect(response.body.name).toBe("John");
   });
 
-  //! TC002: Reject duplicate email
+  //! AUTO-002: Reject duplicate email
 
   it("should reject duplicate email", async () => {
     // Usar un email único para esta prueba
@@ -64,7 +64,7 @@ describe("User registration tests", () => {
     expect(response.status).toBe(409);
   });
 
-  //! TC003: Basic validations (400 Bad Request)
+  //! AUTO-003: Basic validations (400 Bad Request)
 
   it("should reject incomplete data", async () => {
     const userData = {
@@ -114,7 +114,7 @@ describe("User registration tests", () => {
     expect(response.body.message).toContain("Passwords do not match");
   });
 
-  //! TC004: Optional fields validations (400 Bad Request)
+  //! AUTO-004: Optional fields validations (400 Bad Request)
 
   it("should reject invalid phone format", async () => {
     const userData = {
@@ -188,7 +188,7 @@ describe("User registration tests", () => {
     expect(response.body.message).toContain("City must be at least 2 characters long");
   });
 
-  //! TC005: Success with optional fields (201 Created)
+  //! AUTO-005: Success with optional fields (201 Created)
 
   it("should accept valid optional fields", async () => {
     const userData = {

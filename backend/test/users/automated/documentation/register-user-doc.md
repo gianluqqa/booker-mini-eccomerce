@@ -1,6 +1,26 @@
 # Automated Test: User Registration
 
-## TC-001: Successful new user registration
+## Objective
+
+The objective of this automated test suite is to validate the user registration functionality of the Booker e-commerce system. This test ensures that:
+
+- New users can successfully register with valid data
+- The system properly validates input data and rejects invalid information
+- Database operations are performed correctly
+- API responses follow HTTP standards
+- Error handling works as expected for various edge cases
+
+## Environment
+
+- **Test Framework:** Jest with TypeScript
+- **API Testing:** Supertest for HTTP assertions
+- **Database:** PostgreSQL with TypeORM
+- **Node.js Version:** v22.16.0
+- **Test Environment:** Isolated test database
+- **Coverage Tool:** Jest built-in coverage reporting
+- **Execution Time:** ~4-5 seconds per test suite
+
+## AUTO-001: Successful new user registration
 
 **Date:** 2025-01-09  
 **Type:** Automated Test  
@@ -62,5 +82,5 @@ Tests:       1 passed, 1 total
 
 ### Evidence
 
-- **File:** `TC001-register-user-auto-PASS.png`
-- **Location:** `evidences/TC001-register-user-auto-PASS.png`
+- **File:** `AUTO-001-register-user-PASS.png`
+- **Location:** `evidences/AUTO-001-register-user-PASS.png`

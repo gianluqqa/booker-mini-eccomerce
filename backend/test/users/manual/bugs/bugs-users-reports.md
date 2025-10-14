@@ -66,14 +66,14 @@ The code was modified to:
 ## Evidence
 
 ### Bug Evidence (Original)
-- **File:** `BUG002-duplicate-email.png`
-- **Location:** `backend/test/users/manual/bugs/BUG002-duplicate-email.png`
+- **File:** `BUG-002-duplicate-email.png`
+- **Location:** `backend/test/users/manual/bugs/BUG-002-duplicate-email.png`
 - **Description:** Screenshot showing 500 response instead of expected 409
 - **Type:** HTTP response error screenshot
 
 ### Fix Evidence
-- **File:** `TC002-duplicate-email-fixed.png`
-- **Location:** `backend/test/users/manual/evidences/TC002-duplicate-email-fixed.png`
+- **File:** `TC-002-duplicate-email-fixed.png`
+- **Location:** `backend/test/users/manual/evidences/TC-002-duplicate-email-fixed.png`
 - **Description:** Screenshot showing correct 409 Conflict response
 - **Type:** Fixed HTTP response screenshot
 

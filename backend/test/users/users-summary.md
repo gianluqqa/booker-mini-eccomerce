@@ -18,13 +18,13 @@ This document provides a comprehensive summary of testing activities for the Use
 - **Status:** ✅ PASS
 - **Date:** 2025-01-08
 - **Tester:** Gian Luca Caravone
-- **Evidence:** TC001-register-succesfully.png
+- **Evidence:** TC-001-register-succesfully.png
 
 #### TC-002: Registration with duplicate email
 - **Status:** ✅ PASS (After bug fix)
 - **Date:** 2025-01-08
 - **Tester:** Gian Luca Caravone
-- **Evidence:** TC002-duplicate-email-fixed.png
+- **Evidence:** TC-002-duplicate-email-fixed.png
 
 ## Bug Reports
 
@@ -54,8 +54,8 @@ backend/test/users/
 │   ├── bugs/
 │   │   └── bugs-users-reports.md
 │   └── evidences/
-│       ├── TC001-register-succesfully.png
-│       └── TC002-duplicate-email-fixed.png
+│       ├── TC-001-register-succesfully.png
+│       └── TC-002-duplicate-email-fixed.png
 ├── automated/
 │   └── user.test.ts
 └── users-summary.md

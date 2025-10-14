@@ -1,6 +1,5 @@
 # Test Case: User Module
 
-
 ## TC-001: Successful new user registration
 
 **Date:** 2025-01-08  
@@ -74,8 +73,8 @@
 
 ### Evidence
 
-- **File:** `TC001-register-succesfully.png`
-- **Location:** `evidences/TC001-register-succesfully.png`
+- **File:** `TC-001-register-succesfully.png`
+- **Location:** `evidences/TC-001-register-succesfully.png`
 
 
 
@@ -149,8 +148,8 @@
 
 ### Evidence
 
-- **File:** `TC002-duplicate-email-fixed.png`
-- **Location:** `evidences/TC002-duplicate-email-fixed.png`
+- **File:** `TC-002-duplicate-email-fixed.png`
+- **Location:** `evidences/TC-002-duplicate-email-fixed.png`
 
 
 

@@ -7,7 +7,9 @@ module.exports = {
     '**/test/**/*.spec.ts'
   ],
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: 'tsconfig.json'
+    }],
   },
   setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
   collectCoverage: true,
@@ -16,9 +18,4 @@ module.exports = {
   testTimeout: 10000,
   verbose: true,
   clearMocks: true,
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json'
-    }
-  }
 };
