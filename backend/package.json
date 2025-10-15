@@ -11,6 +11,7 @@
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
     "test:users": "jest test/users/automated/user.test.ts",
+    "test:report:users": "jest test/users/automated/register-user-auto.test.ts --coverage --reporters=default --reporters=jest-html-reporter --outputFile=test/users/automated/test-reports/users-test-report.html",
     "test:debug": "jest --detectOpenHandles --forceExit"
   },
   "keywords": [],
