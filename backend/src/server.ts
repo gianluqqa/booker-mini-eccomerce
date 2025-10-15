@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import { AppDataSource } from "./config/data-source";
-import { registerUserController } from "./controllers/userControllers";
+import userRoutes from "./routes/userRoutes";
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 // Rutas
-app.post("/users/register", registerUserController);
+app.use("/users", userRoutes);
 
 const PORT = process.env.PORT || 5000;
 

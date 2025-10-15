@@ -1,5 +1,5 @@
-import { RegisterUserDTO } from "../dto/UserDto";
-import { validateRegisterUser } from "../middlewares/validateUser";
+import { LoginUserDTO, RegisterUserDTO } from "../dto/UserDto";
+import { validateLoginUser, validateRegisterUser } from "../middlewares/validateUser";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
 import bcrypt from "bcrypt";
@@ -53,4 +53,23 @@ export const registerUserService = async (user: RegisterUserDTO) => {
   return safeUser;
 };
 
+export const loginUserService = async (user: LoginUserDTO) => {
+  // 1️⃣ Validación del request
+  const errors = validateLoginUser(user);
+  if (errors.length > 0) {
+    throw new Error(errors.join(", "));
+  }
 
+  // 2️⃣ Verificar que el usuario exista
+  const userRepo = AppDataSource.getRepository(User);
+  const existingUser = await userRepo.findOne({ where: { email: user.email } });
+  if (!existingUser) throw new Error("User with that email does not exist");
+
+  // 3️⃣ Verificar password
+  const isPasswordValid = await bcrypt.compare(user.password, existingUser.password);
+  if (!isPasswordValid) throw new Error("Invalid password");
+
+  // 4️⃣ Retornar usuario seguro
+  const { password: _, ...safeUser } = existingUser;
+  return safeUser;
+};

@@ -25,7 +25,9 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
 
   // Password validation
   if (password && password.length < 8) {
-    errors.push("Password must contain at least 8 characters, uppercase, lowercase and number");
+    errors.push(
+      "Password must contain at least 8 characters, uppercase, lowercase and number"
+    );
   }
 
   // Confirm password validation
@@ -64,7 +66,7 @@ export const validateLoginUser = (user: LoginUserDTO) => {
   const { email, password } = user;
 
   // Email validation
-  if (!email) {
+  if (!email || email.trim() === "") {
     errors.push("Email is required");
   } else {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -74,7 +76,9 @@ export const validateLoginUser = (user: LoginUserDTO) => {
   }
 
   // Password validation
-  if (!password) {
+  if (!password || password.trim() === "") {
     errors.push("Password is required");
   }
+
+  return errors;
 };
