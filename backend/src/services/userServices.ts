@@ -5,33 +5,37 @@ import { User } from "../entities/User";
 import bcrypt from "bcrypt";
 
 export const registerUserService = async (user: RegisterUserDTO) => {
+  // 1️⃣ Chequear campos obligatorios faltantes
+  const requiredFields: (keyof RegisterUserDTO)[] = [
+    "email",
+    "password",
+    "confirmPassword",
+    "name",
+    "surname",
+  ];
+  const missingFields = requiredFields.filter(
+    (f) => !user[f] || (typeof user[f] === "string" && user[f].trim() === "")
+  );
+
+  if (missingFields.length > 0) {
+    throw new Error(
+      "Email, password, confirmPassword, name and surname are required"
+    );
+  }
+
+  // 2️⃣ Validación de contenido (longitud de password, coincidencia de confirmPassword, formato de email, etc.)
   const errors = validateRegisterUser(user);
   if (errors.length > 0) {
-    // Si faltan campos críticos, devolver mensaje generalizado
-    const requiredFields = [
-      "email",
-      "password",
-      "confirmPassword",
-      "name",
-      "surname",
-    ];
-    const missingFields = requiredFields.filter(
-      (f) => !user[f as keyof RegisterUserDTO]
-    );
-    if (missingFields.length > 0) {
-      throw new Error(
-        "Email, password, confirmPassword, name and surname are required"
-      );
-    }
     throw new Error(errors.join(", "));
   }
 
+  // 3️⃣ Check duplicado
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
   if (existingUser) throw new Error("User with that email already exists");
 
+  // 4️⃣ Crear usuario
   const hashedPassword = await bcrypt.hash(user.password, 10);
-
   const newUser = userRepo.create({
     email: user.email,
     password: hashedPassword,
@@ -48,3 +52,5 @@ export const registerUserService = async (user: RegisterUserDTO) => {
   const { password, ...safeUser } = newUser;
   return safeUser;
 };
+
+

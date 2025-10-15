@@ -24,8 +24,8 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
   }
 
   // Password validation
-  if (password && password.length < 6) {
-    errors.push("Password must be at least 6 characters long");
+  if (password && password.length < 8) {
+    errors.push("Password must contain at least 8 characters, uppercase, lowercase and number");
   }
 
   // Confirm password validation

@@ -1,6 +1,6 @@
 # BUG-002: Registration with duplicate email returns 500 instead of 409 ✅ FIXED
 
-**Module:** Users  
+**Module:** Users - Registration
 **Related Test Case:** TC-002  
 **Severity:** Medium  
 **Priority:** High  
@@ -93,7 +93,7 @@ The code was modified to:
 
 # BUG-005: Missing required fields validation returns technical error instead of user-friendly message ✅ FIXED
 
-**Module:** Users  
+**Module:** Users - Registration  
 **Related Test Case:** TC-005  
 **Severity:** Medium  
 **Priority:** High  

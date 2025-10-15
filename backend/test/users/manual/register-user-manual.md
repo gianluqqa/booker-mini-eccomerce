@@ -9,7 +9,7 @@ Este documento contiene los casos de prueba manuales para el módulo de usuarios
 **Date:** 08-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users
+**Module:** Users - Registration
 
 ### Description
 
@@ -90,7 +90,7 @@ Verifica el registro exitoso de un nuevo usuario con datos válidos.
 **Date:** 08-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users
+**Module:** Users - Registration
 
 ### Description
 
@@ -168,7 +168,7 @@ Valida el manejo de emails duplicados durante el registro.
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** Medium
-**Module:** Users
+**Module:** Users - Registration
 
 ### Description
 
@@ -238,7 +238,7 @@ Verifica la validación de formato de email inválido.
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** Medium
-**Module:** Users
+**Module:** Users - Registration
 
 ### Description
 
@@ -308,7 +308,7 @@ Valida la integridad de contraseñas ingresadas por el usuario cuando no coincid
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users
+**Module:** Users - Registration
 
 ### Description
 
@@ -379,3 +379,78 @@ Valida el manejo de campos requeridos faltantes durante el registro.
 
 - **File:** `TC-005-missing-required-field-fixed.png`
 - **Location:** `evidences/TC-005-missing-required-field-fixed.png`
+
+
+
+## TC-006: Registration with weak password validation
+
+**Date:** 14-10-2025
+**Tester:** Gian Luca Caravone  
+**Priority:** High
+**Module:** Users - Registration
+
+### Description
+
+Valida las políticas de seguridad mínimas para contraseñas (longitud, mayúsculas, números).
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/register`
+2. Include JSON body with weak password (short, no uppercase, no numbers)
+3. Verify server response
+
+### Test Data
+
+```json
+{
+  "email": "shortpassword@gmail.com",
+  "password": "1234",
+  "confirmPassword": "1234",
+  "name": "short",
+  "surname": "password",
+  "address": "Av. Siempre Viva 742",
+  "country": "Argentina",
+  "city": "Rosario",
+  "phone": "541112345678"
+}
+```
+
+### Expected Result
+
+- Status Code: 400 Bad Request
+- Error message: "Password must contain at least 8 characters, uppercase, lowercase and number"
+- User is not created in the database
+
+### Actual Result
+
+- **Status Code:** 400 Bad Request
+- **Response Body:**
+
+```json
+{
+  "message": "Password must contain at least 8 characters, uppercase, lowercase and number"
+}
+```
+
+### Result
+
+**✅ PASS** - Test executed successfully
+
+### Observations
+
+- La validación de contraseñas funciona correctamente
+- El endpoint devuelve 400 Bad Request con el mensaje de validación específico para contraseñas débiles
+- Las políticas de seguridad de contraseñas se están aplicando correctamente
+- El mensaje de error es claro y específico sobre los requisitos de la contraseña
+
+### Evidence
+
+- **File:** `TC-006-weak-password-validation.png`
+- **Location:** `evidences/TC-006-weak-password-validation.png`
+
+
