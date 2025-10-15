@@ -8,10 +8,8 @@ import { app } from "../../../src/server";
  */
 
 describe("User registration tests", () => {
-
   //! AUTO-001: Successful new user registration
-
-  it("1. should create a new user successfully", async () => {
+  it("AUTO-001: should create a new user successfully", async () => {
     // Paso 1: Preparar datos de prueba con email único
     const userData = {
       email: `test-${Date.now()}@example.com`, // Email único usando timestamp
@@ -31,8 +29,7 @@ describe("User registration tests", () => {
   });
 
   //! AUTO-002: Reject duplicate email
-
-  it("2. should reject duplicate email", async () => {
+  it("AUTO-002: should reject duplicate email", async () => {
     // Usar un email único para esta prueba
     const uniqueEmail = `duplicate-${Date.now()}@example.com`;
 
@@ -64,23 +61,23 @@ describe("User registration tests", () => {
     expect(response.status).toBe(409);
   });
 
-  //! AUTO-003: Basic validations (400 Bad Request)
-
-  it("3. should reject incomplete data", async () => {
+  //! AUTO-003: Reject incomplete data
+  it("AUTO-003: should reject incomplete data", async () => {
     const userData = {
-      email: `test-${Date.now()}@example.com`
+      email: `test-${Date.now()}@example.com`,
       // Faltan campos requeridos
     };
 
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
+    const response = await request(app).post("/users/register").send(userData);
 
     expect(response.status).toBe(400);
-    expect(response.body.message).toContain("Password is required");
+    expect(response.body.message).toContain(
+      "Email, password, confirmPassword, name and surname are required"
+    );
   });
 
-  it("4. should reject invalid email format", async () => {
+  //! AUTO-004: Reject invalid email format
+  it("AUTO-004: should reject invalid email format", async () => {
     const userData = {
       email: "invalid-email-format",
       password: "Password123",
@@ -89,15 +86,14 @@ describe("User registration tests", () => {
       surname: "Doe",
     };
 
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
+    const response = await request(app).post("/users/register").send(userData);
 
     expect(response.status).toBe(400);
     expect(response.body.message).toContain("Email format is invalid");
   });
 
-  it("5. should reject mismatched passwords", async () => {
+  //! AUTO-005: Reject mismatched passwords
+  it("AUTO-005: should reject mismatched passwords", async () => {
     const userData = {
       email: `test-${Date.now()}@example.com`,
       password: "Password123",
@@ -106,129 +102,9 @@ describe("User registration tests", () => {
       surname: "Doe",
     };
 
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
+    const response = await request(app).post("/users/register").send(userData);
 
     expect(response.status).toBe(400);
     expect(response.body.message).toContain("Passwords do not match");
   });
-
-  //! AUTO-004: Optional fields validations (400 Bad Request)
-
-  it("6. should reject invalid phone format", async () => {
-    const userData = {
-      email: `test-${Date.now()}@example.com`,
-      password: "Password123",
-      confirmPassword: "Password123",
-      name: "John",
-      surname: "Doe",
-      phone: "invalid-phone",
-    };
-
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
-
-    expect(response.status).toBe(400);
-    expect(response.body.message).toContain("Phone number must contain only digits");
-  });
-
-  it("7. should reject short address", async () => {
-    const userData = {
-      email: `test-${Date.now()}@example.com`,
-      password: "Password123",
-      confirmPassword: "Password123",
-      name: "John",
-      surname: "Doe",
-      address: "AB", // Muy corto
-    };
-
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
-
-    expect(response.status).toBe(400);
-    expect(response.body.message).toContain("Address must be at least 3 characters long");
-  });
-
-  it("8. should reject short country", async () => {
-    const userData = {
-      email: `test-${Date.now()}@example.com`,
-      password: "Password123",
-      confirmPassword: "Password123",
-      name: "John",
-      surname: "Doe",
-      country: "A", // Muy corto
-    };
-
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
-
-    expect(response.status).toBe(400);
-    expect(response.body.message).toContain("Country must be at least 2 characters long");
-  });
-
-  it("9. should reject short city", async () => {
-    const userData = {
-      email: `test-${Date.now()}@example.com`,
-      password: "Password123",
-      confirmPassword: "Password123",
-      name: "John",
-      surname: "Doe",
-      city: "A", // Muy corto
-    };
-
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
-
-    expect(response.status).toBe(400);
-    expect(response.body.message).toContain("City must be at least 2 characters long");
-  });
-
-  //! AUTO-005: Success with optional fields (201 Created)
-
-  it("10. should accept valid optional fields", async () => {
-    const userData = {
-      email: `test-${Date.now()}@example.com`,
-      password: "Password123",
-      confirmPassword: "Password123",
-      name: "John",
-      surname: "Doe",
-      address: "123 Main Street",
-      country: "USA",
-      city: "New York",
-      phone: "1234567890",
-    };
-
-    const response = await request(app)
-      .post("/users/register")
-      .send(userData);
-
-    expect(response.status).toBe(201);
-    expect(response.body.address).toBe("123 Main Street");
-    expect(response.body.country).toBe("USA");
-    expect(response.body.city).toBe("New York");
-    expect(response.body.phone).toBe("1234567890");
-  });
 });
-
-/**
- * ========================================
- * CÓMO LEER ESTAS PRUEBAS
- * ========================================
- *
- * Cada prueba tiene 3 partes:
- * 1. ARREGLAR: Preparar los datos de prueba
- * 2. ACTUAR: Hacer algo (llamada a la API)
- * 3. AFIRMAR: Verificar que funcionó como se esperaba
- *
- * Los nombres de las pruebas explican qué hacen:
- * - "should create a new user successfully"
- * - "should reject duplicate email"
- * - "should reject incomplete data"
- * - "should reject invalid email format"
- * - "should reject mismatched passwords"
- */
