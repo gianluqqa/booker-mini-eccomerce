@@ -175,8 +175,8 @@ The code was modified to:
 - **Type:** HTTP response error screenshot
 
 ### Fix Evidence
-- **File:** `TC-005-missing-required-field.png`
-- **Location:** `backend/test/users/manual/evidences/TC-005-missing-required-field.png`
+- **File:** `TC-005-missing-required-field-fixed.png`
+- **Location:** `backend/test/users/manual/evidences/TC-005-missing-required-field-fixed.png`
 - **Description:** Screenshot showing correct validation message for missing required fields
 - **Type:** Fixed HTTP response screenshot
 

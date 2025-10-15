@@ -377,5 +377,5 @@ Valida el manejo de campos requeridos faltantes durante el registro.
 
 ### Evidence
 
-- **File:** `BUG-005-missing-required-field.png`
-- **Location:** `bugs/BUG-005-missing-required-field.png`
+- **File:** `TC-005-missing-required-field-fixed.png`
+- **Location:** `evidences/TC-005-missing-required-field-fixed.png`
