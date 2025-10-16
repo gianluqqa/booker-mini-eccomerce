@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../../src/server";
+import { app } from "../../../../src/server";
 
 /**
  * ========================================
@@ -10,19 +10,19 @@ import { app } from "../../../src/server";
 describe("User registration tests", () => {
   //! AUTO-001: Successful new user registration
   it("AUTO-001: should create a new user successfully", async () => {
-    // Paso 1: Preparar datos de prueba con email único
+    // Paso 1: Preparar datos de prueba con email unico
     const userData = {
-      email: `test-${Date.now()}@example.com`, // Email único usando timestamp
+      email: `test-${Date.now()}@example.com`, // Email unico usando timestamp
       password: "Password123",
       confirmPassword: "Password123",
       name: "John",
       surname: "Doe",
     };
 
-    // Paso 2: Enviar petición a la API
+    // Paso 2: Enviar peticion a la API
     const response = await request(app).post("/users/register").send(userData);
 
-    // Paso 3: Verificar que funcionó
+    // Paso 3: Verificar que funciono
     expect(response.status).toBe(201);
     expect(response.body.email).toBe(userData.email);
     expect(response.body.name).toBe("John");
@@ -30,7 +30,7 @@ describe("User registration tests", () => {
 
   //! AUTO-002: Reject duplicate email
   it("AUTO-002: should reject duplicate email", async () => {
-    // Usar un email único para esta prueba
+    // Usar un email unico para esta prueba
     const uniqueEmail = `duplicate-${Date.now()}@example.com`;
 
     // Primero, crear un usuario
@@ -57,7 +57,7 @@ describe("User registration tests", () => {
       .post("/users/register")
       .send(duplicateUser);
 
-    // Debe fallar con código 409
+    // Debe fallar con codigo 409
     expect(response.status).toBe(409);
   });
 

@@ -1,15 +1,11 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/test'],
   testMatch: [
-    '**/test/**/*.test.ts',
-    '**/test/**/*.spec.ts'
+    '<rootDir>/test/**/*.test.ts'
   ],
   transform: {
-    '^.+\\.ts$': ['ts-jest', {
-      tsconfig: 'tsconfig.json'
-    }],
+    '^.+\\.ts$': 'ts-jest',
   },
   setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
   collectCoverage: true,

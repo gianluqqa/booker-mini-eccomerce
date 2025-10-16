@@ -6,7 +6,7 @@ console.log('🚀 Generating test report...');
 
 try {
   // Ejecutar las pruebas y capturar la salida
-  const testOutput = execSync('npm test -- test/users/automated/register-user-auto.test.ts --coverage', { 
+  const testOutput = execSync('npm test -- test/users/automated/unit-tests/register-user-auto.test.ts --coverage', { 
     encoding: 'utf8',
     cwd: process.cwd()
   });
@@ -176,7 +176,7 @@ try {
 </html>`;
 
   // Escribir el archivo HTML
-  const reportPath = path.join(__dirname, '../test/users/automated/test-reports/users-test-report.html');
+  const reportPath = path.join(__dirname, '../test/users/automated/test-reports/register-test-report.html');
   fs.writeFileSync(reportPath, htmlContent);
 
   console.log('✅ Test report generated successfully!');

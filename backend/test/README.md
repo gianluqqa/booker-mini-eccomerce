@@ -23,13 +23,25 @@ npm run test:coverage
 npm run test:watch
 ```
 
-### Ejecutar tests específicos de usuarios
+### Generar Reportes HTML
+```bash
+# Generar todos los reportes
+npm run test:report:all
+
+# Generar reporte de registro únicamente
+npm run test:report:register
+
+# Generar reporte de login únicamente
+npm run test:report:login
+```
+
+### Ejecutar tests específicos
 ```bash
 # Tests automatizados de registro de usuarios
 npm test -- test/users/automated/unit-tests/register-user-auto.test.ts
 
-# Generar reporte HTML de tests de usuarios
-npm run test:report:users
+# Tests automatizados de login de usuarios
+npm test -- test/users/automated/unit-tests/login-user-auto.test.ts
 ```
 
 ### Ejecutar tests con reporte detallado
@@ -40,24 +52,45 @@ npm test -- test/users/automated/unit-tests/register-user-auto.test.ts --coverag
 
 ## 📁 Estructura de Tests
 
-### Ejemplo de Jerarquia de Tests Automatizados
+### Jerarquía Completa de Tests
 ```
 test/
 ├── users/
 │   ├── automated/
 │   │   ├── unit-tests/
 │   │   │   ├── register-user-auto.test.ts    # 5 tests de registro
-│   │   │   └── login-user-auto.test.ts       # Tests de login
+│   │   │   └── login-user-auto.test.ts       # 7 tests de login
 │   │   └── test-reports/
-│   │       └── users-test-report.html        # Reporte HTML generado
+│   │       ├── register-test-report.html     # Reporte HTML de registro
+│   │       ├── login-test-report.html        # Reporte HTML de login
+│   │       └── README.md                     # Documentación de reportes
 │   └── manual/
 │       ├── unit-tests/
 │       │   ├── register-user-manual.md       # Tests manuales de registro
 │       │   └── login-user-manual.md          # Tests manuales de login
 │       └── evidences/                        # Evidencias de pruebas
-├── integration-tests/
-│   └── user-register-login-integration.test.ts
+├── integration-tests/                        # Tests de integración
+├── setup.ts                                  # Configuración de tests
+└── README.md                                 # Esta documentación
 ```
+
+### Tests Automatizados Disponibles
+
+#### Registro de Usuarios (5 tests):
+- **AUTO-001**: Registro exitoso de usuario
+- **AUTO-002**: Rechazo de email duplicado
+- **AUTO-003**: Validación de datos incompletos
+- **AUTO-004**: Validación de formato de email inválido
+- **AUTO-005**: Validación de contraseñas que no coinciden
+
+#### Login de Usuarios (7 tests):
+- **AUTO-006**: Login exitoso con credenciales válidas
+- **AUTO-007**: Rechazo de contraseña incorrecta
+- **AUTO-008**: Manejo de usuario inexistente
+- **AUTO-009**: Validación de email faltante
+- **AUTO-010**: Validación de contraseña faltante
+- **AUTO-011**: Validación de formato de email inválido
+- **AUTO-012**: Manejo de body de request vacío
 
 ### Tests Manuales
 Los tests manuales están documentados en formato Markdown y incluyen:
@@ -100,6 +133,21 @@ Los tests manuales están documentados con:
 - **Resultados esperados vs actuales**
 - **Evidencias** (capturas de pantalla)
 
+## 📊 Estado Actual de los Tests
+
+### Resumen de Ejecución:
+- **Total de Tests**: 17 (10 registro + 7 login)
+- **Tests Pasando**: 17 ✅
+- **Tests Fallando**: 0 ❌
+- **Tasa de Éxito**: 100%
+- **Tiempo de Ejecución**: ~6.3 segundos
+
+### Cobertura de Código:
+- **Controllers**: 93.1% statements
+- **Services**: 100% statements
+- **Middlewares**: 82.05% statements
+- **Overall**: 95.31% statements
+
 ## 🔧 Problemas Comunes y Soluciones
 
 ### Problema: "Cannot find module"
@@ -114,13 +162,16 @@ Los tests manuales están documentados con:
 ### Problema: "Tests no se ejecutan"
 **Solución:** Verifica que estés en el directorio correcto y que las dependencias estén instaladas
 
+### Problema: "No tests found"
+**Solución:** Verifica que los archivos de test tengan la extensión `.test.ts` y estén en la ubicación correcta
+
 ## ➕ Agregar Nuevos Tests
 
 ### Tests Automatizados
 Para agregar un nuevo test automatizado, sigue este patrón:
 
 ```typescript
-it('AUTO-006: should do something new', async () => {
+it('AUTO-013: should do something new', async () => {
   // 1. Configurar datos de prueba
   const testData = {
     email: `test-${Date.now()}@example.com`,
@@ -151,18 +202,20 @@ Para agregar un nuevo test manual:
 3. **Un test, una cosa**: Cada test debe verificar un comportamiento específico
 4. **Usa nombres descriptivos**: "should create user" es mejor que "test1"
 5. **No te preocupes por ser perfecto**: Los tests siempre se pueden mejorar después
+6. **Usa los reportes HTML**: Son más fáciles de leer que la consola
 
 ## 📚 Documentación Adicional
 
 - **Tests de Usuarios**: [users/users-summary.md](./users/users-summary.md) - Detalles del módulo users
 - **Tests Manuales de Registro**: [users/manual/unit-tests/register-user-manual.md](./users/manual/unit-tests/register-user-manual.md)
 - **Tests Manuales de Login**: [users/manual/unit-tests/login-user-manual.md](./users/manual/unit-tests/login-user-manual.md)
-- **Reporte HTML**: [users/automated/test-reports/users-test-report.html](./users/automated/test-reports/users-test-report.html)
-- **Tests de Integración**: [integration-tests/user-register-login-integration.test.ts](./integration-tests/user-register-login-integration.test.ts)
+- **Reportes HTML**: [users/automated/test-reports/README.md](./users/automated/test-reports/README.md)
+- **Tests de Integración**: [integration-tests/](./integration-tests/)
 
 ## 🆘 ¿Necesitas Ayuda?
 
 - Revisa la salida de la consola para mensajes de error
 - Asegúrate de que tu servidor esté ejecutándose
 - Verifica tu conexión a la base de datos
+- Usa `npm run test:report:all` para generar reportes detallados
 - ¡Pide ayuda si te quedas atascado!
