@@ -73,4 +73,4 @@ test/users/automated/test-reports/
 └── users-test-report.html    # Complete HTML test report
 ```
 
-**Note:** This replaces the old `evidences/` directory structure with professional HTML reports.
+**Note:** This replaces the old `evidences/` directory structure with professional HTML reports. The automated unit tests are now located in `test/users/automated/unit-tests/` directory.

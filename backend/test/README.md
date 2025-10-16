@@ -1,10 +1,10 @@
 # Guía de Testing - Proyecto Booker
 
 ## 📋 Información General
-Este directorio contiene todos los tests para el backend del proyecto Booker. Para información detallada sobre la estrategia de testing y progreso, consulta [test-plan.md](./test-plan.md).
+Este directorio contiene todos los tests para el backend del proyecto Booker. Los tests están organizados en módulos y cubren tanto pruebas manuales como automatizadas.
 
 ## 🎯 ¿Qué son estos tests?
-Los tests verifican automáticamente que las funcionalidades del backend funcionen correctamente. Incluyen tests para registro de usuarios, carrito de compras y proceso de checkout.
+Los tests verifican automáticamente que las funcionalidades del backend funcionen correctamente. Actualmente incluyen tests para el módulo de usuarios (registro y login).
 
 ## 🚀 Cómo Ejecutar los Tests
 
@@ -23,48 +23,62 @@ npm run test:coverage
 npm run test:watch
 ```
 
-### Ejecutar tests de un módulo específico
+### Ejecutar tests específicos de usuarios
 ```bash
-# Tests de usuarios
-npm test -- users
+# Tests automatizados de registro de usuarios
+npm test -- test/users/automated/unit-tests/register-user-auto.test.ts
 
-# Tests de carrito (cuando estén implementados)
-npm test -- cart
-
-# Tests de checkout (cuando estén implementados)
-npm test -- checkout
+# Generar reporte HTML de tests de usuarios
+npm run test:report:users
 ```
 
-## 📊 Estado Actual de los Tests
+### Ejecutar tests con reporte detallado
+```bash
+# Tests con cobertura y reporte HTML
+npm test -- test/users/automated/unit-tests/register-user-auto.test.ts --coverage
+```
 
-### ✅ Módulo Users (Completado)
-- **Test 1**: "should create a new user successfully"
-  - ✅ Verifica que un nuevo usuario pueda registrarse
-  - ✅ Valida que la respuesta sea correcta
-  - ✅ Confirma que los datos del usuario se guarden
+## 📁 Estructura de Tests
 
-- **Test 2**: "should reject duplicate email"
-  - ✅ Verifica que el sistema prevenga emails duplicados
-  - ✅ Confirma que retorne el código de error correcto (409)
+### Ejemplo de Jerarquia de Tests Automatizados
+```
+test/
+├── users/
+│   ├── automated/
+│   │   ├── unit-tests/
+│   │   │   ├── register-user-auto.test.ts    # 5 tests de registro
+│   │   │   └── login-user-auto.test.ts       # Tests de login
+│   │   └── test-reports/
+│   │       └── users-test-report.html        # Reporte HTML generado
+│   └── manual/
+│       ├── unit-tests/
+│       │   ├── register-user-manual.md       # Tests manuales de registro
+│       │   └── login-user-manual.md          # Tests manuales de login
+│       └── evidences/                        # Evidencias de pruebas
+├── integration-tests/
+│   └── user-register-login-integration.test.ts
+```
 
-- **Test 3**: "should reject incomplete data"
-  - ✅ Verifica que el sistema rechace datos incompletos
-  - ✅ Confirma que retorne el código de error correcto (400)
-
-### 🔄 Módulo Cart (En desarrollo)
-- Tests pendientes de implementación
-
-### 🔄 Módulo Checkout (En desarrollo)
-- Tests pendientes de implementación
+### Tests Manuales
+Los tests manuales están documentados en formato Markdown y incluyen:
+- **TC-001 a TC-006**: Tests de registro de usuarios
+- **TC-007 a TC-009**: Tests de login de usuarios
 
 ## 📖 Cómo Leer los Tests
 
-Cada test sigue 3 pasos simples:
+### Tests Automatizados
+Cada test automatizado sigue 3 pasos simples:
 
 ```typescript
-it('should do something', async () => {
+it('AUTO-001: should create a new user successfully', async () => {
   // 1. ARRANGE: Configurar datos de prueba
-  const userData = { /* tus datos de prueba */ };
+  const userData = {
+    email: `test-${Date.now()}@example.com`,
+    password: "Password123",
+    confirmPassword: "Password123",
+    name: "John",
+    surname: "Doe"
+  };
   
   // 2. ACT: Ejecutar la acción que quieres probar
   const response = await request(app)
@@ -73,8 +87,18 @@ it('should do something', async () => {
   
   // 3. ASSERT: Verificar que funcionó correctamente
   expect(response.status).toBe(201);
+  expect(response.body.email).toBe(userData.email);
 });
 ```
+
+### Tests Manuales
+Los tests manuales están documentados con:
+- **Descripción** del test
+- **Prerequisites** necesarios
+- **Pasos de ejecución**
+- **Datos de prueba**
+- **Resultados esperados vs actuales**
+- **Evidencias** (capturas de pantalla)
 
 ## 🔧 Problemas Comunes y Soluciones
 
@@ -92,12 +116,16 @@ it('should do something', async () => {
 
 ## ➕ Agregar Nuevos Tests
 
-¿Quieres agregar un nuevo test? Sigue este patrón:
+### Tests Automatizados
+Para agregar un nuevo test automatizado, sigue este patrón:
 
 ```typescript
-it('should do something new', async () => {
+it('AUTO-006: should do something new', async () => {
   // 1. Configurar datos de prueba
-  const testData = { /* tus datos */ };
+  const testData = {
+    email: `test-${Date.now()}@example.com`,
+    // ... otros campos
+  };
   
   // 2. Hacer la llamada a la API
   const response = await request(app)
@@ -109,6 +137,13 @@ it('should do something new', async () => {
 });
 ```
 
+### Tests Manuales
+Para agregar un nuevo test manual:
+1. Crea un nuevo archivo `.md` en `test/users/manual/unit-tests/`
+2. Sigue el formato de los tests existentes
+3. Incluye evidencias (capturas de pantalla) en `test/users/manual/evidences/`
+4. Actualiza la numeración (TC-010, TC-011, etc.)
+
 ## 💡 Consejos para Principiantes
 
 1. **Empieza simple**: No trates de probar todo de una vez
@@ -119,9 +154,11 @@ it('should do something new', async () => {
 
 ## 📚 Documentación Adicional
 
-- **Plan de Testing**: [test-plan.md](./test-plan.md) - Estrategia y progreso general
-- **Resumen Backend**: [backend-summary.md](./backend-summary.md) - Estado de todos los módulos
 - **Tests de Usuarios**: [users/users-summary.md](./users/users-summary.md) - Detalles del módulo users
+- **Tests Manuales de Registro**: [users/manual/unit-tests/register-user-manual.md](./users/manual/unit-tests/register-user-manual.md)
+- **Tests Manuales de Login**: [users/manual/unit-tests/login-user-manual.md](./users/manual/unit-tests/login-user-manual.md)
+- **Reporte HTML**: [users/automated/test-reports/users-test-report.html](./users/automated/test-reports/users-test-report.html)
+- **Tests de Integración**: [integration-tests/user-register-login-integration.test.ts](./integration-tests/user-register-login-integration.test.ts)
 
 ## 🆘 ¿Necesitas Ayuda?
 

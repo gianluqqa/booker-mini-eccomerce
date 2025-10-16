@@ -48,17 +48,25 @@ This document provides a comprehensive summary of all backend testing activities
 ## File Structure
 ```
 backend/test/
-├── backend-summary.md (this file)
+├── tests-summary.md (this file)
 ├── users/
 │   ├── users-summary.md
 │   ├── manual/
+│   │   ├── unit-tests/
+│   │   ├── evidences/
+│   │   └── bugs/
 │   └── automated/
+│       ├── unit-tests/
+│       ├── test-reports/
+│       └── documentation/
 ├── cart/
-│   ├── backend-summary.md
+│   ├── cart-summary.md
 │   ├── manual/
 │   └── automated/
-└── checkout/
-    ├── backend-summary.md
-    ├── manual/
-    └── automated/
+├── checkout/
+│   ├── checkout-summary.md
+│   ├── manual/
+│   └── automated/
+└── integration-tests/
+    └── user-register-login-integration.test.ts
 ```

@@ -50,13 +50,30 @@ This document provides a comprehensive summary of testing activities for the Use
 ```
 backend/test/users/
 ├── manual/
-│   ├── user-test-report.md
+│   ├── unit-tests/
+│   │   ├── user-manual-report.md
+│   │   ├── register-user-manual.md
+│   │   └── login-user-manual.md
 │   ├── bugs/
 │   │   └── bugs-users-reports.md
 │   └── evidences/
 │       ├── TC-001-register-succesfully.png
-│       └── TC-002-duplicate-email-fixed.png
+│       ├── TC-002-duplicate-email-fixed.png
+│       ├── TC-003-invalid-email.png
+│       ├── TC-004-passwords-no-match.png
+│       ├── TC-005-missing-required-field-fixed.png
+│       ├── TC-006-weak-password-validation.png
+│       ├── TC-007-login-successfully.png
+│       ├── TC-008-login-incorrect-password.png
+│       └── TC-009-login-non-existent-user.png
 ├── automated/
-│   └── user.test.ts
+│   ├── unit-tests/
+│   │   ├── register-user-auto.test.ts
+│   │   ├── login-user-auto.test.ts
+│   │   └── user-auto-report.md
+│   ├── test-reports/
+│   │   └── users-test-report.html
+│   └── documentation/
+│       └── register-user-doc.md
 └── users-summary.md
 ```
