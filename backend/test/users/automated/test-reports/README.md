@@ -28,7 +28,7 @@ These commands will:
 ## 📁 Report Files
 
 - **`complete-test-report.html`** - Complete HTML test report combining all tests
-  - 12 automated test cases (AUTO-001 to AUTO-012)
+  - 11 automated test cases (AUTO-001 to AUTO-011)
   - Both registration and login functionality
   - Comprehensive coverage analysis
   - Interactive table of contents
@@ -42,7 +42,7 @@ These commands will:
   - Professional HTML format
 
 - **`login-test-report.html`** - HTML test report for User Login module
-  - 7 automated test cases (AUTO-006 to AUTO-012)
+  - 6 automated test cases (AUTO-006 to AUTO-011)
   - Authentication and security validation
   - Error handling scenarios
   - Code coverage metrics
@@ -51,7 +51,7 @@ These commands will:
 ## 📋 Report Features
 
 ### What's Included:
-- ✅ **Test Results Summary** - 12 total tests, 100% pass rate
+- ✅ **Test Results Summary** - 11 total tests, 100% pass rate
 - ✅ **Coverage Analysis** - Detailed code coverage metrics (95.31% statements)
 - ✅ **Performance Metrics** - Execution times per test
 - ✅ **Error Details** - Complete failure information
@@ -121,9 +121,9 @@ Reports are automatically generated and placed in this directory whenever:
 
 ```
 test/users/automated/test-reports/
-├── complete-test-report.html    # Complete report (12 tests)
+├── complete-test-report.html    # Complete report (11 tests)
 ├── register-test-report.html    # Registration tests (5 tests)
-├── login-test-report.html       # Login tests (7 tests)
+├── login-test-report.html       # Login tests (6 tests)
 └── README.md                    # This documentation
 ```
 

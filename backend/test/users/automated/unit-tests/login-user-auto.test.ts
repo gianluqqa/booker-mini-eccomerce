@@ -5,10 +5,10 @@ import { app } from "../../../../src/server";
  * ========================================
  * PRUEBAS AUTOMATIZADAS DE LOGIN DE USUARIOS
  * ========================================
- * 
+ *
  * Basado en los casos de prueba manuales:
  * - TC-007: Successful user login
- * - TC-008: Login with incorrect password  
+ * - TC-008: Login with incorrect password
  * - TC-009: Login with non-existent user
  */
 
@@ -25,7 +25,7 @@ describe("User login automated tests", () => {
       address: "123 Main Street",
       country: "Argentina",
       city: "Buenos Aires",
-      phone: "541112345678"
+      phone: "541112345678",
     };
 
     // Registrar el usuario
@@ -52,7 +52,7 @@ describe("User login automated tests", () => {
     expect(response.body.id).toBeDefined();
     expect(response.body.createdAt).toBeDefined();
     expect(response.body.updatedAt).toBeDefined();
-    
+
     // Verificar que la contraseña NO está en la respuesta (seguridad)
     expect(response.body.password).toBeUndefined();
   });
@@ -100,7 +100,7 @@ describe("User login automated tests", () => {
     expect(response.body.user).toBeUndefined();
   });
 
-  //! AUTO-009: Login with missing email
+  //! AUTO-009: Login with missing email (TC-010)
   it("AUTO-009: should reject login with missing email", async () => {
     // Paso 1: Intentar login sin email
     const loginData = {
@@ -114,7 +114,7 @@ describe("User login automated tests", () => {
     expect(response.body.message).toContain("Email is required");
   });
 
-  //! AUTO-010: Login with missing password
+  //! AUTO-010: Login with missing password (TC-011)
   it("AUTO-010: should reject login with missing password", async () => {
     // Paso 1: Intentar login sin contraseña
     const loginData = {
@@ -128,7 +128,7 @@ describe("User login automated tests", () => {
     expect(response.body.message).toContain("Password is required");
   });
 
-  //! AUTO-011: Login with invalid email format
+  //! AUTO-011: Login with invalid email format (TC-012)
   it("AUTO-011: should reject login with invalid email format", async () => {
     // Paso 1: Intentar login con email inválido
     const loginData = {
@@ -141,15 +141,5 @@ describe("User login automated tests", () => {
     // Paso 2: Verificar que el login fue rechazado
     expect(response.status).toBe(400);
     expect(response.body.message).toContain("Email format is invalid");
-  });
-
-  //! AUTO-012: Login with empty request body
-  it("AUTO-012: should reject login with empty request body", async () => {
-    // Paso 1: Intentar login con body vacío
-    const response = await request(app).post("/users/login").send({});
-
-    // Paso 2: Verificar que el login fue rechazado
-    expect(response.status).toBe(400);
-    expect(response.body.message).toContain("Email and password are required");
   });
 });

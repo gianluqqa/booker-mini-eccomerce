@@ -83,19 +83,18 @@ test/
 - **AUTO-004**: Validación de formato de email inválido
 - **AUTO-005**: Validación de contraseñas que no coinciden
 
-#### Login de Usuarios (7 tests):
+#### Login de Usuarios (6 tests):
 - **AUTO-006**: Login exitoso con credenciales válidas
 - **AUTO-007**: Rechazo de contraseña incorrecta
 - **AUTO-008**: Manejo de usuario inexistente
 - **AUTO-009**: Validación de email faltante
 - **AUTO-010**: Validación de contraseña faltante
 - **AUTO-011**: Validación de formato de email inválido
-- **AUTO-012**: Manejo de body de request vacío
 
 ### Tests Manuales
 Los tests manuales están documentados en formato Markdown y incluyen:
 - **TC-001 a TC-006**: Tests de registro de usuarios
-- **TC-007 a TC-009**: Tests de login de usuarios
+- **TC-007 a TC-012**: Tests de login de usuarios
 
 ## 📖 Cómo Leer los Tests
 
@@ -136,8 +135,8 @@ Los tests manuales están documentados con:
 ## 📊 Estado Actual de los Tests
 
 ### Resumen de Ejecución:
-- **Total de Tests**: 17 (10 registro + 7 login)
-- **Tests Pasando**: 17 ✅
+- **Total de Tests**: 16 (10 registro + 6 login)
+- **Tests Pasando**: 16 ✅
 - **Tests Fallando**: 0 ❌
 - **Tasa de Éxito**: 100%
 - **Tiempo de Ejecución**: ~6.3 segundos

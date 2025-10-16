@@ -9,7 +9,7 @@ Este documento contiene los casos de prueba manuales para el módulo de usuarios
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users - Login
+**Module:** Users (Login)
 
 ### Description
 
@@ -86,7 +86,7 @@ Verifica el login exitoso de un usuario existente con credenciales válidas.
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users - Login
+**Module:** Users (Login)
 
 ### Description
 
@@ -153,7 +153,7 @@ Verifica que el sistema rechace correctamente intentos de login con contraseña 
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users - Login
+**Module:** Users (Login)
 
 ### Description
 
@@ -213,3 +213,196 @@ Verifica que el sistema rechace correctamente intentos de login con un email que
 
 - **File:** `TC-009-login-non-existent-user.png`
 - **Location:** `evidences/TC-009-login-non-existent-user.png`
+
+## TC-010: Login with missing email
+
+**Date:** 16-10-2025
+**Tester:** Gian Luca Caravone  
+**Priority:** High
+**Module:** Users - Login
+
+### Description
+
+Verifica que el sistema rechace correctamente intentos de login cuando falta el campo email en la petición.
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/login`
+2. Include JSON body with password only (missing email)
+3. Verify server response
+
+### Test Data
+
+```json
+{
+  "password": "StrongPass123"
+}
+```
+
+### Expected Result
+
+- Status Code: 400 Bad Request
+- Error message: "Email is required"
+- No user data returned
+
+### Actual Result
+
+- **Status Code:** 400 Bad Request
+- **Response Body:**
+
+```json
+{
+  "message": "Email is required"
+}
+```
+
+### Result
+
+**✅ PASS** - Test executed successfully
+
+### Observations
+
+- Email field validation works correctly
+- System properly handles missing required fields
+- Status code 400 follows HTTP standards for bad requests
+- Clear error message helps identify the missing field
+- Validation occurs before attempting user lookup
+
+### Evidence
+
+- **File:** `TC-010-login-missing-email.png`
+- **Location:** `evidences/TC-010-login-missing-email.png`
+
+## TC-011: Login with missing password
+
+**Date:** 16-10-2025
+**Tester:** Gian Luca Caravone  
+**Priority:** High
+**Module:** Users - Login
+
+### Description
+
+Verifica que el sistema rechace correctamente intentos de login cuando falta el campo password en la petición.
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/login`
+2. Include JSON body with email only (missing password)
+3. Verify server response
+
+### Test Data
+
+```json
+{
+  "email": "test@example.com"
+}
+```
+
+### Expected Result
+
+- Status Code: 400 Bad Request
+- Error message: "Password is required"
+- No user data returned
+
+### Actual Result
+
+- **Status Code:** 400 Bad Request
+- **Response Body:**
+
+```json
+{
+  "message": "Password is required"
+}
+```
+
+### Result
+
+**✅ PASS** - Test executed successfully
+
+### Observations
+
+- Password field validation works correctly
+- System properly handles missing required fields
+- Status code 400 follows HTTP standards for bad requests
+- Clear error message helps identify the missing field
+- Validation occurs before attempting authentication
+
+### Evidence
+
+- **File:** `TC-011-login-missing-password.png`
+- **Location:** `evidences/TC-011-login-missing-password.png`
+
+## TC-012: Login with invalid email format
+
+**Date:** 16-10-2025
+**Tester:** Gian Luca Caravone  
+**Priority:** High
+**Module:** Users - Login
+
+### Description
+
+Verifica que el sistema rechace correctamente intentos de login con formato de email inválido.
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/login`
+2. Include JSON body with invalid email format
+3. Verify server response
+
+### Test Data
+
+```json
+{
+  "email": "invalid-email-format",
+  "password": "StrongPass123"
+}
+```
+
+### Expected Result
+
+- Status Code: 400 Bad Request
+- Error message: "Email format is invalid"
+- No user data returned
+
+### Actual Result
+
+- **Status Code:** 400 Bad Request
+- **Response Body:**
+
+```json
+{
+  "message": "Email format is invalid"
+}
+```
+
+### Result
+
+**✅ PASS** - Test executed successfully
+
+### Observations
+
+- Email format validation works correctly
+- System properly validates email format before processing
+- Status code 400 follows HTTP standards for bad requests
+- Clear error message helps identify the format issue
+- Validation prevents unnecessary database queries
+
+### Evidence
+
+- **File:** `TC-012-login-invalid-email-format.png`
+- **Location:** `evidences/TC-012-login-invalid-email-format.png`
