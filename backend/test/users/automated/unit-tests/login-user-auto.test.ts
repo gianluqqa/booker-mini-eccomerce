@@ -80,7 +80,7 @@ describe("User login automated tests", () => {
 
     // Paso 3: Verificar que el login fue rechazado
     expect(response.status).toBe(401);
-    expect(response.body.message).toBe("Invalid password");
+    expect(response.body.message).toBe("Invalid credentials");
     expect(response.body.user).toBeUndefined();
   });
 
@@ -94,9 +94,9 @@ describe("User login automated tests", () => {
 
     const response = await request(app).post("/users/login").send(loginData);
 
-    // Paso 2: Verificar que el login fue rechazado
-    expect(response.status).toBe(404);
-    expect(response.body.message).toBe("User with that email does not exist");
+    // Paso 2: Verificar que el login fue rechazado con mensaje genérico por seguridad
+    expect(response.status).toBe(401);
+    expect(response.body.message).toBe("Invalid credentials");
     expect(response.body.user).toBeUndefined();
   });
 

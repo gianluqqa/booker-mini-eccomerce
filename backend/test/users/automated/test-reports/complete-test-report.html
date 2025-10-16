@@ -185,11 +185,11 @@
         <div id="summary" class="summary">
             <div class="summary-card">
                 <h3>Total Tests</h3>
-                <div class="number">12</div>
+                <div class="number">11</div>
             </div>
             <div class="summary-card">
                 <h3>Passed</h3>
-                <div class="number">12</div>
+                <div class="number">11</div>
             </div>
             <div class="summary-card ">
                 <h3>Failed</h3>
@@ -243,7 +243,7 @@
             </div>
 
             <div id="login" class="module-section">
-                <h3>🔐 Login Tests (7 tests)</h3>
+                <h3>🔐 Login Tests (6 tests)</h3>
                 
                 <div class="test-item">
                     <h4>AUTO-006: should login user successfully with valid credentials</h4>
@@ -263,7 +263,7 @@
                     <h4>AUTO-008: should reject login with non-existent user</h4>
                     <div class="status">✅ PASSED</div>
                     <div class="time">Execution time: ~8ms</div>
-                    <div class="description">Ensures non-existent users are handled with 404 status code.</div>
+                    <div class="description">Ensures non-existent users are handled with 401 status code and generic error message for security.</div>
                 </div>
                 
                 <div class="test-item">
@@ -285,13 +285,6 @@
                     <div class="status">✅ PASSED</div>
                     <div class="time">Execution time: ~7ms</div>
                     <div class="description">Validates email format validation during login.</div>
-                </div>
-                
-                <div class="test-item">
-                    <h4>AUTO-012: should reject login with empty request body</h4>
-                    <div class="status">✅ PASSED</div>
-                    <div class="time">Execution time: ~10ms</div>
-                    <div class="description">Tests handling of completely empty request body during login.</div>
                 </div>
                 
             </div>

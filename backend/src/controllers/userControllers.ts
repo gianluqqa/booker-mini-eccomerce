@@ -48,9 +48,7 @@ export const loginUserController = async (req: Request, res: Response) => {
     // 4️⃣ Mapear errores a status codes
     if (errorMessage.includes("required") || errorMessage.includes("format is invalid")) {
       return res.status(400).json({ message: errorMessage });
-    } else if (errorMessage.includes("does not exist")) {
-      return res.status(404).json({ message: errorMessage });
-    } else if (errorMessage.includes("Invalid password")) {
+    } else if (errorMessage.includes("Invalid credentials")) {
       return res.status(401).json({ message: errorMessage });
     } else {
       return res.status(400).json({ message: errorMessage });

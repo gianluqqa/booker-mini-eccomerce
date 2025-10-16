@@ -63,11 +63,11 @@ export const loginUserService = async (user: LoginUserDTO) => {
   // 2️⃣ Verificar que el usuario exista
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
-  if (!existingUser) throw new Error("User with that email does not exist");
+  if (!existingUser) throw new Error("Invalid credentials");
 
   // 3️⃣ Verificar password
   const isPasswordValid = await bcrypt.compare(user.password, existingUser.password);
-  if (!isPasswordValid) throw new Error("Invalid password");
+  if (!isPasswordValid) throw new Error("Invalid credentials");
 
   // 4️⃣ Retornar usuario seguro
   const { password: _, ...safeUser } = existingUser;

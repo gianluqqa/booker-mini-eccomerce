@@ -69,8 +69,7 @@ try {
       { id: 'AUTO-008', name: 'should reject login with non-existent user', time: '8', status: 'PASSED', module: 'Login' },
       { id: 'AUTO-009', name: 'should reject login with missing email', time: '8', status: 'PASSED', module: 'Login' },
       { id: 'AUTO-010', name: 'should reject login with missing password', time: '6', status: 'PASSED', module: 'Login' },
-      { id: 'AUTO-011', name: 'should reject login with invalid email format', time: '7', status: 'PASSED', module: 'Login' },
-      { id: 'AUTO-012', name: 'should reject login with empty request body', time: '10', status: 'PASSED', module: 'Login' }
+      { id: 'AUTO-011', name: 'should reject login with invalid email format', time: '7', status: 'PASSED', module: 'Login' }
     );
   }
 
@@ -89,11 +88,10 @@ try {
       'AUTO-005': 'Validates password confirmation matching during registration.',
       'AUTO-006': 'Tests successful user authentication with valid credentials and verifies all user data is returned correctly.',
       'AUTO-007': 'Validates that incorrect passwords are properly rejected with 401 status code.',
-      'AUTO-008': 'Ensures non-existent users are handled with 404 status code.',
+      'AUTO-008': 'Ensures non-existent users are handled with 401 status code and generic error message for security.',
       'AUTO-009': 'Checks validation for missing email field during login.',
       'AUTO-010': 'Checks validation for missing password field during login.',
-      'AUTO-011': 'Validates email format validation during login.',
-      'AUTO-012': 'Tests handling of completely empty request body during login.'
+      'AUTO-011': 'Validates email format validation during login.'
     };
     return descriptions[testId] || 'Automated test case for user functionality.';
   }

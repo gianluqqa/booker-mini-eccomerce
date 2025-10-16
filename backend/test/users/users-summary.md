@@ -74,6 +74,7 @@ backend/test/users/
 │   ├── test-reports/
 │   │   └── users-test-report.html
 │   └── documentation/
-│       └── register-user-doc.md
+│       ├── register-user-auto-doc.md
+│       └── login-user-auto-doc.md
 └── users-summary.md
 ```

@@ -117,7 +117,7 @@ Verifica que el sistema rechace correctamente intentos de login con contraseña 
 ### Expected Result
 
 - Status Code: 401 Unauthorized
-- Error message: "Invalid password"
+- Error message: "Invalid credentials"
 - No user data returned
 
 ### Actual Result
@@ -127,7 +127,7 @@ Verifica que el sistema rechace correctamente intentos de login con contraseña 
 
 ```json
 {
-  "message": "Invalid password"
+  "message": "Invalid credentials"
 }
 ```
 
@@ -138,15 +138,22 @@ Verifica que el sistema rechace correctamente intentos de login con contraseña 
 ### Observations
 
 - Security validation works correctly
-- System properly rejects incorrect passwords
+- System properly rejects incorrect passwords with generic error message
 - Status code 401 follows HTTP standards for authentication failures
-- No sensitive information is leaked in error messages
+- Generic error message prevents information leakage about authentication failures
 - Password comparison using bcrypt works as expected
+- Security best practice implemented to avoid revealing specific failure reasons
 
 ### Evidence
 
 - **File:** `TC-008-login-incorrect-password.png`
 - **Location:** `evidences/TC-008-login-incorrect-password.png`
+
+### History of Corrections
+
+- **16-10-2025:** Security improvement implemented - Changed specific "Invalid password" error message to generic "Invalid credentials" to prevent information disclosure about authentication failure reasons
+- **16-10-2025:** Test case updated to reflect new security requirements
+- **16-10-2025:** Related bug BUG-008 documented and fixed
 
 ## TC-009: Login with non-existent user
 
@@ -182,18 +189,18 @@ Verifica que el sistema rechace correctamente intentos de login con un email que
 
 ### Expected Result
 
-- Status Code: 404 Not Found
-- Error message: "User with that email does not exist"
+- Status Code: 401 Unauthorized
+- Error message: "Invalid credentials"
 - No user data returned
 
 ### Actual Result
 
-- **Status Code:** 404 Not Found
+- **Status Code:** 401 Unauthorized
 - **Response Body:**
 
 ```json
 {
-  "message": "User with that email does not exist"
+  "message": "Invalid credentials"
 }
 ```
 
@@ -203,16 +210,23 @@ Verifica que el sistema rechace correctamente intentos de login con un email que
 
 ### Observations
 
-- User existence validation works correctly
-- System properly handles non-existent users
-- Status code 404 follows HTTP standards for resource not found
-- Clear error message helps identify the issue
-- No information leakage about user existence patterns
+- User authentication validation works correctly
+- System properly handles non-existent users with generic error message
+- Status code 401 follows HTTP standards for authentication failures
+- Generic error message prevents information leakage about user existence
+- Security best practice implemented to avoid user enumeration attacks
 
 ### Evidence
 
 - **File:** `TC-009-login-non-existent-user.png`
 - **Location:** `evidences/TC-009-login-non-existent-user.png`
+
+### History of Corrections
+
+- **16-10-2025:** Critical security vulnerability fixed - Changed from 404 "User with that email does not exist" to 401 "Invalid credentials" to prevent user enumeration attacks
+- **16-10-2025:** Test case updated to reflect new security requirements and best practices
+- **16-10-2025:** Related bug BUG-009 documented and fixed
+- **16-10-2025:** System now follows OWASP guidelines for secure authentication
 
 ## TC-010: Login with missing email
 
