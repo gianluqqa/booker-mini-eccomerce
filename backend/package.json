@@ -11,6 +11,7 @@
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
     "test:users": "jest test/modules/users/automated/user.test.ts",
+    "test:integration": "jest test/integration-tests/user-register-login.test.ts",
     "test:report:register": "node scripts/generate-test-report.js",
     "test:report:login": "node scripts/generate-login-test-report.js",
     "test:report:all": "node scripts/generate-all-test-reports.js",

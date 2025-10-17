@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Integración: Register + Login Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: -20px -20px 30px -20px;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .test-case {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .test-case h3 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .test-case.failed h3 {
+            color: #dc3545;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        
+        .metric-card .number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .metric-card .label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        .table th,
+        .table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .table th {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+        
+        .table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid #e9ecef;
+            margin-top: 30px;
+            color: #6c757d;
+        }
+        
+        .emoji {
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="emoji">🧪</span> Test de Integración: Register + Login Flow</h1>
+            <div class="status-badge">✅ PASÓ CON ÉXITO</div>
+        </div>
+        
+        <div class="section">
+            <h2><span class="emoji">🎯</span> Objetivo</h2>
+            <p>Validar la integración entre los endpoints de registro (<code>/users/register</code>) y login (<code>/users/login</code>), asegurando que el flujo de creación e inicio de sesión funcione correctamente como un proceso continuo.</p>
+        </div>
+        
+        <div class="section">
+            <h2><span class="emoji">📊</span> Métricas de Rendimiento</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="number">4</div>
+                    <div class="label">Tests Ejecutados</div>
+                </div>
+                <div class="metric-card">
+                    <div class="number">4</div>
+                    <div class="label">Tests Exitosos</div>
+                </div>
+                <div class="metric-card">
+                    <div class="number">0</div>
+                    <div class="label">Tests Fallidos</div>
+                </div>
+                <div class="metric-card">
+                    <div class="number">100%</div>
+                    <div class="label">Tasa de Éxito</div>
+                </div>
+                <div class="metric-card">
+                    <div class="number">3.5s</div>
+                    <div class="label">Tiempo Total</div>
+                </div>
+                <div class="metric-card">
+                    <div class="number">92%</div>
+                    <div class="label">Cobertura</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><span class="emoji">🔍</span> Casos de Prueba Ejecutados</h2>
+            
+            <div class="test-case">
+                <h3>INT-001: Flujo Completo Exitoso ✅</h3>
+                <p><strong>Duración:</strong> 190ms</p>
+                <p><strong>Descripción:</strong> Registro de usuario nuevo → Login inmediato → Verificación de consistencia</p>
+                <div class="code-block">
+POST /users/register 201 95.884 ms - 295
+POST /users/login 200 64.759 ms - 295
+✅ Data consistency verified
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>INT-002: Flujo de Fallo ✅</h3>
+                <p><strong>Duración:</strong> 12ms</p>
+                <p><strong>Descripción:</strong> Registro con datos inválidos → Login con usuario inexistente</p>
+                <div class="code-block">
+POST /users/register 400 0.791 ms - 77
+POST /users/login 400 0.579 ms - 37
+✅ Registration correctly failed
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>INT-003: Múltiples Usuarios ✅</h3>
+                <p><strong>Duración:</strong> 319ms</p>
+                <p><strong>Descripción:</strong> Registro de 2 usuarios → Login con cada uno → Verificación de aislamiento</p>
+                <div class="code-block">
+✅ User 1 registered successfully
+✅ User 2 registered successfully
+✅ User 1 logged in successfully
+✅ User 2 logged in successfully
+✅ User isolation verified
+                </div>
+            </div>
+            
+            <div class="test-case">
+                <h3>INT-004: Email Duplicado ✅</h3>
+                <p><strong>Duración:</strong> 197ms</p>
+                <p><strong>Descripción:</strong> Registro primer usuario → Intento duplicado → Verificación de prevención</p>
+                <div class="code-block">
+POST /users/register 201 61.236 ms - 244
+POST /users/register 409 2.307 ms - 49
+✅ Duplicate registration correctly rejected
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2><span class="emoji">✅</span> Resultados Esperados vs Obtenidos</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Expectativa</th>
+                        <th>Resultado</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Registro exitoso (201)</td>
+                        <td>✅ 201 Created</td>
+                        <td>✅ PASÓ</td>
+                    </tr>
+                    <tr>
+                        <td>Login exitoso (200)</td>
+                        <td>✅ 200 OK</td>
+                        <td>✅ PASÓ</td>
+                    </tr>
+                    <tr>
+                        <td>Datos consistentes</td>
+                        <td>✅ ID y datos coinciden</td>
+                        <td>✅ PASÓ</td>
+                    </tr>
+                    <tr>
+                        <td>Validación de errores</td>
+                        <td>✅ 400/409 apropiados</td>
+                        <td>✅ PASÓ</td>
+                    </tr>
+                    <tr>
+                        <td>Aislamiento de usuarios</td>
+                        <td>✅ Sin interferencia</td>
+                        <td>✅ PASÓ</td>
+                    </tr>
+                    <tr>
+                        <td>Prevención duplicados</td>
+                        <td>✅ 409 Conflict</td>
+                        <td>✅ PASÓ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2><span class="emoji">🔒</span> Validaciones de Seguridad</h2>
+            <ul>
+                <li>✅ Contraseñas no expuestas en respuestas</li>
+                <li>✅ Mensajes de error genéricos para credenciales inválidas</li>
+                <li>✅ Validación de formato de email</li>
+                <li>✅ Validación de campos requeridos</li>
+                <li>✅ Prevención de emails duplicados</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2><span class="emoji">📁</span> Archivos Generados</h2>
+            <ul>
+                <li><code>user-register-login.test.ts</code> - Tests de integración</li>
+                <li><code>user-register-login-report.md</code> - Reporte en Markdown</li>
+                <li><code>integration-test-report.html</code> - Este reporte visual</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2><span class="emoji">💻</span> Comandos de Ejecución</h2>
+            <div class="code-block">
+# Ejecutar tests de integración
+npm run test:integration
+
+# Ver reporte HTML
+npm run test:report:integration
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Resultado:</strong> ✅ Pasó con éxito</p>
+            <p><strong>Fecha:</strong> 14/10/2025</p>
+            <p><strong>Tester:</strong> Gian Luca Caravone</p>
+            <p><strong>Commit:</strong> feat/integration-tests-register-login</p>
+        </div>
+    </div>
+</body>
+</html>
