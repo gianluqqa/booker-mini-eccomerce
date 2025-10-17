@@ -48,7 +48,7 @@ This document provides a comprehensive summary of testing activities for the Use
 
 ## Files Structure
 ```
-backend/test/users/
+backend/test/modules/users/
 ├── manual/
 │   ├── unit-tests/
 │   │   ├── user-manual-report.md

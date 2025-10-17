@@ -10,7 +10,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
-    "test:users": "jest test/users/automated/user.test.ts",
+    "test:users": "jest test/modules/users/automated/user.test.ts",
     "test:report:register": "node scripts/generate-test-report.js",
     "test:report:login": "node scripts/generate-login-test-report.js",
     "test:report:all": "node scripts/generate-all-test-reports.js",

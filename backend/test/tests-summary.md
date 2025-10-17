@@ -10,19 +10,19 @@ This document provides a comprehensive summary of all backend testing activities
 - **Test Cases:** 2
 - **Bugs Found:** 1
 - **Bugs Fixed:** 1
-- **Summary:** [users-summary.md](./users/users-summary.md)
+- **Summary:** [users-summary.md](./modules/users/users-summary.md)
 
 ### Cart Module
 - **Status:** 🔄 In Progress
 - **Test Cases:** TBD
 - **Bugs Found:** 0
-- **Summary:** [cart/backend-summary.md](./cart/backend-summary.md)
+- **Summary:** [cart-summary.md](./modules/cart/cart-summary.md)
 
 ### Checkout Module
 - **Status:** 🔄 In Progress
 - **Test Cases:** TBD
 - **Bugs Found:** 0
-- **Summary:** [checkout/backend-summary.md](./checkout/backend-summary.md)
+- **Summary:** [checkout-summary.md](./modules/checkout/checkout-summary.md)
 
 ## Overall Backend Testing Status
 
@@ -49,24 +49,25 @@ This document provides a comprehensive summary of all backend testing activities
 ```
 backend/test/
 ├── tests-summary.md (this file)
-├── users/
-│   ├── users-summary.md
-│   ├── manual/
-│   │   ├── unit-tests/
-│   │   ├── evidences/
-│   │   └── bugs/
-│   └── automated/
-│       ├── unit-tests/
-│       ├── test-reports/
-│       └── documentation/
-├── cart/
-│   ├── cart-summary.md
-│   ├── manual/
-│   └── automated/
-├── checkout/
-│   ├── checkout-summary.md
-│   ├── manual/
-│   └── automated/
+├── modules/                        # ← NUEVA ESTRUCTURA: Módulos organizados
+│   ├── users/
+│   │   ├── users-summary.md
+│   │   ├── manual/
+│   │   │   ├── unit-tests/
+│   │   │   ├── evidences/
+│   │   │   └── bugs/
+│   │   └── automated/
+│   │       ├── unit-tests/
+│   │       ├── test-reports/
+│   │       └── documentation/
+│   ├── cart/
+│   │   ├── cart-summary.md
+│   │   ├── manual/
+│   │   └── automated/
+│   └── checkout/
+│       ├── checkout-summary.md
+│       ├── manual/
+│       └── automated/
 └── integration-tests/
     └── user-register-login-integration.test.ts
 ```

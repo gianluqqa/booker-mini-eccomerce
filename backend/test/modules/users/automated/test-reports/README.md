@@ -120,7 +120,7 @@ Reports are automatically generated and placed in this directory whenever:
 ## 📈 Report Structure
 
 ```
-test/users/automated/test-reports/
+test/modules/users/automated/test-reports/
 ├── complete-test-report.html    # Complete report (11 tests)
 ├── register-test-report.html    # Registration tests (5 tests)
 ├── login-test-report.html       # Login tests (6 tests)
@@ -137,10 +137,10 @@ npm test
 ### Run Specific Test Suites:
 ```bash
 # Registration tests only
-npm test -- test/users/automated/unit-tests/register-user-auto.test.ts
+npm test -- test/modules/users/automated/unit-tests/register-user-auto.test.ts
 
 # Login tests only  
-npm test -- test/users/automated/unit-tests/login-user-auto.test.ts
+npm test -- test/modules/users/automated/unit-tests/login-user-auto.test.ts
 ```
 
 ## 📊 Current Status
@@ -151,4 +151,4 @@ npm test -- test/users/automated/unit-tests/login-user-auto.test.ts
 - **Execution Time:** ~6.3 seconds
 - **Last Updated:** $(date)
 
-**Note:** This replaces the old `evidences/` directory structure with professional HTML reports. The automated unit tests are located in `test/users/automated/unit-tests/` directory.
+**Note:** This replaces the old `evidences/` directory structure with professional HTML reports. The automated unit tests are located in `test/modules/users/automated/unit-tests/` directory.

@@ -25,29 +25,33 @@ backend/test/
 ├── setup.ts                        # Configuración base para tests
 ├── types.d.ts                      # Tipos TypeScript para testing
 │
-├── users/                          # Módulo de Usuarios
-│   ├── users-summary.md            # Resumen específico del módulo
-│   ├── manual/                     # Testing manual
-│   │   ├── register-user-manual.md
-│   │   ├── login-user-manual.md
-│   │   ├── user-manual-report.md   # Reporte de manual de testing
-│   │   ├── bugs/                   # Reportes de bugs encontrados
-│   │   └── evidences/              # Screenshots y evidencia visual
-│   └── automated/                  # Testing automatizado
-│       ├── register-user-auto.test.ts
-│       ├── user-auto-report.md     # Reporte de testing automatizado
-│       ├── documentation/          # Documentación técnica de testing automatizado
-│       └── test-reports/           # Evidencias de testing automatizado con HTML.
-│
-├── cart/                           # Módulo de Carrito (En desarrollo)
-│   ├── cart-summary.md
-│   ├── manual/
-│   └── automated/
-│
-└── checkout/                       # Módulo de Checkout (En desarrollo)
-    ├── checkout-summary.md
-    ├── manual/
-    └── automated/
+└── modules/                        # ← NUEVA ESTRUCTURA: Módulos organizados
+    ├── users/                      # Módulo de Usuarios
+    │   ├── users-summary.md        # Resumen específico del módulo
+    │   ├── manual/                 # Testing manual
+    │   │   ├── unit-tests/
+    │   │   │   ├── register-user-manual.md
+    │   │   │   ├── login-user-manual.md
+    │   │   │   └── user-manual-report.md   # Reporte de manual de testing
+    │   │   ├── bugs/               # Reportes de bugs encontrados
+    │   │   └── evidences/          # Screenshots y evidencia visual
+    │   └── automated/              # Testing automatizado
+    │       ├── unit-tests/
+    │       │   ├── register-user-auto.test.ts
+    │       │   ├── login-user-auto.test.ts
+    │       │   └── user-auto-report.md     # Reporte de testing automatizado
+    │       ├── documentation/      # Documentación técnica de testing automatizado
+    │       └── test-reports/       # Evidencias de testing automatizado con HTML
+    │
+    ├── cart/                       # Módulo de Carrito (En desarrollo)
+    │   ├── cart-summary.md
+    │   ├── manual/
+    │   └── automated/
+    │
+    └── checkout/                   # Módulo de Checkout (En desarrollo)
+        ├── checkout-summary.md
+        ├── manual/
+        └── automated/
 ```
 
 ### 📖 Explicación de la Jerarquía

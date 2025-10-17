@@ -377,7 +377,7 @@ try {
 </html>`;
 
   // Escribir el archivo HTML
-  const reportPath = path.join(__dirname, '../test/users/automated/test-reports/complete-test-report.html');
+  const reportPath = path.join(__dirname, '../test/modules/users/automated/test-reports/complete-test-report.html');
   fs.writeFileSync(reportPath, htmlContent);
 
   console.log('✅ Complete test report generated successfully!');

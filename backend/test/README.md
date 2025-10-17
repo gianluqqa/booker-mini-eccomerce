@@ -38,16 +38,16 @@ npm run test:report:login
 ### Ejecutar tests específicos
 ```bash
 # Tests automatizados de registro de usuarios
-npm test -- test/users/automated/unit-tests/register-user-auto.test.ts
+npm test -- test/modules/users/automated/unit-tests/register-user-auto.test.ts
 
 # Tests automatizados de login de usuarios
-npm test -- test/users/automated/unit-tests/login-user-auto.test.ts
+npm test -- test/modules/users/automated/unit-tests/login-user-auto.test.ts
 ```
 
 ### Ejecutar tests con reporte detallado
 ```bash
 # Tests con cobertura y reporte HTML
-npm test -- test/users/automated/unit-tests/register-user-auto.test.ts --coverage
+npm test -- test/modules/users/automated/unit-tests/register-user-auto.test.ts --coverage
 ```
 
 ## 📁 Estructura de Tests
@@ -189,9 +189,9 @@ it('AUTO-013: should do something new', async () => {
 
 ### Tests Manuales
 Para agregar un nuevo test manual:
-1. Crea un nuevo archivo `.md` en `test/users/manual/unit-tests/`
+1. Crea un nuevo archivo `.md` en `test/modules/users/manual/unit-tests/`
 2. Sigue el formato de los tests existentes
-3. Incluye evidencias (capturas de pantalla) en `test/users/manual/evidences/`
+3. Incluye evidencias (capturas de pantalla) en `test/modules/users/manual/evidences/`
 4. Actualiza la numeración (TC-010, TC-011, etc.)
 
 ## 💡 Consejos para Principiantes

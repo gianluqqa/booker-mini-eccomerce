@@ -67,13 +67,13 @@ The code was modified to:
 
 ### Bug Evidence (Original)
 - **File:** `BUG-002-duplicate-email.png`
-- **Location:** `backend/test/users/manual/bugs/BUG-002-duplicate-email.png`
+- **Location:** `backend/test/modules/users/manual/bugs/BUG-002-duplicate-email.png`
 - **Description:** Screenshot showing 500 response instead of expected 409
 - **Type:** HTTP response error screenshot
 
 ### Fix Evidence
 - **File:** `TC-002-duplicate-email-fixed.png`
-- **Location:** `backend/test/users/manual/evidences/TC-002-duplicate-email-fixed.png`
+- **Location:** `backend/test/modules/users/manual/evidences/TC-002-duplicate-email-fixed.png`
 - **Description:** Screenshot showing correct 409 Conflict response
 - **Type:** Fixed HTTP response screenshot
 
@@ -170,13 +170,13 @@ The code was modified to:
 
 ### Bug Evidence (Original)
 - **File:** `BUG-005-missing-required-field.png`
-- **Location:** `backend/test/users/manual/bugs/BUG-005-missing-required-field.png`
+- **Location:** `backend/test/modules/users/manual/bugs/BUG-005-missing-required-field.png`
 - **Description:** Screenshot showing technical error message instead of validation message
 - **Type:** HTTP response error screenshot
 
 ### Fix Evidence
 - **File:** `TC-005-missing-required-field-fixed.png`
-- **Location:** `backend/test/users/manual/evidences/TC-005-missing-required-field-fixed.png`
+- **Location:** `backend/test/modules/users/manual/evidences/TC-005-missing-required-field-fixed.png`
 - **Description:** Screenshot showing correct validation message for missing required fields
 - **Type:** Fixed HTTP response screenshot
 
@@ -267,13 +267,13 @@ The code was modified to:
 
 ### Bug Evidence (Original)
 - **File:** `BUG-009-login-non-existent-user.png`
-- **Location:** `backend/test/users/manual/evidences/BUG-009-login-non-existent-user.png`
+- **Location:** `backend/test/modules/users/manual/evidences/BUG-009-login-non-existent-user.png`
 - **Description:** Screenshot showing 404 response revealing user non-existence
 - **Type:** HTTP response security vulnerability screenshot
 
 ### Fix Evidence
 - **File:** `TC-009-login-non-existent-user.png` (Updated)
-- **Location:** `backend/test/users/manual/evidences/TC-009-login-non-existent-user.png`
+- **Location:** `backend/test/modules/users/manual/evidences/TC-009-login-non-existent-user.png`
 - **Description:** Screenshot showing correct 401 response with generic error message
 - **Type:** Fixed HTTP response security screenshot
 
@@ -372,13 +372,13 @@ The code was modified to:
 
 ### Bug Evidence (Original)
 - **File:** `BUG-008-login-incorrect-password.png`
-- **Location:** `backend/test/users/manual/bugs/BUG-008-login-incorrect-password.png`
+- **Location:** `backend/test/modules/users/manual/bugs/BUG-008-login-incorrect-password.png`
 - **Description:** Screenshot showing specific "Invalid password" error message
 - **Type:** HTTP response information disclosure screenshot
 
 ### Fix Evidence
 - **File:** `TC-008-login-incorrect-password.png` (Updated)
-- **Location:** `backend/test/users/manual/evidences/TC-008-login-incorrect-password.png`
+- **Location:** `backend/test/modules/users/manual/evidences/TC-008-login-incorrect-password.png`
 - **Description:** Screenshot showing correct generic "Invalid credentials" error message
 - **Type:** Fixed HTTP response security screenshot
 
