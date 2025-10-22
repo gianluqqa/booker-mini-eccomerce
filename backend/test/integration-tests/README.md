@@ -190,5 +190,5 @@ npm run test:debug
 ---
 
 **Creado por**: Gian Luca Caravone  
-**Fecha**: 14-10-2025  
+**Fecha**: 17-10-2025  
 **Versión**: 1.0

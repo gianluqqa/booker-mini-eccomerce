@@ -10,6 +10,9 @@ export class Book {
   @Column()
   title!: string;
 
+  @Column({ nullable: true })
+  image?: string;
+
   @Column()
   author!: string;
 
