@@ -31,6 +31,39 @@ This document provides a comprehensive summary of all testing activities for the
 - **Failed:** 0 ❌
 - **Success Rate:** 100%
 
+## 📁 Quick Access to Evidence
+
+### 🔧 Manual Testing
+- **[Main Manual Testing Report](./manual/unit-tests/user-manual-report.md)** - Complete summary of 12 manual tests
+- **[Manual Registration Tests](./manual/unit-tests/register-user-manual.md)** - Test cases TC-001 to TC-006
+- **[Manual Login Tests](./manual/unit-tests/login-user-manual.md)** - Test cases TC-007 to TC-012
+- **[Visual Evidence Folder](./manual/evidences/)** - Screenshots of all manual tests
+
+### 🤖 Automated Testing
+- **[Main Automated Testing Report](./automated/unit-tests/user-auto-report.md)** - Complete summary of 11 automated tests
+- **[Registration Test File](./automated/unit-tests/register-user-auto.test.ts)** - Automated tests AUTO-001 to AUTO-005
+- **[Login Test File](./automated/unit-tests/login-user-auto.test.ts)** - Automated tests AUTO-006 to AUTO-011
+- **[HTML Reports Folder](./automated/test-reports/)** - Test execution reports in HTML format
+- **[Test Documentation](./automated/documentation/)** - Detailed automated testing documentation
+
+### 🐛 Bug Reports
+- **[Main Bug Report](./manual/bugs/bugs-users-reports.md)** - Complete tracking of 4 bugs found and fixed
+- **[Bug Evidence Folder](./manual/bugs/)** - Screenshots of all reported bugs
+
+### 📊 Complete File Structure
+```
+📁 backend/test/modules/users/
+├── 📁 manual/
+│   ├── 📁 unit-tests/          # Manual testing reports
+│   ├── 📁 bugs/                # Bug reports and evidence
+│   └── 📁 evidences/           # Visual evidence (screenshots)
+├── 📁 automated/
+│   ├── 📁 unit-tests/          # Automated test files
+│   ├── 📁 test-reports/        # HTML execution reports
+│   └── 📁 documentation/       # Test documentation
+└── 📄 users-summary.md         # This comprehensive summary
+```
+
 ## Comprehensive Test Coverage Table
 
 | Test ID | Test Name | Type | Method | Status | Description | Evidence/File |
