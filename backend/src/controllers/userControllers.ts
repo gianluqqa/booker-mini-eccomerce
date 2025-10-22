@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { registerUserService, loginUserService } from "../services/userServices";
 import { LoginUserDTO, RegisterUserDTO } from "../dto/UserDto";
 
+//? Crear un nuevo usuario (POST).
 export const registerUserController = async (req: Request, res: Response) => {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
@@ -25,6 +26,7 @@ export const registerUserController = async (req: Request, res: Response) => {
   }
 };
 
+//? Iniciar sesión (POST).
 export const loginUserController = async (req: Request, res: Response) => {
   try {
     // 1️⃣ Validar que el body exista

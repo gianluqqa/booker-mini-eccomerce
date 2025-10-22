@@ -15,7 +15,8 @@
     "test:report:register": "node scripts/generate-test-report.js",
     "test:report:login": "node scripts/generate-login-test-report.js",
     "test:report:all": "node scripts/generate-all-test-reports.js",
-    "test:debug": "jest --detectOpenHandles --forceExit"
+    "test:debug": "jest --detectOpenHandles --forceExit",
+    "seed:books": "ts-node src/seeds/books.seed.ts"
   },
   "keywords": [],
   "author": "",
