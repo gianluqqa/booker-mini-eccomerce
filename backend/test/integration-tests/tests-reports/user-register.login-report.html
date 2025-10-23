@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test de Integración: Register + Login Flow</title>
+    <title>Integration Test: Register + Login Flow</title>
     <style>
         * {
             margin: 0;
@@ -171,52 +171,52 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><span class="emoji">🧪</span> Test de Integración: Register + Login Flow</h1>
-            <div class="status-badge">✅ PASÓ CON ÉXITO</div>
+            <h1><span class="emoji">🧪</span> Integration Test: Register + Login Flow</h1>
+            <div class="status-badge">✅ PASSED SUCCESSFULLY</div>
         </div>
         
         <div class="section">
-            <h2><span class="emoji">🎯</span> Objetivo</h2>
-            <p>Validar la integración entre los endpoints de registro (<code>/users/register</code>) y login (<code>/users/login</code>), asegurando que el flujo de creación e inicio de sesión funcione correctamente como un proceso continuo.</p>
+            <h2><span class="emoji">🎯</span> Objective</h2>
+            <p>Validate the integration between registration (<code>/users/register</code>) and login (<code>/users/login</code>) endpoints, ensuring that the user creation and authentication flow works correctly as a continuous process.</p>
         </div>
         
         <div class="section">
-            <h2><span class="emoji">📊</span> Métricas de Rendimiento</h2>
+            <h2><span class="emoji">📊</span> Performance Metrics</h2>
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="number">4</div>
-                    <div class="label">Tests Ejecutados</div>
+                    <div class="label">Tests Executed</div>
                 </div>
                 <div class="metric-card">
                     <div class="number">4</div>
-                    <div class="label">Tests Exitosos</div>
+                    <div class="label">Successful Tests</div>
                 </div>
                 <div class="metric-card">
                     <div class="number">0</div>
-                    <div class="label">Tests Fallidos</div>
+                    <div class="label">Failed Tests</div>
                 </div>
                 <div class="metric-card">
                     <div class="number">100%</div>
-                    <div class="label">Tasa de Éxito</div>
+                    <div class="label">Success Rate</div>
                 </div>
                 <div class="metric-card">
                     <div class="number">3.5s</div>
-                    <div class="label">Tiempo Total</div>
+                    <div class="label">Total Time</div>
                 </div>
                 <div class="metric-card">
                     <div class="number">92%</div>
-                    <div class="label">Cobertura</div>
+                    <div class="label">Coverage</div>
                 </div>
             </div>
         </div>
         
         <div class="section">
-            <h2><span class="emoji">🔍</span> Casos de Prueba Ejecutados</h2>
+            <h2><span class="emoji">🔍</span> Test Cases Executed</h2>
             
             <div class="test-case">
-                <h3>INT-001: Flujo Completo Exitoso ✅</h3>
-                <p><strong>Duración:</strong> 190ms</p>
-                <p><strong>Descripción:</strong> Registro de usuario nuevo → Login inmediato → Verificación de consistencia</p>
+                <h3>INT-001: Complete Successful Flow ✅</h3>
+                <p><strong>Duration:</strong> 190ms</p>
+                <p><strong>Description:</strong> New user registration → Immediate login → Consistency verification</p>
                 <div class="code-block">
 POST /users/register 201 95.884 ms - 295
 POST /users/login 200 64.759 ms - 295
@@ -225,9 +225,9 @@ POST /users/login 200 64.759 ms - 295
             </div>
             
             <div class="test-case">
-                <h3>INT-002: Flujo de Fallo ✅</h3>
-                <p><strong>Duración:</strong> 12ms</p>
-                <p><strong>Descripción:</strong> Registro con datos inválidos → Login con usuario inexistente</p>
+                <h3>INT-002: Failure Flow ✅</h3>
+                <p><strong>Duration:</strong> 12ms</p>
+                <p><strong>Description:</strong> Registration with invalid data → Login with non-existent user</p>
                 <div class="code-block">
 POST /users/register 400 0.791 ms - 77
 POST /users/login 400 0.579 ms - 37
@@ -236,9 +236,9 @@ POST /users/login 400 0.579 ms - 37
             </div>
             
             <div class="test-case">
-                <h3>INT-003: Múltiples Usuarios ✅</h3>
-                <p><strong>Duración:</strong> 319ms</p>
-                <p><strong>Descripción:</strong> Registro de 2 usuarios → Login con cada uno → Verificación de aislamiento</p>
+                <h3>INT-003: Multiple Users ✅</h3>
+                <p><strong>Duration:</strong> 319ms</p>
+                <p><strong>Description:</strong> Registration of 2 users → Login with each → Isolation verification</p>
                 <div class="code-block">
 ✅ User 1 registered successfully
 ✅ User 2 registered successfully
@@ -249,9 +249,9 @@ POST /users/login 400 0.579 ms - 37
             </div>
             
             <div class="test-case">
-                <h3>INT-004: Email Duplicado ✅</h3>
-                <p><strong>Duración:</strong> 197ms</p>
-                <p><strong>Descripción:</strong> Registro primer usuario → Intento duplicado → Verificación de prevención</p>
+                <h3>INT-004: Duplicate Email ✅</h3>
+                <p><strong>Duration:</strong> 197ms</p>
+                <p><strong>Description:</strong> First user registration → Duplicate attempt → Prevention verification</p>
                 <div class="code-block">
 POST /users/register 201 61.236 ms - 244
 POST /users/register 409 2.307 ms - 49
@@ -261,84 +261,84 @@ POST /users/register 409 2.307 ms - 49
         </div>
         
         <div class="section">
-            <h2><span class="emoji">✅</span> Resultados Esperados vs Obtenidos</h2>
+            <h2><span class="emoji">✅</span> Expected vs Actual Results</h2>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Expectativa</th>
-                        <th>Resultado</th>
-                        <th>Estado</th>
+                        <th>Expectation</th>
+                        <th>Result</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Registro exitoso (201)</td>
+                        <td>Successful registration (201)</td>
                         <td>✅ 201 Created</td>
-                        <td>✅ PASÓ</td>
+                        <td>✅ PASSED</td>
                     </tr>
                     <tr>
-                        <td>Login exitoso (200)</td>
+                        <td>Successful login (200)</td>
                         <td>✅ 200 OK</td>
-                        <td>✅ PASÓ</td>
+                        <td>✅ PASSED</td>
                     </tr>
                     <tr>
-                        <td>Datos consistentes</td>
-                        <td>✅ ID y datos coinciden</td>
-                        <td>✅ PASÓ</td>
+                        <td>Consistent data</td>
+                        <td>✅ ID and data match</td>
+                        <td>✅ PASSED</td>
                     </tr>
                     <tr>
-                        <td>Validación de errores</td>
-                        <td>✅ 400/409 apropiados</td>
-                        <td>✅ PASÓ</td>
+                        <td>Error validation</td>
+                        <td>✅ 400/409 appropriate</td>
+                        <td>✅ PASSED</td>
                     </tr>
                     <tr>
-                        <td>Aislamiento de usuarios</td>
-                        <td>✅ Sin interferencia</td>
-                        <td>✅ PASÓ</td>
+                        <td>User isolation</td>
+                        <td>✅ No interference</td>
+                        <td>✅ PASSED</td>
                     </tr>
                     <tr>
-                        <td>Prevención duplicados</td>
+                        <td>Duplicate prevention</td>
                         <td>✅ 409 Conflict</td>
-                        <td>✅ PASÓ</td>
+                        <td>✅ PASSED</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div class="section">
-            <h2><span class="emoji">🔒</span> Validaciones de Seguridad</h2>
+            <h2><span class="emoji">🔒</span> Security Validations</h2>
             <ul>
-                <li>✅ Contraseñas no expuestas en respuestas</li>
-                <li>✅ Mensajes de error genéricos para credenciales inválidas</li>
-                <li>✅ Validación de formato de email</li>
-                <li>✅ Validación de campos requeridos</li>
-                <li>✅ Prevención de emails duplicados</li>
+                <li>✅ Passwords not exposed in responses</li>
+                <li>✅ Generic error messages for invalid credentials</li>
+                <li>✅ Email format validation</li>
+                <li>✅ Required fields validation</li>
+                <li>✅ Duplicate email prevention</li>
             </ul>
         </div>
         
         <div class="section">
-            <h2><span class="emoji">📁</span> Archivos Generados</h2>
+            <h2><span class="emoji">📁</span> Generated Files</h2>
             <ul>
-                <li><code>user-register-login.test.ts</code> - Tests de integración</li>
-                <li><code>user-register-login-report.md</code> - Reporte en Markdown</li>
-                <li><code>integration-test-report.html</code> - Este reporte visual</li>
+                <li><code>user-register-login.test.ts</code> - Integration tests</li>
+                <li><code>user-register-login-report.md</code> - Markdown report</li>
+                <li><code>integration-test-report.html</code> - This visual report</li>
             </ul>
         </div>
         
         <div class="section">
-            <h2><span class="emoji">💻</span> Comandos de Ejecución</h2>
+            <h2><span class="emoji">💻</span> Execution Commands</h2>
             <div class="code-block">
-# Ejecutar tests de integración
+# Run integration tests
 npm run test:integration
 
-# Ver reporte HTML
+# View HTML report
 npm run test:report:integration
             </div>
         </div>
         
         <div class="footer">
-            <p><strong>Resultado:</strong> ✅ Pasó con éxito</p>
-            <p><strong>Fecha:</strong> 14/10/2025</p>
+            <p><strong>Result:</strong> ✅ Passed successfully</p>
+            <p><strong>Date:</strong> 14/10/2025</p>
             <p><strong>Tester:</strong> Gian Luca Caravone</p>
             <p><strong>Commit:</strong> feat/integration-tests-register-login</p>
         </div>

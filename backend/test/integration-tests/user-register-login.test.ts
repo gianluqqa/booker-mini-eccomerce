@@ -8,12 +8,6 @@ import { app } from "../../src/server";
  * 
  * Estos tests verifican que el flujo completo de registro y login
  * funcione correctamente como un proceso integrado.
- * 
- * ¿Qué hace diferente a un test de integración?
- * - Prueba FLUJOS COMPLETOS de usuario (no funciones individuales)
- * - Verifica que múltiples endpoints trabajen juntos
- * - Simula el comportamiento real de un usuario
- * - Detecta problemas de integración entre componentes
  */
 
 describe("Integration Tests: User Register + Login Flow", () => {

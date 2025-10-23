@@ -1,194 +1,114 @@
-# Tests de Integración - Proyecto Booker
+# Integration Tests - Booker Project
 
-## 🎯 ¿Qué son los Tests de Integración?
+## 🚀 How to Run Integration Tests
 
-Los **tests de integración** son pruebas que verifican que múltiples componentes del sistema funcionen correctamente **juntos**. A diferencia de los tests unitarios (que prueban funciones individuales), los tests de integración prueban **flujos completos** de usuario.
-
-### 🔄 Diferencia entre Tests Unitarios vs Tests de Integración
-
-| Aspecto | Tests Unitarios | Tests de Integración |
-|---------|----------------|---------------------|
-| **Alcance** | Una función/método | Múltiples componentes |
-| **Objetivo** | Verificar lógica individual | Verificar flujos completos |
-| **Datos** | Datos mockeados | Datos reales de base de datos |
-| **Velocidad** | Muy rápidos | Más lentos |
-| **Aislamiento** | Completamente aislados | Interactúan entre sí |
-
-## 📋 Tests de Integración Implementados
-
-### INT-001: Flujo Completo Exitoso
-**Objetivo**: Verificar que un usuario puede registrarse y luego hacer login exitosamente.
-
-**Pasos**:
-1. ✅ Registrar un usuario nuevo con datos válidos
-2. ✅ Hacer login con las credenciales del usuario registrado
-3. ✅ Verificar consistencia de datos entre register y login
-
-**¿Qué verifica?**:
-- Que el registro funciona correctamente
-- Que el login funciona con el usuario recién creado
-- Que los datos del usuario son consistentes
-- Que el ID del usuario es el mismo en ambos endpoints
-
-### INT-002: Flujo de Fallo
-**Objetivo**: Verificar que cuando el registro falla, el login también falla apropiadamente.
-
-**Pasos**:
-1. ✅ Intentar registro con datos inválidos (debe fallar)
-2. ✅ Intentar login con usuario que no existe (debe fallar)
-
-**¿Qué verifica?**:
-- Que la validación de datos funciona correctamente
-- Que no se pueden crear usuarios con datos inválidos
-- Que el sistema maneja apropiadamente usuarios inexistentes
-
-### INT-003: Múltiples Usuarios
-**Objetivo**: Verificar que el sistema puede manejar múltiples usuarios sin interferencia.
-
-**Pasos**:
-1. ✅ Registrar múltiples usuarios
-2. ✅ Hacer login con cada usuario
-3. ✅ Verificar que no hay interferencia entre usuarios
-
-**¿Qué verifica?**:
-- Que el sistema puede manejar múltiples usuarios
-- Que cada usuario mantiene sus datos separados
-- Que las credenciales mezcladas no funcionan
-
-### INT-004: Caso Edge: Email Duplicado
-**Objetivo**: Verificar el manejo de emails duplicados en el flujo completo.
-
-**Pasos**:
-1. ✅ Registrar primer usuario
-2. ✅ Intentar registrar segundo usuario con mismo email (debe fallar)
-3. ✅ Verificar que solo el primer usuario puede hacer login
-
-**¿Qué verifica?**:
-- Que el sistema previene emails duplicados
-- Que el primer usuario sigue siendo válido
-- Que el segundo usuario no puede hacer login
-
-## 🚀 Cómo Ejecutar los Tests de Integración
-
-### Opción 1: Ejecutar solo tests de integración
+### Run only integration tests
 ```bash
 npm run test:integration
 ```
 
-### Opción 2: Ejecutar todos los tests
+### Run all tests
 ```bash
 npm test
 ```
 
-### Opción 3: Ejecutar con cobertura
+### Run with coverage
 ```bash
 npm run test:coverage
 ```
 
-### Opción 4: Ejecutar en modo watch (desarrollo)
+### Run in watch mode (development)
 ```bash
 npm run test:watch
 ```
 
-## 📊 Resultados Esperados
+## 📋 Current Integration Tests
 
-Cuando ejecutes los tests de integración, deberías ver algo como esto:
+### User Management Tests
+- **User Registration & Login Flow**: Complete user journey from registration to authentication
+- **User Validation**: Data validation and error handling for user operations
+- **Multi-user Scenarios**: System behavior with multiple concurrent users
+- **Edge Cases**: Duplicate emails, invalid data, and boundary conditions
+
+### Future Integration Test Areas
+This directory is designed to accommodate additional integration tests as they are developed:
+- Book management integration tests
+- Cart and order flow tests
+- API endpoint integration tests
+- Performance and load tests
+
+## 📊 Expected Results
+
+When you run the integration tests, you should see output similar to this:
 
 ```
-Integration Tests: User Register + Login Flow
-  🚀 Starting integration test: Register → Login flow
-  📝 Step 1: Registering new user...
-  ✅ Registration successful
-  🔐 Step 2: Logging in with registered user...
-  ✅ Login successful
-  🔍 Step 3: Verifying data consistency...
-  ✅ Data consistency verified
-  🎉 Integration test completed successfully!
-  ✓ INT-001: should complete full user journey from registration to login (245ms)
+Integration Tests Suite
+  🚀 Starting integration tests...
 
-  🚀 Starting integration test: Failed Register → Login attempt
-  📝 Step 1: Attempting registration with invalid data...
-  ✅ Registration correctly failed
-  🔐 Step 2: Attempting login with non-existent user...
-  ✅ Login correctly failed
-  🎉 Integration test completed successfully!
-  ✓ INT-002: should handle failed registration and subsequent login failure (89ms)
+  User Management Tests
+  ✓ User registration and login flow (245ms)
+  ✓ User validation and error handling (89ms)
+  ✓ Multi-user scenarios (156ms)
+  ✓ Edge cases handling (78ms)
 
-  ... (más tests)
+  🎉 All integration tests completed successfully!
 ```
 
-## 🔧 Configuración Técnica
+## 🔧 Technical Configuration
 
-### Archivos Involucrados
-- `user-register-login.test.ts`: Tests de integración principales
-- `setup.ts`: Configuración de base de datos para tests
-- `package.json`: Scripts para ejecutar tests
+### Test Files Structure
+```
+integration-tests/
+├── user-register-login.test.ts    # User management tests
+├── documentation/                 # Test reports and documentation
+│   └── user-register-login-report.md
+├── tests-reports/                 # HTML test reports
+│   └── user-register.login-report.html
+├── README.md                      # This documentation
+└── [future test files]            # Additional tests as they are developed
+```
 
-### Base de Datos
-- Los tests usan la misma base de datos que el desarrollo
-- Se limpia automáticamente antes de cada test
-- Cada test usa emails únicos con timestamps
+### Database Configuration
+- Tests use the same database as development
+- Automatically cleaned before each test
+- Each test uses unique data with timestamps
+- Database state is reset between test suites
 
-### Dependencias
-- **Jest**: Framework de testing
-- **Supertest**: Para hacer requests HTTP a la API
-- **TypeORM**: Para interactuar con la base de datos
-
-## 🎓 Conceptos Clave Aprendidos
-
-### 1. **Flujo de Usuario Real**
-Los tests de integración simulan lo que hace un usuario real:
-- Registrarse en la aplicación
-- Hacer login inmediatamente después
-- Usar la aplicación normalmente
-
-### 2. **Verificación de Consistencia**
-No solo verificamos que cada endpoint funciona, sino que:
-- Los datos son consistentes entre endpoints
-- El ID del usuario es el mismo
-- La información se mantiene correcta
-
-### 3. **Manejo de Errores**
-Verificamos que los errores se manejan apropiadamente:
-- Registro fallido → Login fallido
-- Datos inválidos → Respuestas apropiadas
-- Emails duplicados → Prevención correcta
-
-### 4. **Aislamiento de Usuarios**
-Cada usuario debe ser independiente:
-- No pueden interferir entre sí
-- Sus credenciales son únicas
-- Sus datos están separados
+### Dependencies
+- **Jest**: Testing framework
+- **Supertest**: For making HTTP requests to the API
+- **TypeORM**: For database interaction
+- **Faker**: For generating test data
 
 ## 🚨 Troubleshooting
 
 ### Error: "Database connection failed"
 ```bash
-# Asegúrate de que la base de datos esté corriendo
+# Make sure the database is running
 npm run dev
 ```
 
 ### Error: "Port already in use"
 ```bash
-# Verifica que no haya otro proceso usando el puerto
+# Check if another process is using the port
 netstat -ano | findstr :3000
 ```
 
 ### Error: "Test timeout"
 ```bash
-# Ejecuta con más tiempo
+# Run with more time
 npm run test:debug
 ```
 
-## 📈 Próximos Pasos
+## 📈 Next Steps
 
-1. **Agregar más flujos**: Cart → Checkout
-2. **Tests de rendimiento**: Múltiples usuarios simultáneos
-3. **Tests de seguridad**: Validación de tokens JWT
-4. **Tests de API**: Documentación automática
+1. **Expand test coverage**: Add more integration scenarios as needed
+2. **Additional test modules**: Create new test files for different areas
+3. **Documentation**: Update this README as new tests are added
+4. **Test organization**: Maintain clear structure as the test suite grows
 
 ---
 
-**Creado por**: Gian Luca Caravone  
-**Fecha**: 17-10-2025  
-**Versión**: 1.0
+**Created by**: Gian Luca Caravone  
+**Date**: 17-10-2025  
+**Version**: 1.0
