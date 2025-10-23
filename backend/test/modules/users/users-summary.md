@@ -6,20 +6,20 @@ This document provides a comprehensive summary of all testing activities for the
 ## Test Execution Summary
 
 ### Overall Statistics
-- **Total Test Cases:** 23
-- **Manual Tests:** 12 (TC-001 to TC-012)
+- **Total Test Cases:** 24
+- **Manual Tests:** 13 (TC-001 to TC-013)
 - **Automated Tests:** 11 (AUTO-001 to AUTO-011)
-- **Total Passed:** 23 ✅
+- **Total Passed:** 24 ✅
 - **Total Failed:** 0 ❌
 - **Success Rate:** 100%
-- **Bugs Found:** 4
-- **Bugs Fixed:** 4
+- **Bugs Found:** 5
+- **Bugs Fixed:** 5
 
 ### Manual Testing Summary
-- **Total Test Cases:** 12
-- **Registration Tests:** 6 (TC-001 to TC-006)
+- **Total Test Cases:** 13
+- **Registration Tests:** 7 (TC-001 to TC-006, TC-013)
 - **Login Tests:** 6 (TC-007 to TC-012)
-- **Passed:** 12 ✅
+- **Passed:** 13 ✅
 - **Failed:** 0 ❌
 - **Success Rate:** 100%
 
@@ -34,8 +34,8 @@ This document provides a comprehensive summary of all testing activities for the
 ## 📁 Quick Access to Evidence
 
 ### 🔧 Manual Testing
-- **[Main Manual Testing Report](./manual/unit-tests/user-manual-report.md)** - Complete summary of 12 manual tests
-- **[Manual Registration Tests](./manual/unit-tests/register-user-manual.md)** - Test cases TC-001 to TC-006
+- **[Main Manual Testing Report](./manual/unit-tests/user-manual-report.md)** - Complete summary of 13 manual tests
+- **[Manual Registration Tests](./manual/unit-tests/register-user-manual.md)** - Test cases TC-001 to TC-006, TC-013
 - **[Manual Login Tests](./manual/unit-tests/login-user-manual.md)** - Test cases TC-007 to TC-012
 - **[Visual Evidence Folder](./manual/evidences/)** - Screenshots of all manual tests
 
@@ -47,7 +47,7 @@ This document provides a comprehensive summary of all testing activities for the
 - **[Test Documentation](./automated/documentation/)** - Detailed automated testing documentation
 
 ### 🐛 Bug Reports
-- **[Main Bug Report](./manual/bugs/bugs-users-reports.md)** - Complete tracking of 4 bugs found and fixed
+- **[Main Bug Report](./manual/bugs/bugs-users-reports.md)** - Complete tracking of 5 bugs found and fixed
 - **[Bug Evidence Folder](./manual/bugs/)** - Screenshots of all reported bugs
 
 ### 📊 Complete File Structure
@@ -80,6 +80,7 @@ This document provides a comprehensive summary of all testing activities for the
 | **TC-010** | Login with Missing Email | Login | Manual | ✅ PASS | Verify rejection when email field is missing | `TC-010-login-missing-email.png` |
 | **TC-011** | Login with Missing Password | Login | Manual | ✅ PASS | Verify rejection when password field is missing | `TC-011-login-missing-password.png` |
 | **TC-012** | Login with Invalid Email Format | Login | Manual | ✅ PASS | Verify rejection of invalid email format | `TC-012-login-invalid-email-format.png` |
+| **TC-013** | Successful Admin User Registration | Registration | Manual | ✅ PASS | Verify successful admin user registration with role assignment | `TC-013-admin-registration-succes.png` |
 | **AUTO-001** | Successful New User Registration | Registration | Automated | ✅ PASS | Verify successful registration with unique email | `register-user-auto.test.ts` |
 | **AUTO-002** | Reject Duplicate Email | Registration | Automated | ✅ PASS | Verify system rejects duplicate email registration | `register-user-auto.test.ts` |
 | **AUTO-003** | Reject Incomplete Data | Registration | Automated | ✅ PASS | Verify system rejects missing required fields | `register-user-auto.test.ts` |
@@ -100,14 +101,35 @@ This document provides a comprehensive summary of all testing activities for the
 | **BUG-005** | Registration with missing required fields returns technical error | Medium | High | ✅ FIXED | 2025-10-14 | TC-005 | `BUG-005-missing-required-field.png` | Poor user experience with unclear error messages |
 | **BUG-008** | Login with incorrect password reveals specific error message | High | Critical | ✅ FIXED | 2025-10-16 | TC-008 | `BUG-008-login-incorrect-password.png` | Security vulnerability - information disclosure |
 | **BUG-009** | Login with non-existent user reveals user existence | High | Critical | ✅ FIXED | 2025-10-16 | TC-009 | `BUG-009-login-non-existent-user.png` | Security vulnerability - user enumeration attack |
+| **BUG-013** | User registration ignores role field and always assigns "customer" role | High | High | ✅ FIXED | 2025-10-23 | TC-013 | `BUG-013-registration-ignores-role-admin.png` | Functional issue - role-based access control broken |
 
 ### Bug Resolution Summary
-- **Total Bugs Found:** 4
-- **Bugs Fixed:** 4 (100% resolution rate)
+- **Total Bugs Found:** 5
+- **Bugs Fixed:** 5 (100% resolution rate)
 - **Critical Security Issues:** 2 (BUG-008, BUG-009)
-- **Functional Issues:** 2 (BUG-002, BUG-005)
+- **Functional Issues:** 3 (BUG-002, BUG-005, BUG-013)
 - **Average Fix Time:** 2 days
 - **Security Improvements:** Implemented generic error messages to prevent information disclosure
+- **Role-Based Access Control:** Fixed admin user creation functionality
+
+## Recent Updates (October 2025)
+
+### 🔧 Code Improvements
+- **Role Assignment Fix:** Fixed user registration to properly handle admin role assignment
+- **DTO Enhancement:** Added `role` field to `RegisterUserDTO` interface
+- **Validation Updates:** Added role validation in middleware
+- **Service Logic:** Updated user service to respect role from request
+
+### 📝 Documentation Updates
+- **Test Cases:** Added TC-013 for admin user registration testing
+- **Bug Reports:** Added BUG-013 for role assignment issue
+- **Translation:** Converted all manual test documentation to English
+- **Evidence:** Updated with new screenshots and test results
+
+### 🐛 Bug Fixes
+- **BUG-013:** User registration now properly assigns admin role when requested
+- **Role Validation:** Added validation for valid role values (customer/admin)
+- **Type Safety:** Improved TypeScript typing with UserRole enum
 
 ## Comprehensive Test Coverage Analysis
 
@@ -115,6 +137,8 @@ This document provides a comprehensive summary of all testing activities for the
 - ✅ **User Registration System**
   - New user creation with complete data
   - New user creation with minimal required data
+  - Admin user creation with role assignment
+  - Customer user creation (default role)
   - Duplicate email prevention
   - Email format validation
   - Password strength validation
@@ -209,7 +233,8 @@ backend/test/modules/users/
 │   │   ├── BUG-002-duplicate-email.png    # Bug evidence
 │   │   ├── BUG-005-missing-required-field.png
 │   │   ├── BUG-008-login-incorrect-password.png
-│   │   └── BUG-009-login-non-existent-user.png
+│   │   ├── BUG-009-login-non-existent-user.png
+│   │   └── BUG-013-registration-ignores-role-admin.png
 │   └── evidences/
 │       ├── TC-001-register-succesfully.png
 │       ├── TC-002-duplicate-email-fixed.png
@@ -222,7 +247,8 @@ backend/test/modules/users/
 │       ├── TC-009-login-non-existent-user.png
 │       ├── TC-010-login-missing-email.png
 │       ├── TC-011-login-missing-password.png
-│       └── TC-012-login-invalid-email-format.png
+│       ├── TC-012-login-invalid-email-format.png
+│       └── TC-013-admin-registration-succes.png
 ├── automated/
 │   ├── unit-tests/
 │   │   ├── register-user-auto.test.ts     # Registration automated tests (AUTO-001 to AUTO-005)

@@ -2,9 +2,9 @@
 
 ## Objective
 
-Este documento contiene los casos de prueba manuales para el módulo de usuarios, específicamente enfocado en el proceso de registro de nuevos usuarios. El objetivo es validar que el sistema maneje correctamente diferentes escenarios de registro, incluyendo casos exitosos, validaciones de datos duplicados y formatos de email inválidos.
+This document contains the manual test cases for the users module, specifically focused on the new user registration process. The objective is to validate that the system correctly handles different registration scenarios, including successful cases, duplicate data validations, and invalid email formats.
 
-## TC-001: Successful new user registration
+## TC-001: Successful new user registration (Customer Role)
 
 **Date:** 08-10-2025
 **Tester:** Gian Luca Caravone  
@@ -13,7 +13,7 @@ Este documento contiene los casos de prueba manuales para el módulo de usuarios
 
 ### Description
 
-Verifica el registro exitoso de un nuevo usuario con datos válidos.
+Verifies the successful registration of a new user with valid data and customer role (default).
 
 ### Prerequisites
 
@@ -23,7 +23,7 @@ Verifica el registro exitoso de un nuevo usuario con datos válidos.
 ### Execution Steps
 
 1. Send POST request to `http://localhost:5000/users/register`
-2. Include JSON body with valid user data
+2. Include JSON body with valid user data (without role field)
 3. Verify server response
 
 ### Test Data
@@ -46,7 +46,7 @@ Verifica el registro exitoso de un nuevo usuario con datos válidos.
 
 - Status Code: 201 Created
 - User created with unique ID
-- Role assigned as "customer"
+- Role assigned as "customer" (default)
 - Password not included in response
 
 ### Actual Result
@@ -79,6 +79,7 @@ Verifica el registro exitoso de un nuevo usuario con datos válidos.
 - Field validations work correctly
 - Security implemented (hashed password)
 - Optional fields handled appropriately
+- Default role assignment works correctly
 
 ### Evidence
 
@@ -94,7 +95,7 @@ Verifica el registro exitoso de un nuevo usuario con datos válidos.
 
 ### Description
 
-Valida el manejo de emails duplicados durante el registro.
+Validates the handling of duplicate emails during registration.
 
 ### Prerequisites
 
@@ -172,7 +173,7 @@ Valida el manejo de emails duplicados durante el registro.
 
 ### Description
 
-Verifica la validación de formato de email inválido.
+Verifies the validation of invalid email format.
 
 ### Prerequisites
 
@@ -242,7 +243,7 @@ Verifica la validación de formato de email inválido.
 
 ### Description
 
-Valida la integridad de contraseñas ingresadas por el usuario cuando no coinciden.
+Validates the integrity of passwords entered by the user when they do not match.
 
 ### Prerequisites
 
@@ -294,9 +295,9 @@ Valida la integridad de contraseñas ingresadas por el usuario cuando no coincid
 
 ### Observations
 
-- El endpoint devuelve 400 Bad Request ante errores de validación (por ejemplo, contraseñas que no coinciden)
-- En un entorno de producción más formal, podría refinarse a 422 Unprocessable Entity, pero para esta demo se prioriza la simplicidad y la claridad del flujo de pruebas
-- Evita registros defectuosos y reduce tickets de soporte
+- The endpoint returns 400 Bad Request for validation errors (e.g., passwords that do not match)
+- In a more formal production environment, it could be refined to 422 Unprocessable Entity, but for this demo simplicity and clarity of the test flow is prioritized
+- Prevents faulty registrations and reduces support tickets
 
 ### Evidence
 
@@ -312,7 +313,7 @@ Valida la integridad de contraseñas ingresadas por el usuario cuando no coincid
 
 ### Description
 
-Valida el manejo de campos requeridos faltantes durante el registro.
+Validates the handling of missing required fields during registration.
 
 ### Prerequisites
 
@@ -370,10 +371,10 @@ Valida el manejo de campos requeridos faltantes durante el registro.
 
 ### Observations
 
-- El endpoint ahora devuelve 400 Bad Request con un mensaje de validación claro y user-friendly
-- El mensaje indica específicamente qué campos son requeridos
-- La validación se ejecuta correctamente antes del procesamiento de la solicitud
-- Bug original exitosamente corregido
+- The endpoint now returns 400 Bad Request with a clear and user-friendly validation message
+- The message specifically indicates which fields are required
+- Validation executes correctly before processing the request
+- Original bug successfully fixed
 
 ### Evidence
 
@@ -391,7 +392,7 @@ Valida el manejo de campos requeridos faltantes durante el registro.
 
 ### Description
 
-Valida las políticas de seguridad mínimas para contraseñas (longitud, mayúsculas, números).
+Validates minimum security policies for passwords (length, uppercase, numbers).
 
 ### Prerequisites
 
@@ -443,14 +444,103 @@ Valida las políticas de seguridad mínimas para contraseñas (longitud, mayúsc
 
 ### Observations
 
-- La validación de contraseñas funciona correctamente
-- El endpoint devuelve 400 Bad Request con el mensaje de validación específico para contraseñas débiles
-- Las políticas de seguridad de contraseñas se están aplicando correctamente
-- El mensaje de error es claro y específico sobre los requisitos de la contraseña
+- Password validation works correctly
+- The endpoint returns 400 Bad Request with specific validation message for weak passwords
+- Password security policies are being applied correctly
+- The error message is clear and specific about password requirements
 
 ### Evidence
 
 - **File:** `TC-006-weak-password-validation.png`
 - **Location:** `evidences/TC-006-weak-password-validation.png`
+
+## TC-013: Successful new user registration (Admin Role)
+
+**Date:** 23-10-2025
+**Tester:** Gian Luca Caravone  
+**Priority:** High
+**Module:** Users - Registration
+
+### Description
+
+Verifies the successful registration of a new user with valid data and admin role.
+
+### Prerequisites
+
+- Backend server running on port 5000
+- Database connected and functioning
+
+### Execution Steps
+
+1. Send POST request to `http://localhost:5000/users/register`
+2. Include JSON body with valid user data including `"role": "admin"`
+3. Verify server response
+
+### Test Data
+
+```json
+{
+  "email": "admin@example.com",
+  "password": "StrongPass123",
+  "confirmPassword": "StrongPass123",
+  "name": "Admin User",
+  "surname": "Test",
+  "address": "123 Main Street",
+  "country": "Argentina",
+  "city": "Buenos Aires",
+  "phone": "541112345678",
+  "role": "admin"
+}
+```
+
+### Expected Result
+
+- Status Code: 201 Created
+- User created with unique ID
+- Role assigned as "admin" (from request)
+- Password not included in response
+
+### Actual Result
+
+- **Status Code:** 201 Created ✅
+- **Response Body:**
+
+```json
+{
+  "email": "admin@example.com",
+  "name": "Admin User",
+  "surname": "Test",
+  "address": "123 Main Street",
+  "country": "Argentina",
+  "city": "Buenos Aires",
+  "phone": "541112345678",
+  "id": 338,
+  "role": "admin",
+  "createdAt": "2025-10-23T03:07:44.054Z",
+  "updatedAt": "2025-10-23T03:07:44.054Z"
+}
+```
+
+### Result
+
+**✅ PASS** - Test executed successfully after bug fix
+
+### Correction History
+
+- **23-10-2025 (Initial):** User created with "customer" role despite requesting "admin" ❌
+- **23-10-2025 (Fixed):** User created with "admin" role as requested ✅
+- **Bug reported in:** BUG-013-registration-ignores-role-admin.png
+
+### Observations
+
+- Role assignment now works correctly
+- Admin users can be created through the API
+- Role-based access control is now functional
+- Bug BUG-013 successfully fixed
+
+### Evidence
+
+- **File:** `TC-013-admin-registration-succes.png`
+- **Location:** `evidences/TC-013-admin-registration-succes.png`
 
 

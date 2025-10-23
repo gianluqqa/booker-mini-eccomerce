@@ -2,18 +2,18 @@
 
 ## Objective
 
-Este documento contiene los casos de prueba manuales para el módulo de usuarios, específicamente enfocado en el proceso de login de usuarios existentes. El objetivo es validar que el sistema maneje correctamente diferentes escenarios de autenticación, incluyendo casos exitosos, credenciales inválidas y validaciones de datos.
+This document contains the manual test cases for the users module, specifically focused on the login process for existing users. The objective is to validate that the system correctly handles different authentication scenarios, including successful cases, invalid credentials, and data validations.
 
 ## TC-007: Successful user login
 
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users (Login)
+**Module:** Login - (Users Module)
 
 ### Description
 
-Verifica el login exitoso de un usuario existente con credenciales válidas.
+Verifies the successful login of an existing user with valid credentials.
 
 ### Prerequisites
 
@@ -86,11 +86,11 @@ Verifica el login exitoso de un usuario existente con credenciales válidas.
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users (Login)
+**Module:** Login - (Users Module)
 
 ### Description
 
-Verifica que el sistema rechace correctamente intentos de login con contraseña incorrecta para un usuario existente.
+Verifies that the system correctly rejects login attempts with incorrect password for an existing user.
 
 ### Prerequisites
 
@@ -160,11 +160,11 @@ Verifica que el sistema rechace correctamente intentos de login con contraseña 
 **Date:** 14-10-2025
 **Tester:** Gian Luca Caravone  
 **Priority:** High
-**Module:** Users (Login)
+**Module:** Login - (Users Module)
 
 ### Description
 
-Verifica que el sistema rechace correctamente intentos de login con un email que no existe en la base de datos.
+Verifies that the system correctly rejects login attempts with an email that does not exist in the database.
 
 ### Prerequisites
 
@@ -237,7 +237,7 @@ Verifica que el sistema rechace correctamente intentos de login con un email que
 
 ### Description
 
-Verifica que el sistema rechace correctamente intentos de login cuando falta el campo email en la petición.
+Verifies that the system correctly rejects login attempts when the email field is missing from the request.
 
 ### Prerequisites
 
@@ -301,7 +301,7 @@ Verifica que el sistema rechace correctamente intentos de login cuando falta el 
 
 ### Description
 
-Verifica que el sistema rechace correctamente intentos de login cuando falta el campo password en la petición.
+Verifies that the system correctly rejects login attempts when the password field is missing from the request.
 
 ### Prerequisites
 
@@ -365,7 +365,7 @@ Verifica que el sistema rechace correctamente intentos de login cuando falta el 
 
 ### Description
 
-Verifica que el sistema rechace correctamente intentos de login con formato de email inválido.
+Verifies that the system correctly rejects login attempts with invalid email format.
 
 ### Prerequisites
 
