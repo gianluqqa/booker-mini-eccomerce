@@ -90,7 +90,7 @@ npm test -- --testNamePattern="AUTO-006: should login user successfully with val
 
 **📊 AUTO-006 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/login-test-report.html`
 - **Content:** Complete test execution details, response data, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -155,7 +155,7 @@ npm test -- --testNamePattern="AUTO-007: should reject login with incorrect pass
 
 **📊 AUTO-007 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/login-test-report.html`
 - **Content:** Complete test execution details, HTTP responses, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -220,7 +220,7 @@ npm test -- --testNamePattern="AUTO-008: should reject login with non-existent u
 
 **📊 AUTO-008 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/login-test-report.html`
 - **Content:** Complete test execution details, HTTP responses, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -285,7 +285,7 @@ npm test -- --testNamePattern="AUTO-009: should reject login with missing email"
 
 **📊 AUTO-009 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/login-test-report.html`
 - **Content:** Complete test execution details, validation errors, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -350,7 +350,7 @@ npm test -- --testNamePattern="AUTO-010: should reject login with missing passwo
 
 **📊 AUTO-010 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/login-test-report.html`
 - **Content:** Complete test execution details, validation errors, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -415,8 +415,71 @@ npm test -- --testNamePattern="AUTO-011: should reject login with invalid email 
 
 **📊 AUTO-011 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/login-test-report.html`
 - **Content:** Complete test execution details, validation errors, and timing
+- **Access:** Open in browser for full interactive experience
+
+## AUTO-012: Successful admin user login
+
+**Date:** 16-10-2025
+**Type:** Automated Test  
+**Priority:** High  
+**File:** `login-user-auto.test.ts`
+**Endpoint:** `POST /users/login`
+**Base URL:** `http://localhost:5000`
+
+### Test Description
+
+Verifies that a user with the 'admin' role can successfully authenticate through the API endpoint, ensuring role-based login works correctly.
+
+### Test Data
+
+```json
+{
+  "email": "login-admin-[timestamp]@example.com",
+  "password": "AdminStrongPass123"
+}
+```
+
+### Expected Result
+
+- **Status Code:** 200 OK
+- **Response:** User object with `role: "admin"`
+
+### Execution
+
+```bash
+npm test -- --testNamePattern="AUTO-012: should login an admin user successfully"
+```
+
+**API Call Details:**
+- **Method:** POST
+- **URL:** `http://localhost:5000/users/login`
+- **Headers:** `Content-Type: application/json`
+- **Body:** JSON with admin user login credentials
+
+### Test Results
+
+**✅ PASS** - Test executed successfully
+
+- **Execution Time:** ~150 ms
+- **Status Code:** 200 OK
+- **Response:** User object returned with `role: "admin"`
+
+### Test Status
+
+**✅ PASS** - Admin user login successful
+
+- **Authentication:** Admin user authenticated successfully.
+- **Role Verification:** User role correctly returned as 'admin'.
+- **Security:** Sensitive data (password) properly excluded from response.
+
+### Evidence
+
+**📊 AUTO-012 Test Evidence:**
+
+- **File:** `test-reports/login-test-report.html`
+- **Content:** Complete test execution details, response data, and timing
 - **Access:** Open in browser for full interactive experience
 
 ## Test Suite Summary
@@ -430,11 +493,12 @@ The login test suite provides comprehensive coverage of:
 - ✅ **User Enumeration Prevention:** Non-existent user handling with generic error messages
 - ✅ **Input Validation:** Required fields validation (email and password)
 - ✅ **Format Validation:** Email format validation
+- ✅ **Role-Based Login:** Successful login for 'admin' role
 - ✅ **Security Best Practices:** Generic error messages and proper HTTP status codes
 
 ### Performance Metrics
 
-- **Total Tests:** 6 automated tests
+- **Total Tests:** 7 automated tests
 - **Execution Time:** ~4-5 seconds per test suite
 - **Success Rate:** 100% (all tests passing)
 - **Coverage:** Complete login flow validation

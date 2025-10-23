@@ -7,6 +7,7 @@ The objective of this automated test suite is to validate the user registration 
 - New users can successfully register with valid data
 - The system properly validates input data and rejects invalid information
 - Database operations are performed correctly
+- Users can be registered with specific roles (e.g., admin)
 - API responses follow HTTP standards
 - Error handling works as expected for various edge cases
 
@@ -90,7 +91,7 @@ npm test -- --testNamePattern="AUTO-001: should create a new user successfully"
 
 **📊 AUTO-001 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/register-test-report.html`
 - **Content:** Complete test execution details, response data, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -159,7 +160,7 @@ npm test -- --testNamePattern="AUTO-002: should reject duplicate email"
 
 **📊 AUTO-002 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/register-test-report.html`
 - **Content:** Complete test execution details, HTTP responses, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -224,7 +225,7 @@ npm test -- --testNamePattern="AUTO-003: should reject incomplete data"
 
 **📊 AUTO-003 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/register-test-report.html`
 - **Content:** Complete test execution details, validation errors, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -292,7 +293,7 @@ npm test -- --testNamePattern="AUTO-004: should reject invalid email format"
 
 **📊 AUTO-004 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/register-test-report.html`
 - **Content:** Complete test execution details, validation errors, and timing
 - **Access:** Open in browser for full interactive experience
 
@@ -357,11 +358,78 @@ npm test -- --testNamePattern="AUTO-005: should reject mismatched passwords"
 - **Security:** Ensures password accuracy during registration
 
 ### Evidence
-
 **📊 AUTO-005 Test Evidence:**
 
-- **File:** `test-reports/users-test-report.html`
+- **File:** `test-reports/register-test-report.html`
 - **Content:** Complete test execution details, validation errors, and timing
+- **Access:** Open in browser for full interactive experience
+
+## AUTO-006: Allow creating a user with admin role (TC-013)
+
+**Date:** 16-10-2025
+**Type:** Automated Test  
+**Priority:** High  
+**File:** `register-user-auto.test.ts`
+**Endpoint:** `POST /users/register`
+**Base URL:** `http://localhost:5000`
+
+### Test Description
+
+Verifies that the system allows creating a user with the 'admin' role through the API endpoint, ensuring role assignment functionality.
+
+### Test Data
+
+```json
+{
+  "email": "admin-[timestamp]@example.com",
+  "password": "AdminPassword123",
+  "confirmPassword": "AdminPassword123",
+  "name": "Admin",
+  "surname": "User",
+  "role": "admin"
+}
+```
+
+### Expected Result
+
+- **Status Code:** 201 Created
+- **Response:** User object with `role: "admin"`
+- **Database:** New user record created with `admin` role
+
+### Execution
+
+```bash
+npm test -- --testNamePattern="AUTO-006: should allow creating a user with admin role"
+```
+
+**API Call Details:**
+- **Method:** POST
+- **URL:** `http://localhost:5000/users/register`
+- **Headers:** `Content-Type: application/json`
+- **Body:** JSON with admin user registration data
+
+### Test Results
+
+**✅ PASS** - Test executed successfully
+
+- **Execution Time:** ~125 ms
+- **Status Code:** 201 Created
+- **Response:** User object with `role: "admin"`
+
+### Test Status
+
+**✅ PASS** - Admin user registration successful
+
+- **Response:** User object returned with `admin` role
+- **Database:** New user record created with `admin` role
+- **Role Assignment:** Admin role correctly assigned
+
+### Evidence
+
+**📊 AUTO-006 Test Evidence:**
+
+- **File:** `test-reports/register-test-report.html`
+- **Content:** Complete test execution details, response data, and timing
 - **Access:** Open in browser for full interactive experience
 
 ## Test Suite Summary
@@ -375,10 +443,11 @@ The registration test suite provides comprehensive coverage of:
 - ✅ **Data Validation:** Required fields validation
 - ✅ **Format Validation:** Email format validation
 - ✅ **Password Security:** Password confirmation matching
+- ✅ **Role Assignment:** Admin user registration
 
 ### Performance Metrics
 
-- **Total Tests:** 5 automated tests
+- **Total Tests:** 6 automated tests
 - **Execution Time:** ~4-5 seconds per test suite
 - **Success Rate:** 100% (all tests passing)
 - **Coverage:** Complete registration flow validation
@@ -389,4 +458,3 @@ The registration test suite provides comprehensive coverage of:
 - **Data Integrity:** Password confirmation and email uniqueness
 - **Error Handling:** Proper HTTP status codes and error messages
 - **Database Security:** No invalid or incomplete records created
-
