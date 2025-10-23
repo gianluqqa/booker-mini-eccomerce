@@ -1,4 +1,5 @@
 import { LoginUserDTO, RegisterUserDTO } from "../dto/UserDto";
+import { UserRole } from "../enums/UserRole";
 
 export const validateRegisterUser = (user: RegisterUserDTO) => {
   const errors: string[] = [];
@@ -13,6 +14,7 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     country,
     city,
     phone,
+    role,
   } = user;
 
   // Email validation
@@ -56,6 +58,11 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     errors.push("Country must be at least 2 characters long");
   if (city && city.length < 2)
     errors.push("City must be at least 2 characters long");
+
+  // Role validation
+  if (role && !Object.values(UserRole).includes(role as UserRole)) {
+    errors.push("Role must be either 'customer' or 'admin'");
+  }
 
   return errors;
 };

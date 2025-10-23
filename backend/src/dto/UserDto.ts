@@ -16,6 +16,7 @@ export interface RegisterUserDTO {
   country?: string;
   city?: string;
   phone?: string;
+  role?: string;
 }
 
 export interface LoginUserDTO {

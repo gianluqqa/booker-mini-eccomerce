@@ -2,6 +2,7 @@ import { LoginUserDTO, RegisterUserDTO } from "../dto/UserDto";
 import { validateLoginUser, validateRegisterUser } from "../middlewares/validateUser";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
+import { UserRole } from "../enums/UserRole";
 import bcrypt from "bcrypt";
 
 export const registerUserService = async (user: RegisterUserDTO) => {
@@ -45,6 +46,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
     country: user.country ?? null,
     city: user.city ?? null,
     phone: user.phone ?? null,
+    role: (user.role as UserRole) ?? UserRole.CUSTOMER, // Usar el rol del request o CUSTOMER por defecto
   });
 
   await userRepo.save(newUser);
