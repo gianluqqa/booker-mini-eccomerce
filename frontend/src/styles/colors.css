@@ -1,0 +1,41 @@
+/* Paleta de colores de Booker */
+:root {
+  /* Colores principales */
+  --booker-beige: #f5efe1;
+  --booker-green: #2e4b30;
+  --booker-green-dark: #1a3a1c;
+  --booker-green-light: #3d5a3f;
+  
+  /* Colores de acento */
+  --booker-accent: #4a6b4d;
+  --booker-muted: #6b7c6d;
+  
+  /* Colores de estado */
+  --booker-success: #22c55e;
+  --booker-warning: #f59e0b;
+  --booker-error: #ef4444;
+  --booker-info: #3b82f6;
+  
+  /* Transparencias */
+  --booker-beige-10: rgba(245, 239, 225, 0.1);
+  --booker-beige-20: rgba(245, 239, 225, 0.2);
+  --booker-beige-50: rgba(245, 239, 225, 0.5);
+  --booker-beige-80: rgba(245, 239, 225, 0.8);
+  
+  --booker-green-10: rgba(46, 75, 48, 0.1);
+  --booker-green-20: rgba(46, 75, 48, 0.2);
+  --booker-green-50: rgba(46, 75, 48, 0.5);
+  --booker-green-80: rgba(46, 75, 48, 0.8);
+}
+
+/* Clases de utilidad para colores */
+.bg-booker-beige { background-color: var(--booker-beige); }
+.bg-booker-green { background-color: var(--booker-green); }
+.bg-booker-green-dark { background-color: var(--booker-green-dark); }
+
+.text-booker-beige { color: var(--booker-beige); }
+.text-booker-green { color: var(--booker-green); }
+.text-booker-green-dark { color: var(--booker-green-dark); }
+
+.border-booker-beige { border-color: var(--booker-beige); }
+.border-booker-green { border-color: var(--booker-green); }
