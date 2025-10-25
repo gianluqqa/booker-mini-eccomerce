@@ -8,6 +8,7 @@ const booksData: IBook[] = [
       price: 10.99,
       stock: 100,
       image: "https://images.cdn2.buscalibre.com/fit-in/360x360/43/b3/43b37a982ff4b3fdefeb3fa969de1149.jpg",
+      genre: "Classic Literature",
     },
     {
       id: "2",
@@ -16,6 +17,7 @@ const booksData: IBook[] = [
       price: 12.99,
       stock: 85,
       image: "https://images.cdn1.buscalibre.com/fit-in/360x360/ab/54/ab54a82815e061d7fc8f22bcd22f2605.jpg",
+      genre: "Dystopian Fiction",
     },
     {
       id: "3",
@@ -24,6 +26,7 @@ const booksData: IBook[] = [
       price: 11.50,
       stock: 120,
       image: "https://images.cdn1.buscalibre.com/fit-in/360x360/f6/b6/f6b6a354bbc07e0791081e6e988e0efe.jpg",
+      genre: "Classic Literature",
     },
     {
       id: "4",
@@ -32,6 +35,7 @@ const booksData: IBook[] = [
       price: 9.99,
       stock: 90,
       image: "https://images.cdn2.buscalibre.com/fit-in/360x360/65/13/65137ebf9c785c28053642d321c89209.jpg",
+      genre: "Romance",
     },
     {
       id: "5",
@@ -40,6 +44,7 @@ const booksData: IBook[] = [
       price: 13.25,
       stock: 75,
       image: "https://images.cdn1.buscalibre.com/fit-in/360x360/60/29/60297e36593e7322bdab153d11c5ed95.jpg",
+      genre: "Coming-of-Age",
     },
     {
       id: "6",
@@ -48,6 +53,7 @@ const booksData: IBook[] = [
       price: 15.99,
       stock: 60,
       image: "https://images.cdn3.buscalibre.com/fit-in/360x360/2c/c8/2cc8d8b40389605434add789a1fc055d.jpg",
+      genre: "Fantasy",
     },
     {
       id: "7",
@@ -56,6 +62,7 @@ const booksData: IBook[] = [
       price: 14.99,
       stock: 200,
       image: "https://images.cdn3.buscalibre.com/fit-in/360x360/10/9d/109df8e47c0b36b888ea2be18a4ce3e5.jpg",
+      genre: "Fantasy",
     },
     {
       id: "8",
@@ -64,6 +71,7 @@ const booksData: IBook[] = [
       price: 12.75,
       stock: 95,
       image: "https://images.cdn1.buscalibre.com/fit-in/360x360/45/44/4544aa9e50feca33c58b1d4646f34b2f.jpg",
+      genre: "Fantasy",
     },
     {
       id: "9",
@@ -72,6 +80,7 @@ const booksData: IBook[] = [
       price: 11.99,
       stock: 110,
       image: "https://images.cdn1.buscalibre.com/fit-in/360x360/3e/b7/3eb7fa1d683c5ef60c2e6cc56ce8d40d.jpg",
+      genre: "Fantasy",
     },
     {
       id: "10",
@@ -80,6 +89,7 @@ const booksData: IBook[] = [
       price: 10.50,
       stock: 150,
       image: "https://images.cdn3.buscalibre.com/fit-in/360x360/7b/3d/7b3dced43f7cbbac894dd1fb1196041b.jpg",
+      genre: "Philosophical Fiction",
     },
     {
       id: "11",
@@ -88,6 +98,7 @@ const booksData: IBook[] = [
       price: 13.99,
       stock: 180,
       image: "https://images.cdn3.buscalibre.com/fit-in/360x360/09/2b/092be19c48bac23fb897b3d4696a3a09.jpg",
+      genre: "Thriller",
     },
     {
       id: "12",
@@ -96,6 +107,7 @@ const booksData: IBook[] = [
       price: 11.75,
       stock: 95,
       image: "https://images.cdn2.buscalibre.com/fit-in/360x360/ec/fc/ecfc2c780d25a9841882ae4823bfabf9.jpg",
+      genre: "Literary Fiction",
     },
     {
       id: "13",
@@ -104,6 +116,7 @@ const booksData: IBook[] = [
       price: 12.25,
       stock: 80,
       image: "https://images.cdn1.buscalibre.com/fit-in/360x360/1f/1e/1f1ede0b04d8e6d02f804f97ac89e59d.jpg",
+      genre: "Historical Fiction",
     },
     {
       id: "14",
@@ -112,6 +125,7 @@ const booksData: IBook[] = [
       price: 14.50,
       stock: 160,
       image: "https://images.cdn1.buscalibre.com/fit-in/520x520/b8/38/be5fe97a07edbb2c5d6e6d755d70b707.jpg",
+      genre: "Dystopian Fiction",
     },
     {
       id: "15",
@@ -120,6 +134,7 @@ const booksData: IBook[] = [
       price: 13.25,
       stock: 70,
       image: "https://images.cdn2.buscalibre.com/fit-in/360x360/95/f6/95f60abf76ed2f6546c4eb694f221cb6.jpg",
+      genre: "Crime Thriller",
     },
     {
       id: "16",
@@ -128,6 +143,7 @@ const booksData: IBook[] = [
       price: 12.99,
       stock: 105,
       image: "https://images.cdn2.buscalibre.com/fit-in/520x520/76/64/7664588388ee26ead4557ab7a8af8bb0.jpg",
+      genre: "Dystopian Fiction",
     },
     {
       id: "17",
@@ -136,6 +152,7 @@ const booksData: IBook[] = [
       price: 11.99,
       stock: 140,
       image: "https://images.cdn3.buscalibre.com/fit-in/360x360/03/d4/03d441320c2eecb3bee3faaeea9b56ca.jpg",
+      genre: "Young Adult Romance",
     },
     {
       id: "18",
@@ -144,6 +161,7 @@ const booksData: IBook[] = [
       price: 13.75,
       stock: 90,
       image: "https://images.cdn3.buscalibre.com/fit-in/360x360/4d/2c/4d2cb1fac874b84c30fcf0fd63fe4eba.jpg",
+      genre: "Science Fiction",
     },
     {
       id: "19",
@@ -152,6 +170,7 @@ const booksData: IBook[] = [
       price: 12.50,
       stock: 85,
       image: "https://images.cdn2.buscalibre.com/fit-in/360x360/f3/5f/f35f34fddce312369d8246773a650ade.jpg",
+      genre: "Psychological Thriller",
     },
     {
       id: "20",
@@ -160,6 +179,7 @@ const booksData: IBook[] = [
       price: 14.99,
       stock: 75,
       image: "https://images.cdn1.buscalibre.com/fit-in/360x360/e1/5f/e15f89a3e8f60854c6dce67070944796.jpg",
+      genre: "Memoir",
     },
   ];
 
