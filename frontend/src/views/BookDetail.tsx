@@ -30,15 +30,6 @@ const BookDetail = ({ params }: IPropsId) => {
   return (
     <div className="min-h-screen bg-[#f5efe1] pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Botón de Regreso */}
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 text-[#2e4b30] hover:text-[#1a3a1c] transition-colors duration-300 mb-8 font-medium"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
-        </Link>
-
         {/* Contenido Principal */}
         <div className="bg-white rounded-2xl shadow-lg border border-[#f5efe1] overflow-hidden">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 p-6 lg:p-8">

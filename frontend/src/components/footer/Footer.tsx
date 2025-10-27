@@ -1,17 +1,18 @@
-import { BookOpen, Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import React from 'react'
+import Image from 'next/image'
 
 const Footer = () => {
   return ((
         <footer className="bg-[#2E4B30] text-[#F5EFE1]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            {/* Main Footer Content */}
+            {/* Contenido Principal del Footer */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-              {/* Brand Section */}
+              {/* Sección de la Marca */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
                   <div className="bg-[#F5EFE1] p-2 rounded-lg">
-                    <BookOpen className="w-6 h-6 text-[#2E4B30]" strokeWidth={2} />
+                    <Image src="/booker-new-logo.png" alt="Booker Logo" width={24} height={24} className="w-6 h-6" />
                   </div>
                   <span className="text-2xl font-bold text-[#F5EFE1]">Booker</span>
                 </div>
@@ -34,7 +35,7 @@ const Footer = () => {
                 </div>
               </div>
     
-              {/* Quick Links */}
+              {/* Enlaces Rápidos */}
               <div>
                 <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Quick Links</h3>
                 <ul className="space-y-3">
@@ -66,7 +67,7 @@ const Footer = () => {
                 </ul>
               </div>
     
-              {/* Customer Service */}
+              {/* Servicio al Cliente */}
               <div>
                 <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Customer Service</h3>
                 <ul className="space-y-3">
@@ -98,7 +99,7 @@ const Footer = () => {
                 </ul>
               </div>
     
-              {/* Contact Info */}
+              {/* Información de Contacto */}
               <div>
                 <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Contact Us</h3>
                 <ul className="space-y-4">
@@ -120,7 +121,7 @@ const Footer = () => {
               </div>
             </div>
     
-            {/* Newsletter Section */}
+            {/* Sección de Newsletter */}
             <div className="border-t border-[#F5EFE1]/20 pt-8 pb-8">
               <div className="max-w-2xl mx-auto text-center">
                 <h3 className="text-[#F5EFE1] font-bold text-xl mb-2">Subscribe to Our Newsletter</h3>
@@ -138,7 +139,7 @@ const Footer = () => {
               </div>
             </div>
     
-            {/* Bottom Bar */}
+            {/* Barra Inferior */}
             <div className="border-t border-[#F5EFE1]/20 pt-8">
               <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <p className="text-[#F5EFE1]/60 text-sm">

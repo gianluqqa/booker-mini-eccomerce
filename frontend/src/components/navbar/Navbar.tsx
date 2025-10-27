@@ -1,15 +1,16 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Search, ShoppingCart, User, LogOut, Menu, X } from 'lucide-react'
+import { Search, ShoppingCart, User, LogOut, Menu, X, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartCount] = useState(3);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,7 +22,7 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Función para hacer smooth scroll a una sección
+  // Función para hacer scroll suave a una sección
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -30,7 +31,6 @@ const Navbar = () => {
         block: 'start',
       });
     }
-    // Cerrar el menú móvil si está abierto
     setIsMenuOpen(false);
   };
 
@@ -38,19 +38,27 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      isScrolled 
+      isScrolled || isMenuOpen
         ? 'bg-[#f5efe1] bg-opacity-95 backdrop-blur-md shadow-lg' 
         : 'bg-transparent'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Image src="/booker-new-logo.png" alt="Booker Logo" width={32} height={32} className="h-8 w-auto" /> 
-            <span className="text-xl font-bold text-[#2e4b30] tracking-tight transition-colors duration-300">Booker</span>
-          </Link>
+          {/* Botón de Regreso y Logo */}
+          <div className="flex items-center">
+            {!isHomePage && (
+              <button onClick={() => router.back()} className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80 mr-3">
+                <ArrowLeft className="w-5 h-5" strokeWidth={2} />
+              </button>
+            )}
+            <Link href="/" className="flex items-center space-x-2">
+              <Image src="/booker-new-logo.png" alt="Booker Logo" width={32} height={32} className="h-8 w-auto" /> 
+              <span className="text-xl font-bold text-[#2e4b30] tracking-tight transition-colors duration-300">Booker</span>
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
+
+          {/* Navegación de Desktop */}
           {isHomePage && (
             <div className="hidden md:flex items-center space-x-6">
               <button 
@@ -80,7 +88,7 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Search Bar */}
+          {/* Barra de Búsqueda */}
           {isHomePage && (
             <div className="hidden lg:flex items-center flex-1 max-w-xs mx-6">
               <div className="relative w-full">
@@ -98,30 +106,30 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Right Side Icons */}
+          {/* Iconos del Lado Derecho */}
           <div className="flex items-center space-x-3">
-            {/* Cart */}
-            <button className="relative text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80">
+            {/* Carrito */}
+            <Link href="/cart" className="relative text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80">
               <ShoppingCart className="w-5 h-5" strokeWidth={2} />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#2e4b30] text-[#f5efe1] text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center shadow-lg transition-colors duration-200">
                   {cartCount}
                 </span>
               )}
-            </button>
+            </Link>
 
-            {/* User Profile */}
-            <button className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80">
+            {/* Perfil de Usuario */}
+            <Link href="/profile" className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80">
               <User className="w-5 h-5" strokeWidth={2} />
-            </button>
+            </Link>
 
-            {/* Logout */}
+            {/* Cerrar Sesión */}
             <button className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium shadow-md text-sm">
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
             </button>
 
-            {/* Mobile Menu Button */}
+            {/* Botón de Menú Móvil */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80"
@@ -131,7 +139,7 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
+        {/* Barra de Búsqueda Móvil */}
         {isHomePage && (
           <div className="lg:hidden pb-4 max-w-xs mx-auto">
             <div className="relative">
@@ -145,7 +153,7 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Mobile Menu */}
+        {/* Menú Móvil */}
         {isMenuOpen && (
           <div className="md:hidden pb-3 border-t border-[#2e4b30]/20 pt-3 transition-colors duration-200">
             <div className="flex flex-col space-y-2">
