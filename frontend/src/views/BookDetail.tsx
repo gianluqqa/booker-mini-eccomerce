@@ -77,7 +77,7 @@ const BookDetail = ({ params }: IPropsId) => {
               <div className="flex items-center gap-2">
                 <Tag className="w-5 h-5 text-[#2e4b30]" />
                 <span className="text-[#2e4b30] font-medium">Genre:</span>
-                <span className="px-3 py-1 bg-[#2e4b30] bg-opacity-10 text-[#2e4b30] rounded-full text-sm font-medium">
+                <span className="px-3 py-1 bg-[#2e4b30] bg-opacity-10 text-[#f5efe1] rounded-full text-sm font-medium">
                   {book.genre}
                 </span>
               </div>
@@ -122,19 +122,7 @@ const BookDetail = ({ params }: IPropsId) => {
                 </button>
               </div>
 
-              {/* Additional Info */}
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-[#f5efe1]">
-                <div className="text-center p-4 bg-[#f5efe1] rounded-lg">
-                  <Package className="w-6 h-6 text-[#2e4b30] mx-auto mb-2" />
-                  <p className="text-sm text-[#2e4b30] opacity-70">Stock</p>
-                  <p className="font-semibold text-[#2e4b30]">{book.stock} units</p>
-                </div>
-                <div className="text-center p-4 bg-[#f5efe1] rounded-lg">
-                  <DollarSign className="w-6 h-6 text-[#2e4b30] mx-auto mb-2" />
-                  <p className="text-sm text-[#2e4b30] opacity-70">Price</p>
-                  <p className="font-semibold text-[#2e4b30]">${book.price}</p>
-                </div>
-              </div>
+    
             </div>
           </div>
         </div>

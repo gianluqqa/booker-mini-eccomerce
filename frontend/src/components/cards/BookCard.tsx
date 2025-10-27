@@ -10,8 +10,8 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
       {/* Imagen del libro */}
       <div className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
         {book.image ? (
-          <Image 
-            src={book.image} 
+          <Image
+            src={book.image}
             alt={book.title}
             width={200}
             height={300}
@@ -46,16 +46,6 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
 
         {/* Botones de Accion */}
         <div className="flex gap-2">
-          {/* Botones de Detalles*/}
-          <Link
-            href={`/book/${book.id}`}
-            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm"
-          >
-            <Eye className="w-4 h-4" />
-            Details
-          </Link>
-
-          {/* "Add to Cart" Boton */}
           <button
             className={`flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm ${
               book.stock > 0
@@ -67,6 +57,17 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
             <ShoppingCart className="w-4 h-4" />
             {book.stock > 0 ? "Add to cart" : "Not available"}
           </button>
+          
+          {/* Botones de Detalles*/}
+          <Link
+            href={`/book/${book.id}`}
+            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm"
+          >
+            <Eye className="w-4 h-4" />
+            Details
+          </Link>
+
+          {/* "Add to Cart" Boton */}
         </div>
       </div>
     </div>

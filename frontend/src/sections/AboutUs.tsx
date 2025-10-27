@@ -31,7 +31,7 @@ const About = () => {
             <div className="flex flex-wrap gap-4">
               <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-lg flex-1 min-w-[140px]">
                 <div className="text-3xl font-bold text-[#2e4b30] mb-1">
-                  5000+
+                  20+
                 </div>
                 <div className="text-[#2e4b30] text-sm opacity-80">
                   Books Available
