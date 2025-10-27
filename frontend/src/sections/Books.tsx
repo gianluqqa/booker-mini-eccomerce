@@ -8,7 +8,7 @@ const Books = () => {
   const duplicatedBooks = [...booksData, ...booksData];
 
   return (
-    <section id="books" className="bg-[#f5efe1] min-h-screen py-20 px-4 sm:px-6 lg:px-8">
+    <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">

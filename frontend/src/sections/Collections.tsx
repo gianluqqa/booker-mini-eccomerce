@@ -24,10 +24,10 @@ const Collections = () => {
   const genreGroups = groupBooksByGenre();
   const genres = Object.keys(genreGroups);
 
-  // Crear array de todos los libros para el carrusel
+  // Crear un array de todos los libros para el carrusel
   const allBooks = booksData;
 
-  // Funciones de navegación del carrusel
+  // Funciones para la navegación del carrusel
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % allBooks.length);
   };
@@ -46,7 +46,7 @@ const Collections = () => {
     return visibleBooks;
   };
 
-  // Obtener el icono de un género
+  // Obtener el ícono para un género
   const getGenreIcon = (genre: string) => {
     const iconMap: Record<string, React.ReactNode> = {
       Fantasy: <Crown className="w-6 h-6" />,
@@ -67,7 +67,7 @@ const Collections = () => {
     return iconMap[genre] || <BookOpen className="w-6 h-6" />;
   };
 
-  // Obtener la descripción de un género
+  // Obtener la descripción para un género
   const getGenreDescription = (genre: string) => {
     const descriptions: Record<string, string> = {
       Fantasy: "Magical worlds and epic adventures",
@@ -91,7 +91,7 @@ const Collections = () => {
   return (
     <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Encabezado */}
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-[#1a3a1c] mb-4 flex items-center justify-center gap-3">
             <BookOpen className="w-8 h-8 text-[#2e4b30]" />
@@ -103,7 +103,7 @@ const Collections = () => {
           </p>
         </div>
 
-        {/* Genre Navigation */}
+        {/* Navegación por Género */}
         <div className="mb-8">
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             <button
@@ -134,25 +134,26 @@ const Collections = () => {
           </div>
         </div>
 
-        {/* Collections Display */}
+        {/* Muestra de Colecciones */}
         {selectedGenre === "" ? (
-          // Show carousel for all books
+          // Mostrar carrusel para todos los libros
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#f5efe1]">
-            {/* Carousel Header */}
+            {/* Encabezado del Carrusel */}
             <div className="text-center mb-8">
               <h3 className="text-3xl font-bold text-[#1a3a1c] mb-4 flex items-center justify-center gap-3">
-                <BookOpen className="w-8 h-8 text-[#2e4b30]" />
-                All Books Collection
-                <BookOpen className="w-8 h-8 text-[#2e4b30]" />
+                <div className="p-2 bg-[#2e4b30] text-[#f5efe1] rounded-lg">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                All Genres
               </h3>
               <p className="text-lg text-[#2e4b30] opacity-80">
                 Explore our complete collection of {allBooks.length} books
               </p>
             </div>
 
-            {/* Carousel Container */}
+            {/* Contenedor del Carrusel */}
             <div className="relative">
-              {/* Navigation Arrows */}
+              {/* Flechas de Navegación */}
               <button
                 onClick={prevSlide}
                 className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-[#2e4b30] text-[#f5efe1] p-3 rounded-full shadow-lg hover:bg-[#1a3a1c] transition-all duration-300"
@@ -169,7 +170,7 @@ const Collections = () => {
                 <ChevronRight className="w-6 h-6" />
               </button>
 
-              {/* Books Grid */}
+              {/* Cuadrícula de Libros */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4">
                 {getVisibleBooks().map((book, index) => (
                   <div key={`${book.id}-${currentIndex}-${index}`} className="transition-all duration-500">
@@ -178,7 +179,7 @@ const Collections = () => {
                 ))}
               </div>
 
-              {/* Carousel Indicators */}
+              {/* Indicadores del Carrusel */}
               <div className="flex justify-center mt-6 space-x-2">
                 {Array.from({ length: Math.min(5, allBooks.length) }, (_, i) => (
                   <button
@@ -194,7 +195,7 @@ const Collections = () => {
                 ))}
               </div>
 
-              {/* Book Counter */}
+              {/* Contador de Libros */}
               <div className="text-center mt-4">
                 <p className="text-sm text-[#2e4b30] opacity-70">
                   Showing books {currentIndex + 1}-{Math.min(currentIndex + 4, allBooks.length)} of {allBooks.length}
@@ -203,9 +204,9 @@ const Collections = () => {
             </div>
           </div>
         ) : (
-          // Show selected genre collection
+          // Mostrar la colección del género seleccionado
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#f5efe1]">
-            {/* Back Button */}
+            {/* Botón de Regreso */}
             <button
               onClick={() => setSelectedGenre("")}
               className="flex items-center gap-2 text-[#2e4b30] hover:text-[#1a3a1c] transition-colors duration-300 mb-6"
@@ -214,7 +215,7 @@ const Collections = () => {
               Back to All Collections
             </button>
 
-            {/* Selected Collection Header */}
+            {/* Encabezado de la Colección Seleccionada */}
             <div className="flex items-center gap-4 mb-8">
               <div className="p-4 bg-[#2e4b30] text-[#f5efe1] rounded-xl">
                 {getGenreIcon(selectedGenre)}
@@ -232,7 +233,7 @@ const Collections = () => {
               </div>
             </div>
 
-            {/* All Books in Collection */}
+            {/* Todos los Libros de la Colección */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {genreGroups[selectedGenre].map((book) => (
                 <BookCard key={book.id} book={book} />
