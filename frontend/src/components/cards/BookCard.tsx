@@ -1,5 +1,8 @@
 import React from "react";
 import { IBookCardProps } from "@/interfaces/Book";
+import Link from "next/link";
+import Image from "next/image";
+import { Eye, ShoppingCart } from "lucide-react";
 
 const BookCard: React.FC<IBookCardProps> = ({ book }) => {
   return (
@@ -7,9 +10,11 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
       {/* Imagen del libro */}
       <div className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
         {book.image ? (
-          <img 
+          <Image 
             src={book.image} 
             alt={book.title}
+            width={200}
+            height={300}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
@@ -39,17 +44,30 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
           </div>
         </div>
 
-        {/* Action button */}
-        <button
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-300 ${
-            book.stock > 0
-              ? "bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] hover:shadow-lg"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
-          disabled={book.stock === 0}
-        >
-          {book.stock > 0 ? "Add to cart" : "Not available"}
-        </button>
+        {/* Botones de Accion */}
+        <div className="flex gap-2">
+          {/* Botones de Detalles*/}
+          <Link
+            href={`/book/${book.id}`}
+            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm"
+          >
+            <Eye className="w-4 h-4" />
+            Details
+          </Link>
+
+          {/* "Add to Cart" Boton */}
+          <button
+            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm ${
+              book.stock > 0
+                ? "bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] hover:shadow-lg"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+            disabled={book.stock === 0}
+          >
+            <ShoppingCart className="w-4 h-4" />
+            {book.stock > 0 ? "Add to cart" : "Not available"}
+          </button>
+        </div>
       </div>
     </div>
   );

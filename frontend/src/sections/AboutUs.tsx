@@ -3,7 +3,7 @@ import { BookOpen, Zap, CheckCircle } from "lucide-react";
 
 const About = () => {
   return (
-    <section className="bg-[#2e4b30] min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 relative">
+    <section id="about" className="bg-[#2e4b30] min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 relative">
       <div className="max-w-6xl mx-auto w-full">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>

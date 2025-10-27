@@ -6,6 +6,8 @@ export interface IBook {
     price: number;
     stock: number;
     genre: string;
+    intro?: string;
+    description: string;
   }
 
   export interface IBookCardProps {

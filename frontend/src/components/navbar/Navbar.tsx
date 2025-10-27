@@ -18,6 +18,19 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Función para hacer smooth scroll a una sección
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+    // Cerrar el menú móvil si está abierto
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
       isScrolled 
@@ -34,18 +47,30 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <a href="#books" className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80">
+            <button 
+              onClick={() => scrollToSection('books')} 
+              className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+            >
               Books
-            </a>
-            <a href="#bestsellers" className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80">
+            </button>
+            <button 
+              onClick={() => scrollToSection('bestsellers')} 
+              className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+            >
               Bestsellers
-            </a>
-            <a href="#collections" className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80">
+            </button>
+            <button 
+              onClick={() => scrollToSection('collections')} 
+              className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+            >
               Collections
-            </a>
-            <a href="#about" className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80">
-              About
-            </a>
+            </button>
+            <button 
+              onClick={() => scrollToSection('about')} 
+              className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+            >
+              About Us
+            </button>
           </div>
 
           {/* Search Bar */}
@@ -113,18 +138,30 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="md:hidden pb-3 border-t border-[#2e4b30]/20 pt-3 transition-colors duration-200">
             <div className="flex flex-col space-y-2">
-              <a href="#books" className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80">
+              <button 
+                onClick={() => scrollToSection('books')} 
+                className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+              >
                 Books
-              </a>
-              <a href="#bestsellers" className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80">
+              </button>
+              <button 
+                onClick={() => scrollToSection('bestsellers')} 
+                className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+              >
                 Bestsellers
-              </a>
-              <a href="#collections" className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80">
+              </button>
+              <button 
+                onClick={() => scrollToSection('collections')} 
+                className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+              >
                 Collections
-              </a>
-              <a href="#about" className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80">
-                About
-              </a>
+              </button>
+              <button 
+                onClick={() => scrollToSection('about')} 
+                className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+              >
+                About Us
+              </button>
               <button className="flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium w-fit shadow-md text-sm">
                 <LogOut className="w-4 h-4" />
                 <span>Logout</span>
