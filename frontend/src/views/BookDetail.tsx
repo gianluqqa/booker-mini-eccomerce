@@ -28,31 +28,33 @@ const BookDetail = ({ params }: IPropsId) => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5efe1] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f5efe1] pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Back Button */}
+        {/* Botón de Regreso */}
         <Link 
           href="/"
           className="inline-flex items-center gap-2 text-[#2e4b30] hover:text-[#1a3a1c] transition-colors duration-300 mb-8 font-medium"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Collections
+          Back to Home
         </Link>
 
-        {/* Main Content */}
+        {/* Contenido Principal */}
         <div className="bg-white rounded-2xl shadow-lg border border-[#f5efe1] overflow-hidden">
-          <div className="grid md:grid-cols-2 gap-8 p-8">
-            {/* Book Image */}
-            <div className="flex justify-center">
-              <div className="relative">
-                <Image
-                  src={book.image || "/placeholder-book.jpg"}
-                  alt={book.title}
-                  width={400}
-                  height={600}
-                  className="w-full max-w-md h-auto rounded-xl shadow-lg"
-                />
-                {/* Stock Badge */}
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 p-6 lg:p-8">
+            {/* Imagen del Libro */}
+            <div className="flex justify-center items-center">
+              <div className="relative w-full max-w-sm">
+                <div className="aspect-[3/4] w-full relative overflow-hidden rounded-xl shadow-lg">
+                  <Image
+                    src={book.image || "/placeholder-book.jpg"}
+                    alt={book.title}
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+                {/* Insignia de Stock */}
                 <div className="absolute top-4 right-4 bg-[#2e4b30] text-[#f5efe1] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                   <Package className="w-4 h-4" />
                   {book.stock} in stock
@@ -60,69 +62,70 @@ const BookDetail = ({ params }: IPropsId) => {
               </div>
             </div>
 
-            {/* Book Information */}
-            <div className="space-y-6">
-              {/* Title and Author */}
-              <div>
-                <h1 className="text-3xl sm:text-4xl font-bold text-[#1a3a1c] mb-3 leading-tight">
-                  {book.title}
-                </h1>
-                <div className="flex items-center gap-2 text-lg text-[#2e4b30] mb-4">
-                  <User className="w-5 h-5" />
-                  <span className="font-medium">{book.author}</span>
+            {/* Información del Libro */}
+            <div className="flex flex-col justify-between min-h-[500px]">
+              {/* Contenido Principal */}
+              <div className="space-y-6">
+                {/* Título y Autor */}
+                <div>
+                  <h1 className="text-3xl sm:text-4xl font-bold text-[#1a3a1c] mb-3 leading-tight">
+                    {book.title}
+                  </h1>
+                  <div className="flex items-center gap-2 text-lg text-[#2e4b30] mb-4">
+                    <User className="w-5 h-5" />
+                    <span className="font-medium">{book.author}</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Genre */}
-              <div className="flex items-center gap-2">
-                <Tag className="w-5 h-5 text-[#2e4b30]" />
-                <span className="text-[#2e4b30] font-medium">Genre:</span>
-                <span className="px-3 py-1 bg-[#2e4b30] bg-opacity-10 text-[#f5efe1] rounded-full text-sm font-medium">
-                  {book.genre}
-                </span>
-              </div>
+                {/* Género */}
+                <div className="flex items-center gap-2">
+                  <Tag className="w-5 h-5 text-[#2e4b30]" />
+                  <span className="text-[#2e4b30] font-medium">Genre:</span>
+                  <span className="px-3 py-1 bg-[#2e4b30] bg-opacity-10 text-[#f5efe1] rounded-full text-sm font-medium">
+                    {book.genre}
+                  </span>
+                </div>
 
-              {/* Price */}
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-6 h-6 text-[#2e4b30]" />
-                <span className="text-3xl font-bold text-[#2e4b30]">
-                  ${book.price}
-                </span>
-              </div>
+                {/* Precio */}
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-6 h-6 text-[#2e4b30]" />
+                  <span className="text-3xl font-bold text-[#2e4b30]">
+                    ${book.price}
+                  </span>
+                </div>
 
-              {/* Description */}
-              <div className="space-y-3">
-                <h3 className="text-xl font-semibold text-[#1a3a1c] flex items-center gap-2">
-                  <BookOpen className="w-5 h-5" />
-                  Description
-                </h3>
-                <p className="text-[#2e4b30] leading-relaxed text-lg">
-                  {book.description}
-                </p>
-              </div>
-
-              {/* Intro (if available) */}
-              {book.intro && (
+                {/* Descripción */}
                 <div className="space-y-3">
                   <h3 className="text-xl font-semibold text-[#1a3a1c] flex items-center gap-2">
-                    <Star className="w-5 h-5" />
-                    Introduction
+                    <BookOpen className="w-5 h-5" />
+                    Description
                   </h3>
-                  <p className="text-[#2e4b30] leading-relaxed">
-                    {book.intro}
+                  <p className="text-[#2e4b30] leading-relaxed text-lg">
+                    {book.description}
                   </p>
                 </div>
-              )}
 
-              {/* Add to Cart Button */}
-              <div className="pt-6">
+                {/* Introducción (si está disponible) */}
+                {book.intro && (
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-semibold text-[#1a3a1c] flex items-center gap-2">
+                      <Star className="w-5 h-5" />
+                      Introduction
+                    </h3>
+                    <p className="text-[#2e4b30] leading-relaxed">
+                      {book.intro}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Botón de Añadir al Carrito */}
+              <div className="mt-auto pt-6">
                 <button className="w-full bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] transition-all duration-300 py-4 px-6 rounded-xl font-semibold text-lg flex items-center justify-center gap-3 shadow-lg hover:shadow-xl">
                   <ShoppingCart className="w-6 h-6" />
                   Add to Cart
                 </button>
               </div>
-
-    
             </div>
           </div>
         </div>
