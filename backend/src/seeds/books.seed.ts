@@ -1,5 +1,5 @@
-import { AppDataSource } from "../config/data-source";
-import { Book } from "../entities/Book";
+import { AppDataSource } from "../../src/config/data-source";
+import { Book } from "../../src/entities/Book";
 
 const booksData = [
   {
@@ -157,7 +157,14 @@ export const seedBooks = async () => {
 
     // Crear libros
     const bookRepository = AppDataSource.getRepository(Book);
-    const books = bookRepository.create(booksData);
+    const preparedData = booksData.map((b) => ({
+      ...b,
+      genre: (b as any).genre ?? "General",
+      description: (b as any).description ?? `${b.title} by ${b.author}`,
+      intro: (b as any).intro ?? undefined,
+    }));
+
+    const books = bookRepository.create(preparedData);
     await bookRepository.save(books);
 
     console.log(`✅ Se han creado ${booksData.length} libros en la base de datos`);

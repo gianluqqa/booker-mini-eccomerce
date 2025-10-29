@@ -22,6 +22,15 @@ export class Book {
   @Column()
   stock!: number;
 
+  @Column()
+  genre!: string;
+
+  @Column({ nullable: true })
+  intro?: string;
+
+  @Column()
+  description!: string;
+
   @OneToMany(() => OrderItem, (orderItem) => orderItem.book)
   orderItems!: OrderItem[];
 

@@ -17,7 +17,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD || "glc2001luca2001",
   database: process.env.DB_NAME || "booker",
   synchronize: true, // solo para desarrollo
-  // dropSchema: true,
+  //dropSchema: true,
   logging: false,
   entities: [User, Book, Order, OrderItem, Cart],
 });

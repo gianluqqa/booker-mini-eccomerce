@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { createBookService, getBooksService } from "../services/books-services";
-import { validateBook } from "../middlewares/validateBook";
+import { validateBook } from "../routes/middlewares/validateBook";
 
 //? Obtener todos los Books (GET).
 export const getBooksController = async (req: Request, res: Response) => {

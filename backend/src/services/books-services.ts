@@ -20,16 +20,19 @@ export const getBooksService = async (query?: string): Promise<BookDto[]> => {
     const books = await queryBuilder.getMany();
 
     // Convertir entidades a DTOs
-    const bookDtos: BookDto[] = books.map((book) => ({
-      id: book.id.toString(),
+    const booksResponse: BookDto[] = books.map((book) => ({
+      id: book.id?.toString(),
       title: book.title,
       author: book.author,
-      price: book.price,
+      price: Number(book.price),
       stock: book.stock,
       image: book.image || "",
+      genre: book.genre,
+      intro: book.intro,
+      description: book.description,
     }));
 
-    return bookDtos;
+    return booksResponse;
   } catch (error) {
     console.error("Error getting books:", error);
     throw new Error("Could not get books");
@@ -53,7 +56,19 @@ export const createBookService = async (book: CreateBookDto): Promise<BookDto> =
 
     await bookRepository.save(newBook);
 
-    return newBook;
+    const createdBookResponse: BookDto = {
+      id: newBook.id?.toString(),
+      title: newBook.title,
+      author: newBook.author,
+      price: Number(newBook.price),
+      stock: newBook.stock,
+      image: newBook.image || "",
+      genre: newBook.genre,
+      intro: newBook.intro,
+      description: newBook.description,
+    };
+
+    return createdBookResponse;
   } catch (error: any) {
     console.error("Error creating book:", error);
 

@@ -1,5 +1,5 @@
 import { LoginUserDTO, RegisterUserDTO } from "../dto/UserDto";
-import { validateLoginUser, validateRegisterUser } from "../middlewares/validateUser";
+import { validateLoginUser, validateRegisterUser } from "../routes/middlewares/validateUser";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
 import { UserRole } from "../enums/UserRole";
