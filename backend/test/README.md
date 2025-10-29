@@ -7,7 +7,7 @@ This is the **Complete Testing System** for the Booker E-Commerce application. A
 **Project:** Booker - Mini E-Commerce Book Store  
 **Architecture:** React/Next.js (Frontend) + Node.js/Express/TypeScript (Backend) + PostgreSQL (Database)  
 **Approach:** Comprehensive Manual + Automated Testing  
-**Coverage:** 5 Functional Modules with 24+ Test Cases  
+**Scope:** Manual, automated, and integration for key modules  
 
 ---
 
@@ -44,26 +44,18 @@ npm run test:coverage
 # Run tests in watch mode
 npm run test:watch
 
+# Run only integration tests
+npm run test:integration
+
 # Generate comprehensive HTML reports
 npm run test:report:all
 ```
 
 ---
 
-## 📊 Current Testing Status
+## ℹ️ About this Guide
 
-### Completed Modules
-| Module | Status | Manual Tests | Automated Tests | Total | Success Rate |
-|--------|--------|--------------|------------------|-------|--------------|
-| **Users** | ✅ Complete | 12 | 10 | 22 | 100% |
-| **Admin** | ✅ Complete | 1 | 2 | 3 | 100% |
-
-### Modules in Development
-| Module | Status | Planned Tests |
-|--------|--------|---------------|
-| **Books** | 🔄 In Progress | 15 tests |
-| **Cart** | 🔄 In Progress | 12 tests |
-| **Checkout** | 🔄 In Progress | 18 tests |
+This README is the first stop to orient yourself in the testing area. It explains environment setup, how to run tests, and where to find key artefacts (code, reports, and documentation). For metrics and summaries, refer to each module’s documents linked below.
 
 ---
 
@@ -77,31 +69,31 @@ backend/test/
 ├── types.d.ts                     # TypeScript definitions
 │
 ├── modules/                       # Functional testing modules
-│   ├── users/                     # ✅ COMPLETED (22 tests)
+│   ├── users/                     # Users module tests and docs
 │   │   ├── users-backend-summary.md
 │   │   ├── manual/                # Manual testing
 │   │   │   ├── unit-tests/        # Test documentation
-│   │   │   ├── evidences/         # Visual evidence (12 files)
-│   │   │   └── bugs/              # Bug reports (4 bugs fixed)
+│   │   │   ├── evidences/         # Visual evidence
+│   │   │   └── bugs/              # Bug reports
 │   │   └── automated/             # Automated testing
-│   │       ├── unit-tests/        # Test files (10 tests)
+│   │       ├── unit-tests/        # Test files
 │   │       ├── test-reports/      # HTML reports
 │   │       └── documentation/     # Technical documentation
 │   │
-│   ├── admin/                     # ✅ COMPLETED (3 tests)
+│   ├── admin/                     # Admin module tests and docs
 │   │   ├── admin-backend-summary.md
 │   │   ├── manual/                # Manual testing
 │   │   │   ├── unit-tests/       # Test documentation
-│   │   │   ├── evidences/        # Visual evidence (1 file)
-│   │   │   └── bugs/             # Bug reports (1 bug fixed)
+│   │   │   ├── evidences/        # Visual evidence
+│   │   │   └── bugs/             # Bug reports
 │   │   └── automated/            # Automated testing
-│   │       ├── unit-tests/      # Test files (2 tests)
-│   │       ├── test-reports/    # HTML reports
-│   │       └── documentation/   # Technical documentation
+│   │       ├── unit-tests/       # Test files
+│   │       ├── test-reports/     # HTML reports
+│   │       └── documentation/    # Technical documentation
 │   │
-│   ├── books/                     # 🔄 IN PROGRESS
-│   ├── cart/                      # 🔄 IN PROGRESS
-│   └── checkout/                  # 🔄 IN PROGRESS
+│   ├── books/
+│   ├── cart/
+│   └── checkout/
 │
 └── integration-tests/             # End-to-end testing
     ├── user-register-login.test.ts
@@ -147,6 +139,9 @@ npm run test:coverage
 # Run tests in watch mode
 npm run test:watch
 
+# Run only integration tests
+npm run test:integration
+
 # Run specific test file
 npm test -- test/modules/users/automated/unit-tests/register-user-auto.test.ts
 ```
@@ -159,6 +154,11 @@ npm run test:report:all
 # Generate specific module reports
 npm run test:report:register
 npm run test:report:login
+
+# Admin reports
+npm run test:report:admin:register
+npm run test:report:admin:login
+npm run test:report:admin:complete
 ```
 
 ---
@@ -180,33 +180,11 @@ npm run test:report:login
 
 ---
 
-## 🎯 Current Test Coverage
+## 📌 Test Status
 
-### ✅ Users Module (Complete)
-**Manual Tests (12):**
-- TC-001 to TC-006: Registration scenarios
-- TC-007 to TC-012: Login scenarios
+Detailed cases, evidence, and reports per module are available in the module-specific documents in the Documentation section. This README does not include metrics or statistics; its purpose is to guide execution and navigation of the testing area.
 
-**Automated Tests (10):**
-- AUTO-001 to AUTO-005: Registration automation
-- AUTO-007 to AUTO-011: Login automation
-
-### ✅ Admin Module (Complete)
-**Manual Tests (1):**
-- TC-001: Admin user registration
-
-**Automated Tests (2):**
-- AUTO-006: Admin user registration
-- AUTO-012: Admin user login
-
-**Key Features Tested:**
-- User registration with validation
-- Email format and duplicate validation
-- Password strength requirements
-- Successful and failed login scenarios
-- Security vulnerability prevention
-- Admin role assignment and validation
-- Role-based access control
+Note: Current module test suites are considered complete for now based on existing requirements. They may require new or updated tests in the future as features evolve or new requirements arise.
 
 ---
 
@@ -303,26 +281,8 @@ npm run dev
 
 **Developer:** Gian Luca Caravone  
 **Project Type:** Portfolio Demonstration  
-**Last Updated:** October 28, 2025  
-**Version:** 2.1  
+**Last Updated:** October 29, 2025  
+**Version:** 2.2  
 **Status:** Active Development  
 
 ---
-
-## 🔄 Recent Changes (28/10/2025)
-
-### Corrections Made
-- **Test Files:** Corrected test file names for better organization
-- **Execution Times:** Updated according to real HTML reports for more accurate metrics
-- **Evidence Files:** Corrected references to HTML reports for consistent documentation
-- **Test Coverage:** Simplified to reflect real tests with more accurate information
-
-### Admin Module Updated
-- **Automated Tests:** 2 complete tests (admin registration and login)
-- **Documentation:** HTML reports updated with corrected execution times
-- **Coverage:** Specific focus on admin functionality without references to unproven validations
-
-### Documentation Improvements
-- **Organizational Structure:** Clearer and more relevant information for visitors
-- **Focus on Organization:** Less statistics, more practical information
-- **Date Updates:** All dates updated to 28/10/2025
