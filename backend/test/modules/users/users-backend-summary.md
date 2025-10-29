@@ -104,13 +104,12 @@ This document provides a comprehensive summary of all testing activities for the
 | **BUG-013** | User registration ignores role field and always assigns "customer" role | High | High | ✅ FIXED | 2025-10-23 | TC-013 | `BUG-013-registration-ignores-role-admin.png` | Functional issue - role-based access control broken |
 
 ### Bug Resolution Summary
-- **Total Bugs Found:** 5
-- **Bugs Fixed:** 5 (100% resolution rate)
+- **Total Bugs Found:** 4
+- **Bugs Fixed:** 4 (100% resolution rate)
 - **Critical Security Issues:** 2 (BUG-008, BUG-009)
-- **Functional Issues:** 3 (BUG-002, BUG-005, BUG-013)
+- **Functional Issues:** 2 (BUG-002, BUG-005)
 - **Average Fix Time:** 2 days
 - **Security Improvements:** Implemented generic error messages to prevent information disclosure
-- **Role-Based Access Control:** Fixed admin user creation functionality
 
 ## Recent Updates (October 2025)
 
@@ -262,15 +261,15 @@ backend/test/modules/users/
 │   └── documentation/
 │       ├── register-user-auto-doc.md      # Registration automated tests documentation
 │       └── login-user-auto-doc.md         # Login automated tests documentation
-└── users-summary.md                       # This comprehensive summary (23 total tests)
+└── users-backend-summary.md                 # This comprehensive summary (22 total tests)
 ```
 
 ## Summary Statistics
 
 ### Test Execution Overview
-- **Total Test Cases:** 23
-- **Manual Tests:** 12 (52.2%)
-- **Automated Tests:** 11 (47.8%)
+- **Total Test Cases:** 22
+- **Manual Tests:** 12 (54.5%)
+- **Automated Tests:** 10 (45.5%)
 - **Success Rate:** 100%
 - **Coverage:** Complete user module functionality
 

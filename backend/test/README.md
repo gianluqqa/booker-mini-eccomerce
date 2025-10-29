@@ -1,13 +1,13 @@
 # 🧪 Booker E-Commerce Testing Suite
 
-## 🎯 Executive Summary
+## 🎯 Welcome to the Testing System
 
-Welcome to the **Booker E-Commerce Testing Suite** - a comprehensive testing framework for a modern book e-commerce application. This testing suite demonstrates professional QA practices and serves as a portfolio showcase for full-stack development and quality assurance expertise.
+This is the **Complete Testing System** for the Booker E-Commerce application. A professional testing framework that demonstrates QA best practices and serves as a full-stack development portfolio.
 
 **Project:** Booker - Mini E-Commerce Book Store  
 **Architecture:** React/Next.js (Frontend) + Node.js/Express/TypeScript (Backend) + PostgreSQL (Database)  
-**Testing Approach:** Comprehensive Manual + Automated Testing  
-**Coverage:** 5 Functional Modules with 78+ Test Cases  
+**Approach:** Comprehensive Manual + Automated Testing  
+**Coverage:** 5 Functional Modules with 24+ Test Cases  
 
 ---
 
@@ -26,16 +26,16 @@ cd backend
 # Install dependencies
 npm install
 
-# Start the database (ensure PostgreSQL is running)
-# Configure your database connection in .env
+# Configure database (ensure PostgreSQL is running)
+# Configure connection in .env file
 
-# Start the backend server
+# Start backend server
 npm run dev
 ```
 
 ### Running Tests
 ```bash
-# Execute all tests
+# Run all tests
 npm test
 
 # Run tests with coverage report
@@ -50,87 +50,64 @@ npm run test:report:all
 
 ---
 
-## 📊 Testing Overview
+## 📊 Current Testing Status
 
-### Current Status
+### Completed Modules
 | Module | Status | Manual Tests | Automated Tests | Total | Success Rate |
-|--------|--------|--------------|-----------------|-------|--------------|
-| **Users** | ✅ Complete | 12 | 11 | 23 | 100% |
-| **Books** | 🔄 In Progress | 0 | 0 | 0 | N/A |
-| **Cart** | 🔄 In Progress | 0 | 0 | 0 | N/A |
-| **Orders** | 🔄 In Progress | 0 | 0 | 0 | N/A |
-| **Admin** | 🔄 In Progress | 0 | 0 | 0 | N/A |
-| **TOTAL** | 20% Complete | 12 | 11 | 23 | 100% |
+|--------|--------|--------------|------------------|-------|--------------|
+| **Users** | ✅ Complete | 12 | 10 | 22 | 100% |
+| **Admin** | ✅ Complete | 1 | 2 | 3 | 100% |
 
-### Quality Metrics
-- **Test Coverage:** 20% (1/5 modules complete)
-- **Bug Resolution Rate:** 100% (4/4 bugs fixed)
-- **Test Pass Rate:** 100% (23/23 tests passed)
-- **Security Issues:** 0 (2 critical vulnerabilities resolved)
-- **Documentation Coverage:** 100%
+### Modules in Development
+| Module | Status | Planned Tests |
+|--------|--------|---------------|
+| **Books** | 🔄 In Progress | 15 tests |
+| **Cart** | 🔄 In Progress | 12 tests |
+| **Checkout** | 🔄 In Progress | 18 tests |
 
 ---
 
-## 🏗️ Project Architecture
-
-### Core Business Logic
-- **User Management:** Registration, authentication, profile management
-- **Book Management:** CRUD operations, inventory management, search functionality
-- **Shopping Cart:** Add/remove items, quantity management, session persistence
-- **Order Processing:** Complete checkout flow, payment simulation, order tracking
-- **Admin Panel:** User management, order management, administrative controls
-
-### User Roles & Permissions
-- **Customer:** Browse books, manage cart, place orders, view order history
-- **Admin:** Manage books, view all orders, manage users, cancel orders
-
----
-
-## 📁 Testing Structure
+## 📁 Project Structure
 
 ```
 backend/test/
-├── test-plan.md                    # Master testing strategy
-├── tests-summary.md               # Executive testing summary
-├── README.md                      # This comprehensive guide
+├── README.md                      # This main guide
+├── all-tests-backend-summary.md   # Executive summary
 ├── setup.ts                       # Test configuration
 ├── types.d.ts                     # TypeScript definitions
 │
 ├── modules/                       # Functional testing modules
-│   ├── users/                     # ✅ COMPLETED (23 tests)
-│   │   ├── users-summary.md       # Module summary
+│   ├── users/                     # ✅ COMPLETED (22 tests)
+│   │   ├── users-backend-summary.md
 │   │   ├── manual/                # Manual testing
 │   │   │   ├── unit-tests/        # Test documentation
 │   │   │   ├── evidences/         # Visual evidence (12 files)
 │   │   │   └── bugs/              # Bug reports (4 bugs fixed)
 │   │   └── automated/             # Automated testing
-│   │       ├── unit-tests/        # Test files (11 tests)
+│   │       ├── unit-tests/        # Test files (10 tests)
 │   │       ├── test-reports/      # HTML reports
-│   │       └── documentation/     # Technical docs
+│   │       └── documentation/     # Technical documentation
 │   │
-│   ├── books/                     # 🔄 IN PROGRESS (15 tests planned)
-│   │   ├── books-summary.md       # Module summary
-│   │   ├── manual/                # Manual testing structure
-│   │   └── automated/             # Automated testing structure
+│   ├── admin/                     # ✅ COMPLETED (3 tests)
+│   │   ├── admin-backend-summary.md
+│   │   ├── manual/                # Manual testing
+│   │   │   ├── unit-tests/       # Test documentation
+│   │   │   ├── evidences/        # Visual evidence (1 file)
+│   │   │   └── bugs/             # Bug reports (1 bug fixed)
+│   │   └── automated/            # Automated testing
+│   │       ├── unit-tests/      # Test files (2 tests)
+│   │       ├── test-reports/    # HTML reports
+│   │       └── documentation/   # Technical documentation
 │   │
-│   ├── cart/                      # 🔄 IN PROGRESS (12 tests planned)
-│   │   ├── cart-summary.md        # Module summary
-│   │   ├── manual/                # Manual testing structure
-│   │   └── automated/             # Automated testing structure
-│   │
-│   ├── orders/                    # 🔄 IN PROGRESS (18 tests planned)
-│   │   ├── orders-summary.md      # Module summary
-│   │   ├── manual/                # Manual testing structure
-│   │   └── automated/             # Automated testing structure
-│   │
-│   └── admin/                     # 🔄 IN PROGRESS (10 tests planned)
-│       ├── admin-summary.md       # Module summary
-│       ├── manual/                # Manual testing structure
-│       └── automated/             # Automated testing structure
+│   ├── books/                     # 🔄 IN PROGRESS
+│   ├── cart/                      # 🔄 IN PROGRESS
+│   └── checkout/                  # 🔄 IN PROGRESS
 │
 └── integration-tests/             # End-to-end testing
-    ├── user-register-login-integration.test.ts
-    └── e2e-workflows.test.ts      # Planned
+    ├── user-register-login.test.ts
+    ├── documentation/             # Integration test documentation
+    ├── tests-reports/             # Integration test reports
+    └── README.md                  # Integration testing guide
 ```
 
 ---
@@ -159,7 +136,7 @@ backend/test/
 
 ## 📋 Available Test Commands
 
-### Core Testing Commands
+### Core Commands
 ```bash
 # Run all tests
 npm test
@@ -184,20 +161,11 @@ npm run test:report:register
 npm run test:report:login
 ```
 
-### Coverage Analysis
-```bash
-# Generate coverage report
-npm run test:coverage
-
-# View coverage in browser
-open coverage/lcov-report/index.html
-```
-
 ---
 
-## 📖 Understanding Test Structure
+## 📖 Testing Conventions
 
-### Test Naming Convention
+### Naming Convention
 - **Manual Tests:** `TC-XXX: [Description]` (e.g., TC-001: Successful User Registration)
 - **Automated Tests:** `AUTO-XXX: [Description]` (e.g., AUTO-001: Create User Successfully)
 - **Bug Reports:** `BUG-XXX: [Description]` (e.g., BUG-002: Duplicate Email Error)
@@ -219,9 +187,17 @@ open coverage/lcov-report/index.html
 - TC-001 to TC-006: Registration scenarios
 - TC-007 to TC-012: Login scenarios
 
-**Automated Tests (11):**
+**Automated Tests (10):**
 - AUTO-001 to AUTO-005: Registration automation
-- AUTO-006 to AUTO-011: Login automation
+- AUTO-007 to AUTO-011: Login automation
+
+### ✅ Admin Module (Complete)
+**Manual Tests (1):**
+- TC-001: Admin user registration
+
+**Automated Tests (2):**
+- AUTO-006: Admin user registration
+- AUTO-012: Admin user login
 
 **Key Features Tested:**
 - User registration with validation
@@ -229,12 +205,8 @@ open coverage/lcov-report/index.html
 - Password strength requirements
 - Successful and failed login scenarios
 - Security vulnerability prevention
-
-### 🔄 Upcoming Modules
-- **Books Module:** CRUD operations, search, inventory management
-- **Cart Module:** Add/remove items, quantity management, persistence
-- **Orders Module:** Checkout process, payment simulation, tracking
-- **Admin Module:** User management, order management, controls
+- Admin role assignment and validation
+- Role-based access control
 
 ---
 
@@ -244,7 +216,7 @@ open coverage/lcov-report/index.html
 
 **"Cannot find module"**
 ```bash
-# Solution: Ensure you're in the backend directory and dependencies are installed
+# Solution: Ensure you're in backend directory and dependencies are installed
 cd backend
 npm install
 ```
@@ -261,12 +233,6 @@ npm install
 npm run dev
 ```
 
-**"No tests found"**
-```bash
-# Solution: Verify test files have .test.ts extension and are in correct location
-# Check file paths in package.json scripts
-```
-
 ### Getting Help
 1. Check console output for error messages
 2. Verify server and database are running
@@ -279,15 +245,14 @@ npm run dev
 ## 📚 Documentation Links
 
 ### Master Documents
-- **[Test Plan](test-plan.md)** - Comprehensive testing strategy
-- **[Tests Summary](tests-summary.md)** - Executive overview and metrics
+- **[All Tests Backend Summary](all-tests-backend-summary.md)** - Executive overview and metrics
 
 ### Module Documentation
-- **[Users Module](modules/users/users-summary.md)** - Complete user testing documentation
-- **[Books Module](modules/books/books-summary.md)** - Book management testing (planned)
-- **[Cart Module](modules/cart/cart-summary.md)** - Shopping cart testing (planned)
-- **[Orders Module](modules/orders/orders-summary.md)** - Order processing testing (planned)
-- **[Admin Module](modules/admin/admin-summary.md)** - Administrative testing (planned)
+- **[Users Module](modules/users/users-backend-summary.md)** - Complete user testing documentation
+- **[Admin Module](modules/admin/admin-backend-summary.md)** - Administrative testing documentation
+- **[Books Module](modules/books/books-backend-summary.md)** - Book management testing (planned)
+- **[Cart Module](modules/cart/cart-backend-summary.md)** - Shopping cart testing (planned)
+- **[Checkout Module](modules/checkout/checkout-backend-summary.md)** - Order processing testing (planned)
 
 ### Technical Documentation
 - **[Manual Tests](modules/users/manual/unit-tests/)** - Detailed manual test procedures
@@ -338,7 +303,26 @@ npm run dev
 
 **Developer:** Gian Luca Caravone  
 **Project Type:** Portfolio Demonstration  
-**Last Updated:** October 16, 2025  
-**Version:** 2.0  
+**Last Updated:** October 28, 2025  
+**Version:** 2.1  
 **Status:** Active Development  
 
+---
+
+## 🔄 Recent Changes (28/10/2025)
+
+### Corrections Made
+- **Test Files:** Corrected test file names for better organization
+- **Execution Times:** Updated according to real HTML reports for more accurate metrics
+- **Evidence Files:** Corrected references to HTML reports for consistent documentation
+- **Test Coverage:** Simplified to reflect real tests with more accurate information
+
+### Admin Module Updated
+- **Automated Tests:** 2 complete tests (admin registration and login)
+- **Documentation:** HTML reports updated with corrected execution times
+- **Coverage:** Specific focus on admin functionality without references to unproven validations
+
+### Documentation Improvements
+- **Organizational Structure:** Clearer and more relevant information for visitors
+- **Focus on Organization:** Less statistics, more practical information
+- **Date Updates:** All dates updated to 28/10/2025

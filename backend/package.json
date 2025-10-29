@@ -14,6 +14,9 @@
     "test:integration": "jest test/integration-tests/user-register-login.test.ts",
     "test:report:register": "node scripts/generate-test-report.js",
     "test:report:login": "node scripts/generate-login-test-report.js",
+    "test:report:admin:register": "node scripts/generate-admin-register-test-report.js",
+    "test:report:admin:login": "node scripts/generate-admin-login-test-report.js",
+    "test:report:admin:complete": "node scripts/generate-admin-complete-test-report.js",
     "test:report:all": "node scripts/generate-all-test-reports.js",
     "test:debug": "jest --detectOpenHandles --forceExit",
     "seed:books": "ts-node src/seeds/books.seed.ts"
