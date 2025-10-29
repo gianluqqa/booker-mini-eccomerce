@@ -5,6 +5,7 @@ import { Book } from "../entities/Book";
 import { Order } from "../entities/Order";
 import { OrderItem } from "../entities/OrderItem";
 import { Cart } from "../entities/Cart";
+import { Genre } from "../entities/Genre";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -19,5 +20,5 @@ export const AppDataSource = new DataSource({
   synchronize: true, // solo para desarrollo
   //dropSchema: true,
   logging: false,
-  entities: [User, Book, Order, OrderItem, Cart],
+  entities: [User, Book, Order, OrderItem, Cart, Genre],
 });

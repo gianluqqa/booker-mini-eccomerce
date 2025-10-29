@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { createBookService, getBooksService } from "../services/books-services";
 import { validateBook } from "../routes/middlewares/validateBook";
+import { AppDataSource } from "../config/data-source";
+import { Genre } from "../entities/Genre";
 
 //? Obtener todos los Books (GET).
 export const getBooksController = async (req: Request, res: Response) => {
@@ -23,6 +25,17 @@ export const createBookController = async (req: Request, res: Response) => {
         success: false,
         message: "Validation error",
         errors,
+      });
+    }
+
+    // 🔹 Validar que el género exista en la tabla Genre.
+    const genreName = (req.body.genre as string).trim();
+    const genreRepo = AppDataSource.getRepository(Genre);
+    const genre = await genreRepo.findOne({ where: { name: genreName } });
+    if (!genre) {
+      return res.status(400).json({
+        success: false,
+        message: `Genre '${genreName}' is not valid.`,
       });
     }
 
