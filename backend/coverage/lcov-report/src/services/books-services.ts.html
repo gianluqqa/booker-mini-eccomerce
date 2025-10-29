@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">20% </span>
+                <span class="strong">19.35% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/30</span>
+                <span class='fraction'>6/31</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">14.81% </span>
+                <span class="strong">14.28% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>4/27</span>
+                <span class='fraction'>4/28</span>
             </div>
         
             
@@ -129,7 +129,22 @@
 <a name='L64'></a><a href='#L64'>64</a>
 <a name='L65'></a><a href='#L65'>65</a>
 <a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -160,6 +175,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -183,6 +201,18 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -217,16 +247,19 @@ export const getBooksService = <span class="fstat-no" title="function not covere
     const books = <span class="cstat-no" title="statement not covered" >await queryBuilder.getMany();</span>
 &nbsp;
     // Convertir entidades a DTOs
-    const bookDtos: BookDto[] = <span class="cstat-no" title="statement not covered" >books.map(<span class="fstat-no" title="function not covered" >(b</span>ook) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
-      id: book.id.toString(),
+    const booksResponse: BookDto[] = <span class="cstat-no" title="statement not covered" >books.map(<span class="fstat-no" title="function not covered" >(b</span>ook) =&gt; (<span class="cstat-no" title="statement not covered" >{</span></span>
+      id: book.id?.toString(),
       title: book.title,
       author: book.author,
-      price: book.price,
+      price: Number(book.price),
       stock: book.stock,
       image: book.image || "",
+      genre: book.genre,
+      intro: book.intro,
+      description: book.description,
     }));
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return bookDtos;</span>
+<span class="cstat-no" title="statement not covered" >    return booksResponse;</span>
   } catch (error) {
 <span class="cstat-no" title="statement not covered" >    console.error("Error getting books:", error);</span>
 <span class="cstat-no" title="statement not covered" >    throw new Error("Could not get books");</span>
@@ -250,7 +283,19 @@ export const createBookService = <span class="fstat-no" title="function not cove
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    await bookRepository.save(newBook);</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return newBook;</span>
+    const createdBookResponse: BookDto = <span class="cstat-no" title="statement not covered" >{</span>
+      id: newBook.id?.toString(),
+      title: newBook.title,
+      author: newBook.author,
+      price: Number(newBook.price),
+      stock: newBook.stock,
+      image: newBook.image || "",
+      genre: newBook.genre,
+      intro: newBook.intro,
+      description: newBook.description,
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    return createdBookResponse;</span>
   } catch (error: any) {
 <span class="cstat-no" title="statement not covered" >    console.error("Error creating book:", error);</span>
 &nbsp;
@@ -268,7 +313,7 @@ export const createBookService = <span class="fstat-no" title="function not cove
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-10-29T00:53:05.575Z
+                at 2025-10-29T05:30:51.031Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

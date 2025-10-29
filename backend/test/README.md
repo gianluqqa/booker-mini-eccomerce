@@ -139,7 +139,7 @@ npm run test:coverage
 # Run tests in watch mode
 npm run test:watch
 
-# Run only integration tests
+# Run only integration tests (Users Module - Register and Login)
 npm run test:integration
 
 # Run specific test file
