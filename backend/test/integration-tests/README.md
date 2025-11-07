@@ -25,7 +25,7 @@ npm run test:watch
 ## 📋 Current Integration Tests
 
 ### User Management Tests
-- **User Registration & Login Flow**: Complete user journey from registration to authentication
+- **User Registration & Login Flow**: Complete user journey from registration to authentication (login ahora retorna `accessToken` JWT y los campos del usuario al nivel raíz).
 - **User Validation**: Data validation and error handling for user operations
 - **Multi-user Scenarios**: System behavior with multiple concurrent users
 - **Edge Cases**: Duplicate emails, invalid data, and boundary conditions
@@ -79,6 +79,7 @@ integration-tests/
 - **Supertest**: For making HTTP requests to the API
 - **TypeORM**: For database interaction
 - **Faker**: For generating test data
+ - **JWT**: Login emite `accessToken` (Bearer) usado por endpoints protegidos
 
 ## 🚨 Troubleshooting
 

@@ -1,12 +1,13 @@
 # Integration Test: Register + Login Flow
 
 ## Objective
-Validate the integration between registration (`/users/register`) and login (`/users/login`) endpoints, ensuring that the user creation and authentication flow works correctly as a continuous process.
+Validate the integration between registration (`/users/register`) and login (`/users/login`) endpoints, ensuring that the user creation and authentication flow works correctly as a continuous process. The login response now includes a JWT `accessToken` and keeps user fields at the root level for compatibility.
 
 ## Scope
 This test covers:
 - Successful registration of a new user
 - Login with the newly created credentials
+- Presence of `accessToken` (JWT) in login response
 - HTTP response validation, response body, and database persistence
 - Error handling and security validations
 - Isolation between multiple users
@@ -75,6 +76,7 @@ This test covers:
 |-------------|--------|--------|
 | Successful registration (201) | ✅ 201 Created | ✅ PASSED |
 | Successful login (200) | ✅ 200 OK | ✅ PASSED |
+| Login returns accessToken | ✅ Present | ✅ PASSED |
 | Data consistency | ✅ ID and data match | ✅ PASSED |
 | Error validation | ✅ 400/409 appropriate | ✅ PASSED |
 | User isolation | ✅ No interference | ✅ PASSED |
@@ -91,6 +93,7 @@ This test covers:
 
 ## Security Validations
 - ✅ Passwords not exposed in responses
+- ✅ JWT `accessToken` returned and required for protected endpoints
 - ✅ Generic error messages for invalid credentials
 - ✅ Email format validation
 - ✅ Required fields validation

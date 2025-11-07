@@ -4,7 +4,7 @@ import { Book } from "./Book";
 
 @Entity("carts")
 export class Cart {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @ManyToOne(() => User, (user) => user.carts, { onDelete: "CASCADE" })

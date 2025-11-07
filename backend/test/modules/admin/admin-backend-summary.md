@@ -1,7 +1,7 @@
 # Admin Module Testing Summary
 
 ## Overview
-This document provides a comprehensive summary of all testing activities for the Admin module, including both manual and automated testing approaches. The testing covers complete admin user registration and login functionality with comprehensive validation scenarios and role-based access control.
+This document provides a comprehensive summary of all testing activities for the Admin module, including both manual and automated testing approaches. The testing covers complete admin user registration and login functionality with comprehensive validation scenarios and role-based access control. As of October 2025, authentication uses JWT access tokens; login responses include `accessToken`, and admin-only endpoints require `Authorization: Bearer <token>`.
 
 ## Test Execution Summary
 

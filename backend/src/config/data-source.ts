@@ -20,5 +20,6 @@ export const AppDataSource = new DataSource({
   synchronize: true, // solo para desarrollo
   //dropSchema: true,
   logging: false,
+  uuidExtension: "uuid-ossp",
   entities: [User, Book, Order, OrderItem, Cart, Genre],
 });

@@ -23,3 +23,14 @@ export interface LoginUserDTO {
   email: string;
   password: string;
 }
+
+export interface UpdateUserDTO {
+  name?: string;
+  surname?: string;
+  password?: string;
+  address?: string;
+  country?: string;
+  city?: string;
+  phone?: string;
+  role?: string;
+}

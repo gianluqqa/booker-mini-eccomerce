@@ -5,6 +5,9 @@
   "scripts": {
     "predev": "npm run seed:all",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev:backend": "npm run seed:all && ts-node-dev --respawn --transpile-only src/server.ts",
+    "server": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "run": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "prestart": "npm run seed:all",
     "start": "node dist/server.ts",
@@ -34,6 +37,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.6.1",
     "@types/supertest": "^6.0.3",

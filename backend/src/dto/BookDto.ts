@@ -22,3 +22,17 @@ export interface CreateBookDto {
   intro?: string;
   description: string;
 }
+
+
+// Estrucutra de datos para actualizar (PUT) un Book.
+export interface UpdateBookDto {
+  id: string;
+  title?: string;
+  image?: string;
+  author?: string;
+  price?: number;
+  stock?: number;
+  genre?: string;
+  intro?: string;
+  description?: string;
+}

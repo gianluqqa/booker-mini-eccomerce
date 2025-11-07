@@ -1,8 +1,8 @@
-import { Entity, PrimaryColumn, Column, Index } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Index } from "typeorm";
 
 @Entity()
 export class Genre {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Index({ unique: true })

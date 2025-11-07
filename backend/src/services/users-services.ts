@@ -1,10 +1,15 @@
-import { LoginUserDTO, RegisterUserDTO } from "../dto/UserDto";
-import { validateLoginUser, validateRegisterUser } from "../routes/middlewares/validateUser";
+import { LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
+import { validateLoginUser, validateRegisterUser } from "../middlewares/validateUser";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
 import { UserRole } from "../enums/UserRole";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { excludeSensitiveData } from "../helpers/user-helpers";
 
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
+
+//? Crear un nuevo usuario (POST).
 export const registerUserService = async (user: RegisterUserDTO) => {
   // 1️⃣ Chequear campos obligatorios faltantes
   const requiredFields: (keyof RegisterUserDTO)[] = [
@@ -55,6 +60,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
   return safeUser;
 };
 
+//? Iniciar sesión (POST).
 export const loginUserService = async (user: LoginUserDTO) => {
   // 1️⃣ Validación del request
   const errors = validateLoginUser(user);
@@ -71,7 +77,60 @@ export const loginUserService = async (user: LoginUserDTO) => {
   const isPasswordValid = await bcrypt.compare(user.password, existingUser.password);
   if (!isPasswordValid) throw new Error("Invalid credentials");
 
-  // 4️⃣ Retornar usuario seguro
+  // 4️⃣ Emitir access token (15m)
+  const accessToken = jwt.sign(
+    { sub: existingUser.id, role: existingUser.role },
+    JWT_SECRET,
+    { algorithm: "HS256", expiresIn: "15m" }
+  );
+
+  // 5️⃣ Retornar usuario seguro + token
   const { password: _, ...safeUser } = existingUser;
-  return safeUser;
+  return { user: safeUser, accessToken };
+};
+
+//? Obtener todos los usuarios (GET).
+export const getUsersService = async () => {
+  const userRepo = AppDataSource.getRepository(User);
+  const allUsers = await userRepo.find();
+  return allUsers.map(excludeSensitiveData);
+};
+
+//? Obtener un usuario por ID (GET).
+export const getUserByIdService = async (id: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { id } });
+  
+  if (!user) {
+    throw { status: 404, message: "User not found" };
+  }
+  
+  return excludeSensitiveData(user);
+};
+
+//? Actualizar un usuario (PUT).
+export const updateUserService = async (id: string, user: UpdateUserDTO) => {
+  const userRepo = AppDataSource.getRepository(User);
+  
+  try {
+    const existingUser = await userRepo.findOne({ where: { id } });
+    if (!existingUser) {
+      throw { status: 404, message: "User not found" };
+    }
+
+    // Si se actualiza el password, hashearlo
+    if (user.password) {
+      user.password = await bcrypt.hash(user.password, 10);
+    }
+
+    // Actualizar solo los campos definidos
+    Object.assign(existingUser, user);
+    await userRepo.save(existingUser);
+    
+    return excludeSensitiveData(existingUser);
+  } catch (error: any) {
+    console.error("Error updating user:", error);
+    if (error.status && error.message) throw error;
+    throw { status: 500, message: "Could not update user" };
+  }
 };

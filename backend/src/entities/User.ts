@@ -12,7 +12,7 @@ import { UserRole } from "../enums/UserRole";
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column({ unique: true })

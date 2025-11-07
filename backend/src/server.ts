@@ -3,7 +3,7 @@ import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import { AppDataSource } from "./config/data-source";
-import userRoutes from "./routes/userRoutes";
+import userRoutes from "./routes/users-routes";
 import booksRoutes from "./routes/books-routes";
 
 dotenv.config();

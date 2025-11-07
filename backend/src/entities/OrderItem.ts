@@ -3,7 +3,7 @@ import { Book } from "./Book";
 
 @Entity()
 export class OrderItem {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @ManyToOne("Order", "items")

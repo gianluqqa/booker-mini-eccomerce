@@ -35,7 +35,7 @@
     "allowJs": true,
 
     // Tipos para testing
-    "types": ["node", "jest"]
+    "types": ["node", "jest", "jsonwebtoken"]
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist", "coverage"]

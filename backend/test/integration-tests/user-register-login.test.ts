@@ -67,6 +67,8 @@ describe("Integration Tests: User Register + Login Flow", () => {
     expect(loginResponse.body.phone).toBe("543512345678");
     expect(loginResponse.body.role).toBe("customer");
     expect(loginResponse.body.id).toBeDefined();
+    // Nuevo: el backend ahora emite JWT
+    expect(loginResponse.body.accessToken).toBeDefined();
     console.log("✅ Login successful");
 
     // ========================================
@@ -186,6 +188,7 @@ describe("Integration Tests: User Register + Login Flow", () => {
       expect(loginResponse.status).toBe(200);
       expect(loginResponse.body.email).toBe(users[i].email);
       expect(loginResponse.body.id).toBe(registerResponses[i].body.id);
+      expect(loginResponse.body.accessToken).toBeDefined();
       console.log(`✅ User ${i + 1} logged in successfully`);
     }
 
@@ -272,6 +275,7 @@ describe("Integration Tests: User Register + Login Flow", () => {
     expect(firstLoginResponse.status).toBe(200);
     expect(firstLoginResponse.body.email).toBe(firstUser.email);
     expect(firstLoginResponse.body.name).toBe("First");
+    expect(firstLoginResponse.body.accessToken).toBeDefined();
     console.log("✅ First user login successful");
 
     // Login con credenciales del segundo usuario (debe fallar)

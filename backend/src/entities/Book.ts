@@ -4,7 +4,7 @@ import { Cart } from "./Cart";
 
 @Entity()
 export class Book {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @Column()

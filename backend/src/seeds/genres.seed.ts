@@ -37,15 +37,7 @@ export const seedGenres = async () => {
 
     const repo = AppDataSource.getRepository(Genre);
 
-    const slugify = (s: string) =>
-      s
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)+/g, "");
-
-    const records = genreNames.map((name) => ({ id: slugify(name), name }));
+    const records = genreNames.map((name) => ({ name }));
 
     // Upsert por 'name' para no duplicar si ya existen
     await repo.upsert(records, {

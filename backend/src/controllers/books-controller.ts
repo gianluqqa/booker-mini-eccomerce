@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { createBookService, getBooksService } from "../services/books-services";
-import { validateBook } from "../routes/middlewares/validateBook";
+import { createBookService, getBooksService, getBookByIdService, updateBookService, deleteBookService } from "../services/books-services";
+import { validateBook, validateUpdateBook, validateDeleteBook } from "../middlewares/validateBook";
 import { AppDataSource } from "../config/data-source";
 import { Genre } from "../entities/Genre";
 
@@ -14,11 +14,30 @@ export const getBooksController = async (req: Request, res: Response) => {
   }
 };
 
+//? Obtener un Book por ID (GET).
+export const getBookByIdController = async (req: Request, res: Response) => {
+  try {
+    const bookId = req.params.id;
+    const book = await getBookByIdService(bookId);
+    res.status(200).json({
+      success: true,
+      data: book,
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Internal server error";
+    res.status(status).json({
+      success: false,
+      message,
+    });
+  }
+};
+
 //? Crear un nuevo Book (POST).
 export const createBookController = async (req: Request, res: Response) => {
   try {
-    // 🔹 Validar los campos del Book.
-    const errors = validateBook(req.body);
+    // 🔹 Validar los campos del Book y el rol de admin.
+    const errors = validateBook(req.body, req);
 
     if (errors.length > 0) {
       return res.status(400).json({
@@ -53,6 +72,70 @@ export const createBookController = async (req: Request, res: Response) => {
     const message = error.message || "Internal server error";
 
     return res.status(status).json({
+      success: false,
+      message,
+    });
+  }
+};
+
+//? Actualizar un Book (PUT).
+export const updateBookController = async (req: Request, res: Response) => {
+  try {
+    const bookId = req.params.id;
+    
+    // 🔹 Validar los campos del Book y el rol de admin.
+    const updateData = { ...req.body, id: bookId };
+    const errors = validateUpdateBook(updateData, req);
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors,
+      });
+    }
+
+    const book = await updateBookService(updateData);
+    res.status(200).json({
+      success: true,
+      message: "Book updated successfully",
+      data: book,
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Internal server error";
+    res.status(status).json({
+      success: false,
+      message,
+    });
+  }
+};
+
+//? Eliminar un Book (DELETE).
+export const deleteBookController = async (req: Request, res: Response) => {
+  try {
+    const bookId = req.params.id;
+
+    // 🔹 Validar el rol de admin.
+    const errors = validateDeleteBook(req);
+
+    if (errors.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors,
+      });
+    }
+
+    await deleteBookService(bookId);
+    res.status(200).json({
+      success: true,
+      message: "Book deleted successfully",
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Internal server error";
+    res.status(status).json({
       success: false,
       message,
     });

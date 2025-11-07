@@ -75,7 +75,7 @@ The code was modified to:
 ### Technical Changes Made:
 - **DTO (`UserDto.ts`):** Added `role?: string` field to `RegisterUserDTO`
 - **Validation (`validateUser.ts`):** Added role validation to ensure only valid enum values
-- **Service (`userServices.ts`):** Updated to use role from request instead of always defaulting to CUSTOMER
+- **Service (`users-services.ts`):** Updated to use role from request instead of always defaulting to CUSTOMER
 - **Type Safety:** Added proper TypeScript typing with `UserRole` enum
 
 ## Fix Validation

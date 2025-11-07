@@ -12,7 +12,7 @@ import { OrderStatus } from "../enums/OrderStatus";
 
 @Entity()
 export class Order {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn("uuid")
   id!: string;
 
   @ManyToOne(() => User, (user) => user.orders)

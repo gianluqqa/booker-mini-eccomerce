@@ -254,8 +254,8 @@ The code was modified to:
 4. ✅ Follow security best practices for authentication systems
 
 ### Technical Changes Made:
-- **Service (`userServices.ts`):** Changed error messages to generic "Invalid credentials" for both user not found and invalid password scenarios
-- **Controller (`userControllers.ts`):** Updated error mapping to return 401 for all "Invalid credentials" errors
+- **Service (`users-services.ts`):** Changed error messages to generic "Invalid credentials" for both user not found and invalid password scenarios
+- **Controller (`users-controllers.ts`):** Updated error mapping to return 401 for all "Invalid credentials" errors
 - **Test Case (TC-009):** Updated expected results to reflect new security behavior
 
 ## Fix Validation
@@ -359,8 +359,8 @@ The code was modified to:
 4. ✅ Follow security best practices for generic error messaging
 
 ### Technical Changes Made:
-- **Service (`userServices.ts`):** Changed specific "Invalid password" error to generic "Invalid credentials"
-- **Controller (`userControllers.ts`):** Updated error mapping to handle all "Invalid credentials" errors consistently
+- **Service (`users-services.ts`):** Changed specific "Invalid password" error to generic "Invalid credentials"
+- **Controller (`users-controllers.ts`):** Updated error mapping to handle all "Invalid credentials" errors consistently
 - **Test Case (TC-008):** Updated expected results to reflect new generic error messaging
 
 ## Fix Validation
