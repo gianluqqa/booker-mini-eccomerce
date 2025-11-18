@@ -4,10 +4,10 @@ import { authenticateJWT, requireAdmin } from "../middlewares/auth";
 
 const userRoutes = Router();
 
-userRoutes.post("/register", registerUserController);
-userRoutes.post("/login", loginUserController);
-userRoutes.get("/", authenticateJWT, requireAdmin, getUsersController);
-userRoutes.get("/:id", authenticateJWT, requireAdmin, getUserByIdController);
-userRoutes.put("/:id", authenticateJWT, updateUserController);
+userRoutes.post("/register", registerUserController); //? Registrar un nuevo usuario.
+userRoutes.post("/login", loginUserController); //? Iniciar sesión.
+userRoutes.get("/", authenticateJWT, requireAdmin, getUsersController); //? Obtener todos los usuarios.
+userRoutes.get("/:id", authenticateJWT, requireAdmin, getUserByIdController); //? Obtener un usuario por ID.
+userRoutes.put("/:id", authenticateJWT, updateUserController); //? Actualizar un usuario.
 
 export default userRoutes;

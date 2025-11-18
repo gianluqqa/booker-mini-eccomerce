@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { AppDataSource } from "./config/data-source";
 import userRoutes from "./routes/users-routes";
 import booksRoutes from "./routes/books-routes";
+import cartRoutes from "./routes/carts-routes";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(express.json());
 // Rutas
 app.use("/users", userRoutes);
 app.use("/books", booksRoutes);
+app.use("/carts", cartRoutes);
 
 
 const PORT = process.env.PORT || 5000;
