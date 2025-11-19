@@ -21,47 +21,47 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
   if (email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      errors.push("Email format is invalid");
+      errors.push("El formato del email es inválido");
     }
   }
 
   // Password validation
   if (password && password.length < 8) {
     errors.push(
-      "Password must contain at least 8 characters, uppercase, lowercase and number"
+      "La contraseña debe contener al menos 8 caracteres, mayúsculas, minúsculas y números"
     );
   }
 
   // Confirm password validation
   if (password && confirmPassword && password !== confirmPassword) {
-    errors.push("Passwords do not match");
+    errors.push("Las contraseñas no coinciden");
   }
 
   // Name & Surname length validation (si se envían)
-  if (name && name.trim().length === 0) errors.push("Name is required");
-  if (surname && surname.trim().length === 0)
-    errors.push("Surname is required");
+    if (name && name.trim().length === 0) errors.push("El nombre es requerido");
+    if (surname && surname.trim().length === 0)
+    errors.push("El apellido es requerido");
 
   // Optional fields validations
   if (phone) {
     const phoneRegex = /^[0-9]{7,15}$/;
     if (!phoneRegex.test(phone)) {
       errors.push(
-        "Phone number must contain only digits and be between 7 and 15 characters"
+        "El número de teléfono debe contener solo dígitos y tener entre 7 y 15 caracteres"
       );
     }
   }
 
   if (address && address.length < 3)
-    errors.push("Address must be at least 3 characters long");
+    errors.push("La dirección debe tener al menos 3 caracteres");
   if (country && country.length < 2)
-    errors.push("Country must be at least 2 characters long");
+    errors.push("El país debe tener al menos 2 caracteres");
   if (city && city.length < 2)
-    errors.push("City must be at least 2 characters long");
+    errors.push("La ciudad debe tener al menos 2 caracteres");
 
   // Role validation
   if (role && !Object.values(UserRole).includes(role as UserRole)) {
-    errors.push("Role must be either 'customer' or 'admin'");
+    errors.push("El rol debe ser 'customer' o 'admin'");
   }
 
   return errors;
@@ -74,17 +74,17 @@ export const validateLoginUser = (user: LoginUserDTO) => {
 
   // Email validation
   if (!email || email.trim() === "") {
-    errors.push("Email is required");
+    errors.push("El email es requerido");
   } else {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      errors.push("Email format is invalid");
+      errors.push("El formato del email es inválido");
     }
   }
 
   // Password validation
   if (!password || password.trim() === "") {
-    errors.push("Password is required");
+    errors.push("La contraseña es requerida");
   }
 
   return errors;
@@ -97,17 +97,17 @@ export const validateUpdateUser = (user: UpdateUserDTO) => {
 
   // Name validation
   if (name !== undefined && name.trim().length === 0) {
-    errors.push("Name cannot be empty");
+    errors.push("El nombre no puede estar vacío");
   }
 
   // Surname validation
   if (surname !== undefined && surname.trim().length === 0) {
-    errors.push("Surname cannot be empty");
+    errors.push("El apellido no puede estar vacío");
   }
 
   // Password validation
   if (password && password.length < 8) {
-    errors.push("Password must contain at least 8 characters");
+    errors.push("La contraseña debe contener al menos 8 caracteres");
   }
 
   // Phone validation
@@ -120,22 +120,22 @@ export const validateUpdateUser = (user: UpdateUserDTO) => {
 
   // Address validation
   if (address !== undefined && address.length < 3) {
-    errors.push("Address must be at least 3 characters long");
+    errors.push("La dirección debe tener al menos 3 caracteres");
   }
 
   // Country validation
   if (country !== undefined && country.length < 2) {
-    errors.push("Country must be at least 2 characters long");
+    errors.push("El país debe tener al menos 2 caracteres");
   }
 
   // City validation
   if (city !== undefined && city.length < 2) {
-    errors.push("City must be at least 2 characters long");
+    errors.push("La ciudad debe tener al menos 2 caracteres");
   }
 
   // Role validation
   if (role && !Object.values(UserRole).includes(role as UserRole)) {
-    errors.push("Role must be either 'customer' or 'admin'");
+    errors.push("El rol debe ser 'customer' o 'admin'");
   }
 
   return errors;

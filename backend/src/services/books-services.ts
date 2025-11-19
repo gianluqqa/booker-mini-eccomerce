@@ -37,7 +37,7 @@ export const getBooksService = async (query?: string): Promise<BookDto[]> => {
     return booksResponse;
   } catch (error) {
     console.error("Error getting books:", error);
-    throw new Error("Could not get books");
+    throw new Error("No se pudieron obtener los libros");
   }
 };
 
@@ -50,7 +50,7 @@ export const getBookByIdService = async (id: string): Promise<BookDto> => {
     const book = await bookRepository.findOne({ where: { id } });
     
     if (!book) {
-      throw { status: 404, message: "Book not found" };
+      throw { status: 404, message: "Libro no encontrado" };
     }
 
     return {
@@ -67,7 +67,7 @@ export const getBookByIdService = async (id: string): Promise<BookDto> => {
   } catch (error: any) {
     console.error("Error getting book by id:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not get book" };
+    throw { status: 500, message: "No se pudo obtener el libro" };
   }
 };
 
@@ -82,7 +82,7 @@ export const createBookService = async (book: CreateBookDto): Promise<BookDto> =
     });
 
     if (existingBook) {
-      throw { status: 409, message: "Book already exists" };
+      throw { status: 409, message: "El libro ya existe" };
     }
 
     const newBook = bookRepository.create(book);
@@ -109,7 +109,7 @@ export const createBookService = async (book: CreateBookDto): Promise<BookDto> =
       throw error;
     }
 
-    throw { status: 500, message: "Could not create book" };
+    throw { status: 500, message: "No se pudo crear el libro" };
   }
 };
 
@@ -120,7 +120,7 @@ export const updateBookService = async (book: UpdateBookDto): Promise<BookDto> =
   try {
     const existingBook = await bookRepository.findOne({ where: { id: book.id } });
     if (!existingBook) {
-      throw { status: 404, message: "Book not found" };
+      throw { status: 404, message: "Libro no encontrado" };
     }
 
     // Extraer id y actualizar solo los campos definidos
@@ -142,7 +142,7 @@ export const updateBookService = async (book: UpdateBookDto): Promise<BookDto> =
   } catch (error: any) {
     console.error("Error updating book:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not update book" };
+    throw { status: 500, message: "No se pudo actualizar el libro" };
   }
 };
 
@@ -153,13 +153,13 @@ export const deleteBookService = async (id: string): Promise<void> => {
   try {
     const existingBook = await bookRepository.findOne({ where: { id } });
     if (!existingBook) {
-      throw { status: 404, message: "Book not found" };
+      throw { status: 404, message: "Libro no encontrado" };
     }
 
     await bookRepository.remove(existingBook);
   } catch (error: any) {
     console.error("Error deleting book:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not delete book" };
+    throw { status: 500, message: "No se pudo eliminar el libro" };
   }
 };

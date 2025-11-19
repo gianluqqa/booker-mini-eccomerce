@@ -1,4 +1,4 @@
-import Profile from '@/views/Profile'
+import Profile from '@/components/user/Profile'
 import React from 'react'
 
 const ProfileById = () => {

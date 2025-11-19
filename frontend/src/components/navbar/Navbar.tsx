@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Search, ShoppingCart, User, LogOut, Menu, X, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +12,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,25 +67,25 @@ const Navbar = () => {
                 onClick={() => scrollToSection('books')} 
                 className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
               >
-                Books
+                Libros
               </button>
               <button 
                 onClick={() => scrollToSection('bestsellers')} 
                 className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
               >
-                Bestsellers
+                Más Vendidos
               </button>
               <button 
                 onClick={() => scrollToSection('collections')} 
                 className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
               >
-                Collections
+                Colecciones
               </button>
               <button 
                 onClick={() => scrollToSection('about')} 
                 className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
               >
-                About Us
+                Sobre Nosotros
               </button>
             </div>
           )}
@@ -94,7 +96,7 @@ const Navbar = () => {
               <div className="relative w-full">
                 <input
                   type="text"
-                  placeholder="Search..."
+                  placeholder="Buscar..."
                   className={`w-full rounded-lg py-1.5 px-4 pr-8 border focus:outline-none focus:ring-1 transition-all duration-200 text-sm ${
                     isScrolled 
                       ? 'bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 border-[#2e4b30]/20 focus:border-[#2e4b30] focus:ring-[#2e4b30]/20' 
@@ -118,16 +120,28 @@ const Navbar = () => {
               )}
             </Link>
 
-            {/* Perfil de Usuario */}
-            <Link href="/profile" className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80">
-              <User className="w-5 h-5" strokeWidth={2} />
-            </Link>
-
-            {/* Cerrar Sesión */}
-            <button className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium shadow-md text-sm">
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
-            </button>
+            {/* Perfil de Usuario o Login */}
+            {isAuthenticated ? (
+              <>
+                <Link href="/profile" className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80">
+                  <User className="w-5 h-5" strokeWidth={2} />
+                </Link>
+                <button 
+                  onClick={() => {
+                    logout();
+                    router.push('/');
+                  }}
+                  className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium shadow-md text-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Cerrar Sesión</span>
+                </button>
+              </>
+            ) : (
+              <Link href="/login" className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium shadow-md text-sm">
+                <span>Iniciar Sesión</span>
+              </Link>
+            )}
 
             {/* Botón de Menú Móvil */}
             <button
@@ -163,32 +177,49 @@ const Navbar = () => {
                     onClick={() => scrollToSection('books')} 
                     className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
                   >
-                    Books
+                    Libros
                   </button>
                   <button 
                     onClick={() => scrollToSection('bestsellers')} 
                     className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
                   >
-                    Bestsellers
+                    Más Vendidos
                   </button>
                   <button 
                     onClick={() => scrollToSection('collections')} 
                     className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
                   >
-                    Collections
+                    Colecciones
                   </button>
                   <button 
                     onClick={() => scrollToSection('about')} 
                     className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
                   >
-                    About Us
+                    Sobre Nosotros
                   </button>
                 </>
               )}
-              <button className="flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium w-fit shadow-md text-sm">
-                <LogOut className="w-4 h-4" />
-                <span>Logout</span>
-              </button>
+              {isAuthenticated ? (
+                <button 
+                  onClick={() => {
+                    logout();
+                    router.push('/');
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium w-fit shadow-md text-sm"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Cerrar Sesión</span>
+                </button>
+              ) : (
+                <Link 
+                  href="/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center justify-center bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium w-fit shadow-md text-sm"
+                >
+                  <span>Iniciar Sesión</span>
+                </Link>
+              )}
             </div>
           </div>
         )}

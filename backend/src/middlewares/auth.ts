@@ -8,7 +8,7 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
   try {
     const authHeader = req.headers["authorization"] as string | undefined;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Missing or invalid Authorization header" });
+      return res.status(401).json({ message: "Falta o es inválido el encabezado de autorización" });
     }
 
     const token = authHeader.slice("Bearer ".length).trim();
@@ -17,17 +17,17 @@ export const authenticateJWT = (req: Request, res: Response, next: NextFunction)
     (req as any).authUser = { id: payload.sub, role: payload.role };
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return res.status(401).json({ message: "Token inválido o expirado" });
   }
 };
 
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   const authUser = (req as any).authUser as { id: string; role: UserRole } | undefined;
   if (!authUser) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.status(401).json({ message: "No autorizado" });
   }
   if (authUser.role !== UserRole.ADMIN) {
-    return res.status(403).json({ message: "Forbidden: admin role required" });
+    return res.status(403).json({ message: "Prohibido: se requiere rol de administrador" });
   }
   next();
 };

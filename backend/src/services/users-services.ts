@@ -25,7 +25,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
 
   if (missingFields.length > 0) {
     throw new Error(
-      "Email, password, confirmPassword, name and surname are required"
+      "Email, contraseña, confirmación de contraseña, nombre y apellido son requeridos"
     );
   }
 
@@ -38,7 +38,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
   // 3️⃣ Check duplicado
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
-  if (existingUser) throw new Error("User with that email already exists");
+    if (existingUser) throw new Error("Ya existe un usuario con ese email");
 
   // 4️⃣ Crear usuario
   const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -71,7 +71,7 @@ export const loginUserService = async (user: LoginUserDTO) => {
   // 2️⃣ Verificar que el usuario exista
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
-  if (!existingUser) throw new Error("Invalid credentials");
+    if (!existingUser) throw new Error("Credenciales inválidas");
 
   // 3️⃣ Verificar password
   const isPasswordValid = await bcrypt.compare(user.password, existingUser.password);
@@ -96,13 +96,25 @@ export const getUsersService = async () => {
   return allUsers.map(excludeSensitiveData);
 };
 
+//? Obtener el usuario actual (GET /users/me).
+export const getCurrentUserService = async (id: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({ where: { id } });
+  
+  if (!user) {
+    throw { status: 404, message: "Usuario no encontrado" };
+  }
+  
+  return excludeSensitiveData(user);
+};
+
 //? Obtener un usuario por ID (GET).
 export const getUserByIdService = async (id: string) => {
   const userRepo = AppDataSource.getRepository(User);
   const user = await userRepo.findOne({ where: { id } });
   
   if (!user) {
-    throw { status: 404, message: "User not found" };
+    throw { status: 404, message: "Usuario no encontrado" };
   }
   
   return excludeSensitiveData(user);
@@ -115,7 +127,7 @@ export const updateUserService = async (id: string, user: UpdateUserDTO) => {
   try {
     const existingUser = await userRepo.findOne({ where: { id } });
     if (!existingUser) {
-      throw { status: 404, message: "User not found" };
+      throw { status: 404, message: "Usuario no encontrado" };
     }
 
     // Si se actualiza el password, hashearlo
@@ -131,6 +143,6 @@ export const updateUserService = async (id: string, user: UpdateUserDTO) => {
   } catch (error: any) {
     console.error("Error updating user:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not update user" };
+    throw { status: 500, message: "No se pudo actualizar el usuario" };
   }
 };

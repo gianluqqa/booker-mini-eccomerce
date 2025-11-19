@@ -15,11 +15,15 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
+// Endpoint raíz
+app.get("/", (req, res) => {
+  res.send("Booker Backend funcionando ✅");
+});
+
 // Rutas
 app.use("/users", userRoutes);
 app.use("/books", booksRoutes);
 app.use("/carts", cartRoutes);
-
 
 const PORT = process.env.PORT || 5000;
 
@@ -34,7 +38,3 @@ AppDataSource.initialize()
   .catch((err) => {
     console.error("❌ Error al conectar DB", err);
   });
-
-app.get("/", (req, res) => {
-  res.send("Booker Backend funcionando ✅");
-});

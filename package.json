@@ -1,0 +1,50 @@
+{
+  "name": "booker-mini-ecommerce",
+  "version": "1.0.0",
+  "description": "Mini e-commerce de libros - Orquestador del proyecto completo",
+  "private": true,
+  "scripts": {
+    "start": "node backend/dist/server.js",
+    "predev": "npm run seed:all",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "cd backend && npm run build",
+    "start:frontend": "cd frontend && npm run start",
+    "start:backend": "cd backend && npm run start",
+    "test": "cd backend && npm run test",
+    "test:watch": "cd backend && npm run test:watch",
+    "test:coverage": "cd backend && npm run test:coverage",
+    "test:integration": "cd backend && npm run test:integration",
+    "lint": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && npm run lint || echo 'No lint script in backend'",
+    "clean": "rm -rf frontend/node_modules backend/node_modules backend/dist frontend/.next node_modules",
+    "clean:install": "npm run clean && npm run install:all",
+    "seed:genres": "cd backend && npm run seed:genres",
+    "seed:all": "cd backend && npm run seed:genres && npm run seed:books",
+    "seed:books": "cd backend && npm run seed:books",
+    "deploy:frontend": "cd frontend && npm run build && npm run start",
+    "deploy:backend": "cd backend && npm run build && npm run start"
+  },
+  "keywords": [
+    "ecommerce",
+    "books",
+    "nodejs",
+    "typescript",
+    "nextjs",
+    "react",
+    "orchestrator"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

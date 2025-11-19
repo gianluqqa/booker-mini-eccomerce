@@ -25,7 +25,7 @@ export const getBookByIdController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
     res.status(status).json({
       success: false,
       message,
@@ -42,7 +42,7 @@ export const createBookController = async (req: Request, res: Response) => {
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: "Error de validación",
         errors,
       });
     }
@@ -54,7 +54,7 @@ export const createBookController = async (req: Request, res: Response) => {
     if (!genre) {
       return res.status(400).json({
         success: false,
-        message: `Genre '${genreName}' is not valid.`,
+        message: `El género '${genreName}' no es válido.`,
       });
     }
 
@@ -63,13 +63,13 @@ export const createBookController = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       success: true,
-      message: "Book created successfully",
+      message: "Libro creado exitosamente",
       data: book,
     });
   } catch (error: any) {
     // 🔹 Detectar errores controlados del servicio.
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,
@@ -90,7 +90,7 @@ export const updateBookController = async (req: Request, res: Response) => {
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: "Error de validación",
         errors,
       });
     }
@@ -98,12 +98,12 @@ export const updateBookController = async (req: Request, res: Response) => {
     const book = await updateBookService(updateData);
     res.status(200).json({
       success: true,
-      message: "Book updated successfully",
+      message: "Libro actualizado exitosamente",
       data: book,
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
     res.status(status).json({
       success: false,
       message,
@@ -122,7 +122,7 @@ export const deleteBookController = async (req: Request, res: Response) => {
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: "Error de validación",
         errors,
       });
     }
@@ -130,11 +130,11 @@ export const deleteBookController = async (req: Request, res: Response) => {
     await deleteBookService(bookId);
     res.status(200).json({
       success: true,
-      message: "Book deleted successfully",
+      message: "Libro eliminado exitosamente",
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
     res.status(status).json({
       success: false,
       message,

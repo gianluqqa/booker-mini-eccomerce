@@ -18,7 +18,7 @@ export const addBookToCartController = async (req: Request, res: Response) => {
     if (!authUser) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "No autorizado",
       });
     }
 
@@ -28,7 +28,7 @@ export const addBookToCartController = async (req: Request, res: Response) => {
     if (!bookId) {
       return res.status(400).json({
         success: false,
-        message: "bookId is required",
+        message: "bookId es requerido",
       });
     }
 
@@ -38,7 +38,7 @@ export const addBookToCartController = async (req: Request, res: Response) => {
     ) {
       return res.status(400).json({
         success: false,
-        message: "quantity must be a positive integer",
+        message: "La cantidad debe ser un número entero positivo",
       });
     }
 
@@ -49,12 +49,12 @@ export const addBookToCartController = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: "Book added to cart successfully",
+      message: "Libro agregado al carrito exitosamente",
       data: cartItem,
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,
@@ -72,7 +72,7 @@ export const getUserCartController = async (req: Request, res: Response) => {
     if (!authUser) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "No autorizado",
       });
     }
 
@@ -84,7 +84,7 @@ export const getUserCartController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,
@@ -105,7 +105,7 @@ export const updateCartItemQuantityController = async (
     if (!authUser) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "No autorizado",
       });
     }
 
@@ -115,14 +115,14 @@ export const updateCartItemQuantityController = async (
     if (!cartId) {
       return res.status(400).json({
         success: false,
-        message: "cartId is required",
+        message: "cartId es requerido",
       });
     }
 
     if (!quantity || quantity <= 0 || !Number.isInteger(quantity)) {
       return res.status(400).json({
         success: false,
-        message: "quantity must be a positive integer",
+        message: "La cantidad debe ser un número entero positivo",
       });
     }
 
@@ -134,12 +134,12 @@ export const updateCartItemQuantityController = async (
 
     return res.status(200).json({
       success: true,
-      message: "Cart item updated successfully",
+      message: "Item del carrito actualizado exitosamente",
       data: updatedCartItem,
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,
@@ -160,7 +160,7 @@ export const removeBookFromCartController = async (
     if (!authUser) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "No autorizado",
       });
     }
 
@@ -169,7 +169,7 @@ export const removeBookFromCartController = async (
     if (!cartId) {
       return res.status(400).json({
         success: false,
-        message: "cartId is required",
+        message: "cartId es requerido",
       });
     }
 
@@ -177,11 +177,11 @@ export const removeBookFromCartController = async (
 
     return res.status(200).json({
       success: true,
-      message: "Book removed from cart successfully",
+      message: "Libro eliminado del carrito exitosamente",
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,
@@ -199,7 +199,7 @@ export const clearCartController = async (req: Request, res: Response) => {
     if (!authUser) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "No autorizado",
       });
     }
 
@@ -207,11 +207,11 @@ export const clearCartController = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: "Cart cleared successfully",
+      message: "Carrito vaciado exitosamente",
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,
@@ -229,7 +229,7 @@ export const checkoutCartController = async (req: Request, res: Response) => {
     if (!authUser) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "No autorizado",
       });
     }
 
@@ -237,7 +237,7 @@ export const checkoutCartController = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       success: true,
-      message: "Order created successfully",
+      message: "Orden creada exitosamente",
       data: {
         id: order.id,
         userId: order.user.id,
@@ -259,7 +259,7 @@ export const checkoutCartController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,

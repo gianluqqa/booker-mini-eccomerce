@@ -9,23 +9,23 @@ const About = () => {
           <div>
             <div className="inline-block px-4 py-2 bg-[#f5efe1] bg-opacity-10 rounded-full mb-6">
               <span className="text-[#2e4b30] text-sm font-medium tracking-wide">
-                ABOUT US
+                SOBRE NOSOTROS
               </span>
             </div>
 
             <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#f5efe1] mb-6 leading-tight">
-              Welcome to Booker
+              Bienvenido a Booker
             </h2>
 
             <p className="text-[#f5efe1] text-lg sm:text-xl mb-6 leading-relaxed opacity-90">
-              Your premium destination for discovering extraordinary books since
+              Tu destino premium para descubrir libros extraordinarios desde
               2020.
             </p>
 
             <p className="text-[#f5efe1] text-base sm:text-lg mb-8 leading-relaxed opacity-80">
-              We connect readers with carefully curated collections spanning
-              every genre. From timeless classics to modern bestsellers, our
-              mission is to make quality literature accessible to everyone.
+              Conectamos lectores con colecciones cuidadosamente seleccionadas que abarcan
+              todos los géneros. Desde clásicos atemporales hasta bestsellers modernos, nuestra
+              misión es hacer que la literatura de calidad sea accesible para todos.
             </p>
 
             <div className="flex flex-wrap gap-4">
@@ -34,7 +34,7 @@ const About = () => {
                   20+
                 </div>
                 <div className="text-[#2e4b30] text-sm opacity-80">
-                  Books Available
+                  Libros Disponibles
                 </div>
               </div>
               <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-lg flex-1 min-w-[140px]">
@@ -42,7 +42,7 @@ const About = () => {
                   24/7
                 </div>
                 <div className="text-[#2e4b30] text-sm opacity-80">
-                  Customer Support
+                  Soporte al Cliente
                 </div>
               </div>
             </div>
@@ -54,10 +54,10 @@ const About = () => {
                 <BookOpen className="w-6 h-6 text-[#2e4b30]" />
               </div>
               <h3 className="text-xl font-semibold text-[#2e4b30] mb-2">
-                Wide Selection
+                Amplia Selección
               </h3>
               <p className="text-[#2e4b30] opacity-80 text-sm leading-relaxed">
-                Discover thousands of titles across all genres and categories
+                Descubre miles de títulos en todos los géneros y categorías
               </p>
             </div>
 
@@ -66,10 +66,10 @@ const About = () => {
                 <Zap className="w-6 h-6 text-[#2e4b30]" />
               </div>
               <h3 className="text-xl font-semibold text-[#2e4b30] mb-2">
-                Fast Delivery
+                Entrega Rápida
               </h3>
               <p className="text-[#2e4b30] opacity-80 text-sm leading-relaxed">
-                Quick and secure shipping to bring books right to your doorstep
+                Envío rápido y seguro para llevar los libros directamente a tu puerta
               </p>
             </div>
 
@@ -78,10 +78,10 @@ const About = () => {
                 <CheckCircle className="w-6 h-6 text-[#2e4b30]" />
               </div>
               <h3 className="text-xl font-semibold text-[#2e4b30] mb-2">
-                Quality Guaranteed
+                Calidad Garantizada
               </h3>
               <p className="text-[#2e4b30] opacity-80 text-sm leading-relaxed">
-                Every book carefully selected and verified for your satisfaction
+                Cada libro cuidadosamente seleccionado y verificado para tu satisfacción
               </p>
             </div>
           </div>

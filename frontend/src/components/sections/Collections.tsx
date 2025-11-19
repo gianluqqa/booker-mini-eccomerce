@@ -1,17 +1,18 @@
 "use client";
 import React, { useState } from "react";
-import booksData from "@/helpers/booksData";
 import BookCard from "@/components/cards/BookCard";
-import { IBook } from "@/interfaces/Book";
-import { BookOpen, Sparkles, Heart, Zap, Shield, Brain, Telescope, Crown, Star, ChevronRight, ChevronLeft } from "lucide-react";
+import { IBook } from "@/types/Book";
+import { BookOpen, Sparkles, Heart, Zap, Shield, Brain, Telescope, Crown, Star, ChevronRight, ChevronLeft, Loader2 } from "lucide-react";
+import { useBooks } from "@/hooks/useBooks";
 
 const Collections = () => {
+  const { books, loading, error } = useBooks();
   const [selectedGenre, setSelectedGenre] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   // Agrupar los libros por género
   const groupBooksByGenre = (): Record<string, IBook[]> => {
-    return booksData.reduce((groups, book) => {
+    return books.reduce((groups, book) => {
       const genre = book.genre;
       if (!groups[genre]) {
         groups[genre] = [];
@@ -25,7 +26,7 @@ const Collections = () => {
   const genres = Object.keys(genreGroups);
 
   // Crear un array de todos los libros para el carrusel
-  const allBooks = booksData;
+  const allBooks = books;
 
   // Funciones para la navegación del carrusel
   const nextSlide = () => {
@@ -70,23 +71,67 @@ const Collections = () => {
   // Obtener la descripción para un género
   const getGenreDescription = (genre: string) => {
     const descriptions: Record<string, string> = {
-      Fantasy: "Magical worlds and epic adventures",
-      "Dystopian Fiction": "Dark futures and societal warnings",
-      "Classic Literature": "Timeless masterpieces of literature",
-      Romance: "Love stories and romantic tales",
-      "Coming-of-Age": "Stories of growth and self-discovery",
-      Thriller: "Edge-of-your-seat suspense and excitement",
-      "Crime Thriller": "Mysterious crimes and investigations",
-      "Psychological Thriller": "Mind-bending psychological suspense",
-      "Science Fiction": "Futuristic worlds and scientific wonders",
-      "Literary Fiction": "Thought-provoking literary works",
-      "Historical Fiction": "Stories set in historical periods",
-      "Young Adult Romance": "Romantic stories for young adults",
-      "Philosophical Fiction": "Deep thoughts and life reflections",
-      Memoir: "Personal life stories and experiences",
+      Fantasy: "Mundos mágicos y aventuras épicas",
+      "Dystopian Fiction": "Futuros oscuros y advertencias sociales",
+      "Classic Literature": "Obras maestras atemporales de la literatura",
+      Romance: "Historias de amor y relatos románticos",
+      "Coming-of-Age": "Historias de crecimiento y autodescubrimiento",
+      Thriller: "Suspenso y emoción que te mantendrán al borde del asiento",
+      "Crime Thriller": "Crímenes misteriosos e investigaciones",
+      "Psychological Thriller": "Suspenso psicológico que desafía la mente",
+      "Science Fiction": "Mundos futuristas y maravillas científicas",
+      "Literary Fiction": "Obras literarias que invitan a la reflexión",
+      "Historical Fiction": "Historias ambientadas en períodos históricos",
+      "Young Adult Romance": "Historias románticas para jóvenes adultos",
+      "Philosophical Fiction": "Pensamientos profundos y reflexiones sobre la vida",
+      Memoir: "Historias personales y experiencias de vida",
     };
-    return descriptions[genre] || "Explore this collection";
+    return descriptions[genre] || "Explora esta colección";
   };
+
+  if (loading) {
+    return (
+      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
+              <p className="text-[#2e4b30] text-lg">Cargando colecciones...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <p className="text-red-600 text-lg mb-4">{error}</p>
+              <p className="text-[#2e4b30] opacity-70">No se pudieron cargar las colecciones</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (books.length === 0) {
+    return (
+      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <p className="text-[#2e4b30] text-lg">No hay colecciones disponibles</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
@@ -95,11 +140,11 @@ const Collections = () => {
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-[#1a3a1c] mb-4 flex items-center justify-center gap-3">
             <BookOpen className="w-8 h-8 text-[#2e4b30]" />
-            Collections
+            Colecciones
             <BookOpen className="w-8 h-8 text-[#2e4b30]" />
           </h2>
           <p className="text-lg text-[#2e4b30] opacity-80 max-w-2xl mx-auto">
-            Discover books organized by genre and find your next favorite read
+            Descubre libros organizados por género y encuentra tu próxima lectura favorita
           </p>
         </div>
 
@@ -115,7 +160,7 @@ const Collections = () => {
               }`}
             >
               <BookOpen className="w-4 h-4" />
-              All Genres
+              Todos los Géneros
             </button>
             {genres.map((genre) => (
               <button
@@ -144,10 +189,10 @@ const Collections = () => {
                 <div className="p-2 bg-[#2e4b30] text-[#f5efe1] rounded-lg">
                   <BookOpen className="w-6 h-6" />
                 </div>
-                All Genres
+                Todos los Géneros
               </h3>
               <p className="text-lg text-[#2e4b30] opacity-80">
-                Explore our complete collection of {allBooks.length} books
+                Explora nuestra colección completa de {allBooks.length} libros
               </p>
             </div>
 
@@ -157,7 +202,7 @@ const Collections = () => {
               <button
                 onClick={prevSlide}
                 className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-[#2e4b30] text-[#f5efe1] p-3 rounded-full shadow-lg hover:bg-[#1a3a1c] transition-all duration-300"
-                aria-label="Previous books"
+                aria-label="Libros anteriores"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
@@ -165,7 +210,7 @@ const Collections = () => {
               <button
                 onClick={nextSlide}
                 className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-[#2e4b30] text-[#f5efe1] p-3 rounded-full shadow-lg hover:bg-[#1a3a1c] transition-all duration-300"
-                aria-label="Next books"
+                aria-label="Siguientes libros"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
@@ -190,7 +235,7 @@ const Collections = () => {
                         ? 'bg-[#2e4b30]'
                         : 'bg-[#2e4b30]/30 hover:bg-[#2e4b30]/50'
                     }`}
-                    aria-label={`Go to slide ${i + 1}`}
+                    aria-label={`Ir a la diapositiva ${i + 1}`}
                   />
                 ))}
               </div>
@@ -198,7 +243,7 @@ const Collections = () => {
               {/* Contador de Libros */}
               <div className="text-center mt-4">
                 <p className="text-sm text-[#2e4b30] opacity-70">
-                  Showing books {currentIndex + 1}-{Math.min(currentIndex + 4, allBooks.length)} of {allBooks.length}
+                  Mostrando libros {currentIndex + 1}-{Math.min(currentIndex + 4, allBooks.length)} de {allBooks.length}
                 </p>
               </div>
             </div>
@@ -212,7 +257,7 @@ const Collections = () => {
               className="flex items-center gap-2 text-[#2e4b30] hover:text-[#1a3a1c] transition-colors duration-300 mb-6"
             >
               <ChevronLeft className="w-4 h-4" />
-              Back to All Collections
+              Volver a Todas las Colecciones
             </button>
 
             {/* Encabezado de la Colección Seleccionada */}
@@ -228,7 +273,7 @@ const Collections = () => {
                   {getGenreDescription(selectedGenre)}
                 </p>
                 <p className="text-[#2e4b30] opacity-60">
-                  {genreGroups[selectedGenre].length} books in this collection
+                  {genreGroups[selectedGenre].length} libros en esta colección
                 </p>
               </div>
             </div>

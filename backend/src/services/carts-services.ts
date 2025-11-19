@@ -17,19 +17,19 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
     // Verificar que el usuario existe
     const user = await userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw { status: 404, message: "User not found" };
+      throw { status: 404, message: "Usuario no encontrado" };
     }
 
     // Verificar que el libro existe
     const book = await bookRepository.findOne({ where: { id: addToCartDto.bookId } });
     if (!book) {
-      throw { status: 404, message: "Book not found" };
+      throw { status: 404, message: "Libro no encontrado" };
     }
 
     // Verificar stock disponible
     const requestedQuantity = addToCartDto.quantity || 1;
     if (book.stock < requestedQuantity) {
-      throw { status: 400, message: `Insufficient stock. Available: ${book.stock}` };
+      throw { status: 400, message: `Stock insuficiente. Disponible: ${book.stock}` };
     }
 
     // Buscar si el libro ya está en el carrito del usuario
@@ -51,7 +51,7 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
       if (newQuantity > book.stock) {
         throw { 
           status: 400, 
-          message: `Cannot add ${requestedQuantity} items. Total would exceed available stock (${book.stock})` 
+          message: `No se pueden agregar ${requestedQuantity} items. El total excedería el stock disponible (${book.stock})` 
         };
       }
 
@@ -74,7 +74,7 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
     });
 
     if (!savedCartItem) {
-      throw { status: 500, message: "Error saving cart item" };
+      throw { status: 500, message: "Error al guardar el item del carrito" };
     }
 
     return {
@@ -94,7 +94,7 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
   } catch (error: any) {
     console.error("Error adding book to cart:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not add book to cart" };
+    throw { status: 500, message: "No se pudo agregar el libro al carrito" };
   }
 };
 
@@ -137,7 +137,7 @@ export const getUserCartService = async (userId: string): Promise<CartResponseDt
     };
   } catch (error) {
     console.error("Error getting user cart:", error);
-    throw { status: 500, message: "Could not get user cart" };
+    throw { status: 500, message: "No se pudo obtener el carrito del usuario" };
   }
 };
 
@@ -151,7 +151,7 @@ export const updateCartItemQuantityService = async (
 
   try {
     if (updateCartDto.quantity <= 0) {
-      throw { status: 400, message: "Quantity must be greater than 0" };
+      throw { status: 400, message: "La cantidad debe ser mayor que 0" };
     }
 
     const cartItem = await cartRepository.findOne({
@@ -160,14 +160,14 @@ export const updateCartItemQuantityService = async (
     });
 
     if (!cartItem) {
-      throw { status: 404, message: "Cart item not found" };
+      throw { status: 404, message: "Item del carrito no encontrado" };
     }
 
     // Verificar stock disponible
     if (updateCartDto.quantity > cartItem.book.stock) {
       throw {
         status: 400,
-        message: `Insufficient stock. Available: ${cartItem.book.stock}`,
+        message: `Stock insuficiente. Disponible: ${cartItem.book.stock}`,
       };
     }
 
@@ -191,7 +191,7 @@ export const updateCartItemQuantityService = async (
   } catch (error: any) {
     console.error("Error updating cart item:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not update cart item" };
+    throw { status: 500, message: "No se pudo actualizar el item del carrito" };
   }
 };
 
@@ -208,14 +208,14 @@ export const removeBookFromCartService = async (
     });
 
     if (!cartItem) {
-      throw { status: 404, message: "Cart item not found" };
+      throw { status: 404, message: "Item del carrito no encontrado" };
     }
 
     await cartRepository.remove(cartItem);
   } catch (error: any) {
     console.error("Error removing book from cart:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not remove book from cart" };
+    throw { status: 500, message: "No se pudo eliminar el libro del carrito" };
   }
 };
 
@@ -233,7 +233,7 @@ export const clearCartService = async (userId: string): Promise<void> => {
     }
   } catch (error) {
     console.error("Error clearing cart:", error);
-    throw { status: 500, message: "Could not clear cart" };
+    throw { status: 500, message: "No se pudo vaciar el carrito" };
   }
 };
 
@@ -253,13 +253,13 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
     });
 
     if (cartItems.length === 0) {
-      throw { status: 400, message: "Cart is empty" };
+      throw { status: 400, message: "El carrito está vacío" };
     }
 
     // Verificar usuario
     const user = await userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw { status: 404, message: "User not found" };
+      throw { status: 404, message: "Usuario no encontrado" };
     }
 
     // Validar stock antes de crear la orden
@@ -267,7 +267,7 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
       if (cartItem.quantity > cartItem.book.stock) {
         throw {
           status: 400,
-          message: `Insufficient stock for book "${cartItem.book.title}". Available: ${cartItem.book.stock}, Requested: ${cartItem.quantity}`,
+          message: `Stock insuficiente para el libro "${cartItem.book.title}". Disponible: ${cartItem.book.stock}, Solicitado: ${cartItem.quantity}`,
         };
       }
     }
@@ -312,14 +312,14 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
     });
 
     if (!orderWithRelations) {
-      throw { status: 500, message: "Error creating order" };
+      throw { status: 500, message: "Error al crear la orden" };
     }
 
     return orderWithRelations;
   } catch (error: any) {
     console.error("Error during checkout:", error);
     if (error.status && error.message) throw error;
-    throw { status: 500, message: "Could not process checkout" };
+    throw { status: 500, message: "No se pudo procesar el checkout" };
   }
 };
 

@@ -9,7 +9,7 @@ export const getAllGenresServices = async (): Promise<GenresDto[]> => {
         return genres;
     } catch (error) {
         console.error("Error getting genres:", error);
-        throw new Error("Could not get genres");
+        throw new Error("No se pudieron obtener los géneros");
     }
 }
 

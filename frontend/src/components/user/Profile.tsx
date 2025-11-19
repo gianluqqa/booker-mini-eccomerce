@@ -1,47 +1,92 @@
 "use client"
-import React from 'react'
-import { IUser } from '@/interfaces/IUser'
-import { User, Mail, MapPin, Phone, Calendar, ShoppingCart, Package,  } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { IUser } from '@/types/User'
+import { ICartItem } from '@/types/Cart'
+import { User, Mail, MapPin, Phone, Calendar, ShoppingCart, Package, Loader2 } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
+import { getUserProfile } from '@/services/userService'
+import { getUserCart } from '@/services/cartService'
+import { getRoleDisplay, getRoleColor, formatDate } from '@/utils/helpers'
 
 const Profile = () => {
-  // Datos de ejemplo del usuario
-  const userData: IUser = {
-    id: "user-123",
-    name: "Maria",
-    surname: "Gonzalez",
-    email: "maria.gonzalez@example.com",
-    password: "********", 
-    address: "Calle Mayor 123, 2º B",
-    country: "España",
-    city: "Madrid",
-    phone: "+34 612 345 678",
-    role: "USER",
-    cart: ["book-1", "book-3", "book-7"],
-    orders: ["order-001", "order-002", "order-003"],
-  }
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
+  const [userData, setUserData] = useState<IUser | null>(null)
+  const [cartItems, setCartItems] = useState<ICartItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!isAuthenticated) {
+        router.push('/login')
+        return
+      }
 
-  const getRoleDisplay = (role?: string) => {
-    switch (role) {
-      case 'ADMIN':
-        return 'Administrator'
-      case 'USER':
-        return 'User'
-      default:
-        return 'User'
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Obtener perfil del usuario actual
+        const userData = await getUserProfile()
+        setUserData(userData)
+
+        // Obtener carrito del usuario
+        try {
+          const cartData = await getUserCart()
+          setCartItems(cartData.items)
+        } catch {
+          // Si no hay carrito o hay error, simplemente no mostrar items
+          setCartItems([])
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Error al cargar los datos del perfil'
+        setError(errorMessage)
+        console.error('Error fetching user data:', err)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    fetchUserData()
+  }, [isAuthenticated, router])
+
+  // Si no está autenticado, no renderizar nada (será redirigido)
+  if (!isAuthenticated) {
+    return null
   }
 
-  const getRoleColor = (role?: string) => {
-    switch (role) {
-      case 'ADMIN':
-        return 'text-red-600 bg-red-100'
-      case 'USER':
-        return 'text-blue-600 bg-blue-100'
-      default:
-        return 'text-gray-600 bg-gray-100'
-    }
+  // Mostrar estado de carga
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f5efe1] pt-20 pb-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
+          <p className="text-[#2e4b30] text-lg">Cargando perfil...</p>
+        </div>
+      </div>
+    )
   }
+
+  // Mostrar error
+  if (error || !userData) {
+    return (
+      <div className="min-h-screen bg-[#f5efe1] pt-20 pb-8 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-4">{error || 'No se pudo cargar el perfil'}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+
 
   return (
     <div className="min-h-screen bg-[#f5efe1] pt-20 pb-8 px-4 sm:px-6 lg:px-8">
@@ -64,11 +109,11 @@ const Profile = () => {
                   {getRoleDisplay(userData.role)}
                 </span>
                 <span className="text-[#f5efe1] text-sm opacity-80">
-                  Member since January 2024
+                  Miembro desde {formatDate(userData.createdAt)}
                 </span>
               </div>
               <p className="text-[#f5efe1] opacity-90">
-                Passionate reader of classic literature and contemporary novels.
+                Lector apasionado de literatura clásica y novelas contemporáneas.
               </p>
             </div>
           </div>
@@ -80,7 +125,7 @@ const Profile = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
               <Mail className="w-5 h-5" />
-              Contact Information
+              Información de Contacto
             </h2>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
@@ -113,24 +158,26 @@ const Profile = () => {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              Activity
+              Actividad
             </h2>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Books in cart</span>
+                <span className="text-gray-600">Libros en el carrito</span>
                 <span className="font-semibold text-[#2e4b30]">
-                  {userData.cart?.length || 0}
+                  {cartItems.length}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Orders placed</span>
+                <span className="text-gray-600">Total de artículos en el carrito</span>
                 <span className="font-semibold text-[#2e4b30]">
-                  {userData.orders?.length || 0}
+                  {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Member since</span>
-                <span className="font-semibold text-[#2e4b30]">Enero 2024</span>
+                <span className="text-gray-600">Miembro desde</span>
+                <span className="font-semibold text-[#2e4b30]">
+                  {formatDate(userData.createdAt)}
+                </span>
               </div>
             </div>
           </div>
@@ -140,20 +187,12 @@ const Profile = () => {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
           <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
             <Package className="w-5 h-5" />
-            Recent Orders
+            Pedidos Recientes
           </h2>
           <div className="space-y-3">
-            {userData.orders?.map((orderId, index) => (
-              <div key={orderId} className="flex items-center justify-between p-3 bg-[#f5efe1] bg-opacity-30 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Package className="w-4 h-4 text-[#4a6b4d]" />
-                  <span className="text-gray-700">Order #{orderId}</span>
-                </div>
-                <span className="text-sm text-gray-500">
-                  {index === 0 ? '2 days ago' : index === 1 ? '1 week ago' : '2 weeks ago'}
-                </span>
-              </div>
-            ))}
+            <p className="text-gray-500 text-center py-4">
+              El historial de pedidos estará disponible próximamente
+            </p>
           </div>
         </div>
 
@@ -161,34 +200,37 @@ const Profile = () => {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
-            Current Cart
+            Carrito Actual
           </h2>
-          {userData.cart && userData.cart.length > 0 ? (
+          {cartItems && cartItems.length > 0 ? (
             <div className="space-y-3">
-              {userData.cart.map((bookId, index) => (
-                <div key={bookId} className="flex items-center justify-between p-3 bg-[#f5efe1] bg-opacity-30 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <ShoppingCart className="w-4 h-4 text-[#4a6b4d]" />
-                    <span className="text-gray-700">Book #{bookId}</span>
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-3 bg-[#f5efe1] bg-opacity-30 rounded-lg">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <ShoppingCart className="w-4 h-4 text-[#4a6b4d] flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-700 font-medium truncate">{item.book.title}</p>
+                      <p className="text-sm text-gray-500">Cantidad: {item.quantity}</p>
+                    </div>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {index === 0 ? 'Added today' : index === 1 ? 'Yesterday' : '3 days ago'}
+                  <span className="text-sm font-semibold text-[#2e4b30] ml-2">
+                    ${(item.book.price * item.quantity).toFixed(2)}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-4">No books in the cart</p>
+            <p className="text-gray-500 text-center py-4">No hay libros en el carrito</p>
           )}
         </div>
 
         {/* Botones de Acción */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <button className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200">
-            Edit Profile
+            Editar Perfil
           </button>
           <button className="flex-1 bg-white text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-lg font-medium hover:bg-[#f5efe1] transition-colors duration-200">
-            View History
+            Ver Historial
           </button>
         </div>
       </div>

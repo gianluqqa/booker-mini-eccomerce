@@ -17,7 +17,7 @@ const Footer = () => {
                   <span className="text-2xl font-bold text-[#F5EFE1]">Booker</span>
                 </div>
                 <p className="text-[#F5EFE1]/80 text-sm leading-relaxed">
-                  Your ultimate destination for discovering and collecting books. From timeless classics to modern bestsellers.
+                  Tu destino definitivo para descubrir y coleccionar libros. Desde clásicos atemporales hasta bestsellers modernos.
                 </p>
                 <div className="flex space-x-3 pt-2">
                   <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-lg transition-all duration-200">
@@ -37,31 +37,31 @@ const Footer = () => {
     
               {/* Enlaces Rápidos */}
               <div>
-                <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Quick Links</h3>
+                <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Enlaces Rápidos</h3>
                 <ul className="space-y-3">
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      All Books
+                      Todos los Libros
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      Bestsellers
+                      Más Vendidos
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      New Arrivals
+                      Nuevos Lanzamientos
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      Special Offers
+                      Ofertas Especiales
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      Gift Cards
+                      Tarjetas de Regalo
                     </a>
                   </li>
                 </ul>
@@ -69,31 +69,31 @@ const Footer = () => {
     
               {/* Servicio al Cliente */}
               <div>
-                <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Customer Service</h3>
+                <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Servicio al Cliente</h3>
                 <ul className="space-y-3">
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      Help Center
+                      Centro de Ayuda
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      Shipping Info
+                      Información de Envío
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      Returns & Exchanges
+                      Devoluciones y Cambios
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      Track Order
+                      Rastrear Pedido
                     </a>
                   </li>
                   <li>
                     <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                      FAQs
+                      Preguntas Frecuentes
                     </a>
                   </li>
                 </ul>
@@ -101,7 +101,7 @@ const Footer = () => {
     
               {/* Información de Contacto */}
               <div>
-                <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Contact Us</h3>
+                <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Contáctanos</h3>
                 <ul className="space-y-4">
                   <li className="flex items-start space-x-3">
                     <MapPin className="w-5 h-5 text-[#F5EFE1]/80 flex-shrink-0 mt-0.5" />
@@ -124,16 +124,16 @@ const Footer = () => {
             {/* Sección de Newsletter */}
             <div className="border-t border-[#F5EFE1]/20 pt-8 pb-8">
               <div className="max-w-2xl mx-auto text-center">
-                <h3 className="text-[#F5EFE1] font-bold text-xl mb-2">Subscribe to Our Newsletter</h3>
-                <p className="text-[#F5EFE1]/80 text-sm mb-4">Get the latest book recommendations and exclusive offers</p>
+                <h3 className="text-[#F5EFE1] font-bold text-xl mb-2">Suscríbete a Nuestro Boletín</h3>
+                <p className="text-[#F5EFE1]/80 text-sm mb-4">Recibe las últimas recomendaciones de libros y ofertas exclusivas</p>
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                   <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Ingresa tu email"
                     className="flex-1 bg-[#F5EFE1]/10 text-[#F5EFE1] placeholder-[#F5EFE1]/50 rounded-lg py-3 px-4 border border-[#F5EFE1]/20 focus:outline-none focus:border-[#F5EFE1] focus:ring-2 focus:ring-[#F5EFE1]/20 transition-all duration-200"
                   />
                   <button className="bg-[#F5EFE1] text-[#2E4B30] px-6 py-3 rounded-lg hover:bg-white transition-all duration-200 font-medium">
-                    Subscribe
+                    Suscribirse
                   </button>
                 </div>
               </div>
@@ -143,17 +143,17 @@ const Footer = () => {
             <div className="border-t border-[#F5EFE1]/20 pt-8">
               <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <p className="text-[#F5EFE1]/60 text-sm">
-                  © 2025 Booker. All rights reserved.
+                  © 2025 Booker. Todos los derechos reservados.
                 </p>
                 <div className="flex space-x-6">
                   <a href="#" className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                    Privacy Policy
+                    Política de Privacidad
                   </a>
                   <a href="#" className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                    Terms of Service
+                    Términos de Servicio
                   </a>
                   <a href="#" className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
-                    Cookie Policy
+                    Política de Cookies
                   </a>
                 </div>
               </div>

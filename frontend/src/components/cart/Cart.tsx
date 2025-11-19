@@ -1,46 +1,50 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { IBook } from '@/interfaces/Book'
-import booksData from '@/helpers/booksData'
-
-// Datos de muestra del carrito usando libros reales del proyecto
-const sampleCartItems = [
-  {
-    id: "1",
-    book: booksData[0], // The Great Gatsby
-    quantity: 2
-  },
-  {
-    id: "2", 
-    book: booksData[6], // Harry Potter and the Philosopher's Stone
-    quantity: 1
-  },
-  {
-    id: "3",
-    book: booksData[5], // The Lord of the Rings
-    quantity: 1
-  }
-]
-
-interface CartItem {
-  id: string
-  book: IBook
-  quantity: number
-}
+import { ICartItem } from '@/types/Cart'
+import { getUserCart } from '@/services/cartService'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(sampleCartItems)
   const router = useRouter()
+  const { isAuthenticated } = useAuth()
+  const [cartItems, setCartItems] = useState<ICartItem[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const updateQuantity = (itemId: string, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      removeItem(itemId)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login')
       return
     }
+
+    const fetchCart = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const cartData = await getUserCart()
+        setCartItems(cartData.items || [])
+      } catch (err: any) {
+        setError(err?.message || 'Error al cargar el carrito')
+        setCartItems([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCart()
+  }, [isAuthenticated, router])
+
+  const updateQuantity = async (itemId: string, newQuantity: number) => {
+    if (newQuantity <= 0) {
+      await removeItem(itemId)
+      return
+    }
+    // TODO: Implementar actualización de cantidad en el carrito usando el servicio
+    // Por ahora solo actualizamos el estado local
     setCartItems(items => 
       items.map(item => 
         item.id === itemId ? { ...item, quantity: newQuantity } : item
@@ -48,7 +52,9 @@ const Cart = () => {
     )
   }
 
-  const removeItem = (itemId: string) => {
+  const removeItem = async (itemId: string) => {
+    // TODO: Implementar eliminación de item del carrito usando el servicio
+    // Por ahora solo actualizamos el estado local
     setCartItems(items => items.filter(item => item.id !== itemId))
   }
 
@@ -69,6 +75,41 @@ const Cart = () => {
     console.log('Proceder al checkout')
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f5efe1] pt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
+              <p className="text-[#2e4b30] text-lg">Cargando carrito...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#f5efe1] pt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <p className="text-red-600 text-lg mb-4">{error}</p>
+              <Link 
+                href="/"
+                className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium inline-block"
+              >
+                Volver al inicio
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-[#f5efe1] pt-20">
@@ -81,19 +122,19 @@ const Cart = () => {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-3xl font-bold text-[#2e4b30]">Shopping Cart</h1>
+            <h1 className="text-3xl font-bold text-[#2e4b30]">Carrito de Compras</h1>
           </div>
 
           {/* Carrito Vacío */}
           <div className="text-center py-16">
             <ShoppingBag className="w-24 h-24 text-[#2e4b30]/30 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-[#2e4b30] mb-4">Your cart is empty</h2>
-            <p className="text-[#2e4b30]/70 mb-8">Add some books to get started!</p>
+            <h2 className="text-2xl font-bold text-[#2e4b30] mb-4">Tu carrito está vacío</h2>
+            <p className="text-[#2e4b30]/70 mb-8">¡Añade algunos libros para comenzar!</p>
             <Link 
               href="/"
               className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium"
             >
-              Continue Shopping
+              Continuar Comprando
             </Link>
           </div>
         </div>
@@ -106,9 +147,15 @@ const Cart = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Encabezado */}
         <div className="flex items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#2e4b30]">Shopping Cart</h1>
+          <button 
+            onClick={() => router.back()}
+            className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-2 rounded-lg transition-all duration-200 mr-4"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-3xl font-bold text-[#2e4b30]">Carrito de Compras</h1>
           <span className="ml-4 bg-[#2e4b30] text-[#f5efe1] px-3 py-1 rounded-full text-sm font-medium">
-            {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
+            {cartItems.length} {cartItems.length === 1 ? 'artículo' : 'artículos'}
           </span>
         </div>
 
@@ -117,7 +164,7 @@ const Cart = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 overflow-hidden">
               <div className="p-6">
-                <h2 className="text-xl font-bold text-[#2e4b30] mb-6">Cart Items</h2>
+                <h2 className="text-xl font-bold text-[#2e4b30] mb-6">Artículos del Carrito</h2>
                 <div className="space-y-6">
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex items-center space-x-4 p-4 bg-[#f5efe1]/30 rounded-lg">
@@ -138,10 +185,7 @@ const Cart = () => {
                           {item.book.title}
                         </h3>
                         <p className="text-[#2e4b30]/70 text-sm mb-1">
-                          by {item.book.author}
-                        </p>
-                        <p className="text-[#2e4b30]/60 text-xs mb-2">
-                          {item.book.genre}
+                          por {item.book.author}
                         </p>
                         <p className="text-lg font-bold text-[#2e4b30]">
                           ${(item.book.price * item.quantity).toFixed(2)}
@@ -184,15 +228,15 @@ const Cart = () => {
           {/* Resumen del Pedido */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-[#2e4b30] mb-6">Order Summary</h2>
+              <h2 className="text-xl font-bold text-[#2e4b30] mb-6">Resumen del Pedido</h2>
               
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-[#2e4b30]">
-                  <span>Subtotal ({cartItems.reduce((total, item) => total + item.quantity, 0)} items)</span>
+                  <span>Subtotal ({cartItems.reduce((total, item) => total + item.quantity, 0)} artículos)</span>
                   <span className="font-medium">${calculateSubtotal().toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-[#2e4b30]">
-                  <span>Tax (21%)</span>
+                  <span>Impuestos (21%)</span>
                   <span className="font-medium">${calculateTax().toFixed(2)}</span>
                 </div>
                 <div className="border-t border-[#2e4b30]/20 pt-4">
@@ -207,14 +251,14 @@ const Cart = () => {
                 onClick={handleCheckout}
                 className="w-full bg-[#2e4b30] text-[#f5efe1] py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium text-lg mb-4"
               >
-                Proceed to Checkout
+                Proceder al Pago
               </button>
 
               <Link 
                 href="/"
                 className="block w-full text-center text-[#2e4b30] hover:text-[#2e4b30]/70 transition-colors duration-200 font-medium"
               >
-                Continue Shopping
+                Continuar Comprando
               </Link>
             </div>
           </div>

@@ -1,5 +1,5 @@
-import { IPropsId } from "@/interfaces/IProps";
-import BookDetail from "@/views/BookDetail";
+import { IPropsId } from "@/types/Props";
+import BookDetail from "@/components/book/BookDetail";
 import React from "react";
 
 const BookForIdPage = ({ params }: IPropsId) => {

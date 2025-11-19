@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService } from "../services/users-services";
+import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService, getCurrentUserService } from "../services/users-services";
 import { LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
 import { validateUpdateUser } from "../middlewares/validateUser";
 import { UserRole } from "../enums/UserRole";
@@ -9,7 +9,7 @@ export const registerUserController = async (req: Request, res: Response) => {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
-        message: "Email, password, confirmPassword, name and surname are required"
+        message: "Email, contraseña, confirmación de contraseña, nombre y apellido son requeridos"
       });
     }
 
@@ -18,9 +18,9 @@ export const registerUserController = async (req: Request, res: Response) => {
     res.status(201).json(newUser);
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
-    if (errorMessage.includes("already exists")) {
+    if (errorMessage.includes("ya existe")) {
       res.status(409).json({ message: errorMessage });
     } else {
       res.status(400).json({ message: errorMessage });
@@ -34,7 +34,7 @@ export const loginUserController = async (req: Request, res: Response) => {
     // 1️⃣ Validar que el body exista
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
-        message: "Email and password are required",
+        message: "Email y contraseña son requeridos",
       });
     }
 
@@ -48,12 +48,12 @@ export const loginUserController = async (req: Request, res: Response) => {
     return res.status(200).json({ ...loginResult.user, accessToken: loginResult.accessToken });
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
     // 4️⃣ Mapear errores a status codes
-    if (errorMessage.includes("required") || errorMessage.includes("format is invalid")) {
+    if (errorMessage.includes("requerido") || errorMessage.includes("requeridos") || (errorMessage.includes("formato") && errorMessage.includes("inválido"))) {
       return res.status(400).json({ message: errorMessage });
-    } else if (errorMessage.includes("Invalid credentials")) {
+    } else if (errorMessage.includes("Credenciales inválidas")) {
       return res.status(401).json({ message: errorMessage });
     } else {
       return res.status(400).json({ message: errorMessage });
@@ -71,7 +71,34 @@ export const getUsersController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
+    res.status(status).json({
+      success: false,
+      message,
+    });
+  }
+};
+
+//? Obtener el usuario actual (GET /users/me).
+export const getCurrentUserController = async (req: Request, res: Response) => {
+  try {
+    const authUser = (req as any).authUser as { id: string; role: string } | undefined;
+    
+    if (!authUser) {
+      return res.status(401).json({
+        success: false,
+        message: "No autorizado",
+      });
+    }
+
+    const user = await getCurrentUserService(authUser.id);
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Error interno del servidor";
     res.status(status).json({
       success: false,
       message,
@@ -90,7 +117,7 @@ export const getUserByIdController = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
     res.status(status).json({
       success: false,
       message,
@@ -109,7 +136,7 @@ export const updateUserController = async (req: Request, res: Response) => {
     if (!authUser) {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "No autorizado",
       });
     }
 
@@ -118,7 +145,7 @@ export const updateUserController = async (req: Request, res: Response) => {
     if (authUser.role !== UserRole.ADMIN && authUser.id !== userId) {
       return res.status(403).json({
         success: false,
-        message: "Forbidden: You can only update your own information",
+        message: "Prohibido: Solo puedes actualizar tu propia información",
       });
     }
 
@@ -126,7 +153,7 @@ export const updateUserController = async (req: Request, res: Response) => {
     if (authUser.role !== UserRole.ADMIN && user.role) {
       return res.status(403).json({
         success: false,
-        message: "Forbidden: You cannot change your role",
+        message: "Prohibido: No puedes cambiar tu rol",
       });
     }
 
@@ -135,7 +162,7 @@ export const updateUserController = async (req: Request, res: Response) => {
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
+        message: "Error de validación",
         errors,
       });
     }
@@ -143,12 +170,12 @@ export const updateUserController = async (req: Request, res: Response) => {
     const updatedUser = await updateUserService(userId, user);
     res.status(200).json({
       success: true,
-      message: "User updated successfully",
+      message: "Usuario actualizado exitosamente",
       data: updatedUser,
     });
   } catch (error: any) {
     const status = error.status || 500;
-    const message = error.message || "Internal server error";
+    const message = error.message || "Error interno del servidor";
     res.status(status).json({
       success: false,
       message,
