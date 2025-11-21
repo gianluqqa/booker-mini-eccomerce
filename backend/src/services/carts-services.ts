@@ -278,7 +278,7 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
       status: OrderStatus.PENDING,
     });
     const savedOrder = await orderRepository.save(order);
-
+    
     // Crear los OrderItems y actualizar stock
     const orderItems: OrderItem[] = [];
 
@@ -286,7 +286,7 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
       // Crear OrderItem con el precio total (precio unitario * cantidad)
       const unitPrice = Number(cartItem.book.price);
       const totalPrice = unitPrice * cartItem.quantity;
-      
+
       const orderItem = orderItemRepository.create({
         order: savedOrder,
         book: cartItem.book,
@@ -322,4 +322,3 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
     throw { status: 500, message: "No se pudo procesar el checkout" };
   }
 };
-

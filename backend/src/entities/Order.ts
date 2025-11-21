@@ -23,6 +23,9 @@ export class Order {
   })
   items!: OrderItem[];
 
+  @Column("decimal", { precision: 10, scale: 2, default: 0 })
+  total!: number;
+
   @Column({
     type: "enum",
     enum: OrderStatus,
