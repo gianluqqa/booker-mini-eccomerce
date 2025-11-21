@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { addToCart } from '@/services/cartService'
 import { IAddToCart, ICartItem } from '@/types/Cart'
+import { useCart } from '@/contexts/CartContext'
+
 
 interface UseAddToCartReturn {
   addBookToCart: (data: IAddToCart) => Promise<ICartItem | null>
@@ -19,20 +21,22 @@ interface UseAddToCartReturn {
 export const useAddToCart = (): UseAddToCartReturn => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+  const { refreshCart } = useCart();
 
   const addBookToCart = async (data: IAddToCart): Promise<ICartItem | null> => {
     setLoading(true)
     setError(null)
 
     try {
-      const result = await addToCart(data)
-      return result
+      const result = await addToCart(data);
+      await refreshCart(); // Actualiza el carrito después de añadir
+      return result;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error al añadir el libro al carrito'
-      setError(errorMessage)
-      return null
+      const errorMessage = error instanceof Error ? error.message : 'Error al añadir el libro al carrito';
+      setError(errorMessage);
+      return null;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
