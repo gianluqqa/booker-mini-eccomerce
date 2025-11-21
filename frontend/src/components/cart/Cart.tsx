@@ -27,8 +27,9 @@ const Cart = () => {
       try {
         const cartData = await getUserCart()
         setCartItems(cartData.items || [])
-      } catch (err: any) {
-        setError(err?.message || 'Error al cargar el carrito')
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
+        setError(errorMessage)
         setCartItems([])
       } finally {
         setLoading(false)

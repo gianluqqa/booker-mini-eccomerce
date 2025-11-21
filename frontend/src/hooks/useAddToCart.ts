@@ -27,8 +27,8 @@ export const useAddToCart = (): UseAddToCartReturn => {
     try {
       const result = await addToCart(data)
       return result
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Error al añadir el libro al carrito'
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al añadir el libro al carrito'
       setError(errorMessage)
       return null
     } finally {

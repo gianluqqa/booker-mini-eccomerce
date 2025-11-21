@@ -13,8 +13,9 @@ export const getUserCart = async (): Promise<ICartResponse> => {
   try {
     const response = await apiClient.get<{ success: boolean; data: ICartResponse }>('/carts')
     return extractData<ICartResponse>(response)
-  } catch (error) {
-    throw new Error('Error al cargar el carrito')
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
+    throw new Error(errorMessage)
   }
 }
 
@@ -28,8 +29,8 @@ export const addToCart = async (addToCartData: IAddToCart): Promise<ICartItem> =
   try {
     const response = await apiClient.post<{ success: boolean; message: string; data: ICartItem }>('/carts/add', addToCartData)
     return extractData<ICartItem>(response)
-  } catch (error: any) {
-    const errorMessage = error?.message || 'Error al añadir el libro al carrito'
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error al añadir el libro al carrito'
     throw new Error(errorMessage)
   }
 }
@@ -43,8 +44,8 @@ export const checkout = async (): Promise<IOrder> => {
   try {
     const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/carts/checkout')
     return extractData<IOrder>(response)
-  } catch (error: any) {
-    const errorMessage = error?.message || 'Error al procesar el checkout'
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error al procesar el checkout'
     throw new Error(errorMessage)
   }
 }

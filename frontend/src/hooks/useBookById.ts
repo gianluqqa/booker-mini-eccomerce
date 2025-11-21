@@ -1,6 +1,6 @@
 // Hook personalizado para obtener un libro por ID
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getBookById } from '@/services/booksService'
 import { IBook } from '@/types/Book'
 
@@ -21,7 +21,7 @@ export const useBookById = (id: string | undefined): UseBookByIdReturn => {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchBook = async () => {
+  const fetchBook = useCallback(async () => {
     if (!id) {
       setLoading(false)
       setError('ID de libro no proporcionado')
@@ -34,18 +34,18 @@ export const useBookById = (id: string | undefined): UseBookByIdReturn => {
     try {
       const data = await getBookById(id)
       setBook(data)
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Error al cargar el libro'
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar el libro'
       setError(errorMessage)
       setBook(null)
     } finally {
       setLoading(false)
     }
-  }
+  }, [id])
 
   useEffect(() => {
     fetchBook()
-  }, [id])
+  }, [fetchBook])
 
   return {
     book,

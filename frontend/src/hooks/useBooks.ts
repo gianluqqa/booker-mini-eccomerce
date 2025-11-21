@@ -1,6 +1,6 @@
 // Hook personalizado para obtener todos los libros
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getBooks } from '@/services/booksService'
 import { IBook } from '@/types/Book'
 
@@ -21,25 +21,25 @@ export const useBooks = (query?: string): UseBooksReturn => {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     setLoading(true)
     setError(null)
 
     try {
       const data = await getBooks(query)
       setBooks(data)
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Error al cargar los libros'
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar los libros'
       setError(errorMessage)
       setBooks([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [query])
 
   useEffect(() => {
     fetchBooks()
-  }, [query])
+  }, [fetchBooks])
 
   return {
     books,

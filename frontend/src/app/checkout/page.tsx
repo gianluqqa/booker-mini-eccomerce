@@ -35,8 +35,9 @@ const CheckoutPage = () => {
           router.push('/cart')
           return
         }
-      } catch (err: any) {
-        setError(err?.message || 'Error al cargar el carrito')
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
+        setError(errorMessage)
       } finally {
         setLoading(false)
       }
@@ -53,8 +54,9 @@ const CheckoutPage = () => {
       const orderData = await checkout()
       setOrder(orderData)
       setLoading(false)
-    } catch (err: any) {
-      setError(err?.message || 'Error al procesar el pago')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago'
+      setError(errorMessage)
       setProcessing(false)
     }
   }
