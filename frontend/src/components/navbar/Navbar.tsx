@@ -114,18 +114,20 @@ const Navbar = () => {
           {/* Iconos del Lado Derecho */}
           <div className="flex items-center space-x-3">
             {/* Carrito */}
-            <Link 
-  href="/cart" 
-  className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
-  onClick={() => setIsMenuOpen(false)}
->
-  <ShoppingCart className="h-6 w-6" />
-  {cartCount > 0 && (
-    <span className="absolute -top-1 -right-1 bg-[#2e4b30] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-      {cartCount > 9 ? '9+' : cartCount}
-    </span>
-  )}
-</Link>
+            {isAuthenticated && (
+              <Link
+                href="/cart"
+                className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#2e4b30] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {cartCount > 9 ? "9+" : cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* Perfil de Usuario o Login */}
             {isAuthenticated ? (
