@@ -17,6 +17,12 @@ const CheckoutPage = () => {
   const [order, setOrder] = useState<IOrder | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [processing, setProcessing] = useState<boolean>(false)
+  const [cardData, setCardData] = useState({
+    cardNumber: '',
+    cardName: '',
+    expiryDate: '',
+    cvc: ''
+  })
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -317,15 +323,68 @@ const CheckoutPage = () => {
                   Información de Pago
                 </h2>
               </div>
-              <p className="text-[#2e4b30]/70 mb-4">
-                Por ahora, el checkout se procesa de forma simple. 
-                Próximamente se integrará Mercado Pago para procesar los pagos de forma segura.
-              </p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="space-y-4 mb-4">
+                <div>
+                  <label htmlFor="cardNumber" className="block text-sm font-medium text-[#2e4b30] mb-1">
+                    Número de tarjeta
+                  </label>
+                  <input
+                    type="text"
+                    id="cardNumber"
+                    placeholder="1234 5678 9012 3456"
+                    className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+                    value={cardData.cardNumber}
+                    onChange={(e) => setCardData({...cardData, cardNumber: e.target.value})}
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="cardName" className="block text-sm font-medium text-[#2e4b30] mb-1">
+                    Nombre en la tarjeta
+                  </label>
+                  <input
+                    type="text"
+                    id="cardName"
+                    placeholder="JUAN PEREZ"
+                    className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+                    value={cardData.cardName}
+                    onChange={(e) => setCardData({...cardData, cardName: e.target.value})}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="expiryDate" className="block text-sm font-medium text-[#2e4b30] mb-1">
+                      Vencimiento (MM/AA)
+                    </label>
+                    <input
+                      type="text"
+                      id="expiryDate"
+                      placeholder="12/25"
+                      className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+                      value={cardData.expiryDate}
+                      onChange={(e) => setCardData({...cardData, expiryDate: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="cvc" className="block text-sm font-medium text-[#2e4b30] mb-1">
+                      CVC
+                    </label>
+                    <input
+                      type="text"
+                      id="cvc"
+                      placeholder="123"
+                      className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+                      value={cardData.cvc}
+                      onChange={(e) => setCardData({...cardData, cvc: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                 <p className="text-sm text-blue-800">
-                  <strong>Nota:</strong> Al confirmar el pago, se creará la orden y se 
-                  descontará el stock de los libros. El pago real se procesará cuando 
-                  se integre Mercado Pago.
+                  <strong>Nota:</strong> Esta es una simulación. Los datos de pago no se envían a ningún servidor.
                 </p>
               </div>
             </div>
@@ -360,8 +419,9 @@ const CheckoutPage = () => {
               <div className="flex flex-col gap-4">
                 <button
                   onClick={handleCheckout}
-                  disabled={processing}
+                  disabled={processing || !cardData.cardNumber || !cardData.cardName || !cardData.expiryDate || !cardData.cvc}
                   className="w-full bg-[#2e4b30] text-[#f5efe1] py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  title={!cardData.cardNumber || !cardData.cardName || !cardData.expiryDate || !cardData.cvc ? "Por favor complete todos los datos de la tarjeta" : ""}
                 >
                   {processing ? (
                     <>
@@ -388,4 +448,3 @@ const CheckoutPage = () => {
 }
 
 export default CheckoutPage
-
