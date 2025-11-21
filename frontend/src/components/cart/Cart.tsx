@@ -71,8 +71,7 @@ const Cart = () => {
   }
 
   const handleCheckout = () => {
-    // Aquí iría la lógica para proceder al pago
-    console.log('Proceder al checkout')
+    router.push('/checkout')
   }
 
   if (loading) {

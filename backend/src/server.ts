@@ -6,6 +6,7 @@ import { AppDataSource } from "./config/data-source";
 import userRoutes from "./routes/users-routes";
 import booksRoutes from "./routes/books-routes";
 import cartRoutes from "./routes/carts-routes";
+import paymentRoutes from "./routes/payments-routes";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 app.use("/users", userRoutes);
 app.use("/books", booksRoutes);
 app.use("/carts", cartRoutes);
+app.use("/payments", paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
