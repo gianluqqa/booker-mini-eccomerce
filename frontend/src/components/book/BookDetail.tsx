@@ -1,19 +1,52 @@
 "use client"
-import { IPropsId } from "@/types/Props";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { ShoppingCart, Star, BookOpen, User, DollarSign, Package, Tag, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useBookById } from "@/hooks/useBookById";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { getBookById } from "@/services/booksService";
+import { IBook } from "@/types/Book";
 
-const BookDetail = ({ params }: IPropsId) => {
+const BookDetail = () => {
   const router = useRouter();
+  const params = useParams();
   const { isAuthenticated } = useAuth();
-  const { book, loading, error } = useBookById(params.id);
+  const [book, setBook] = useState<IBook | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { addBookToCart, loading: addingToCart, error: cartError } = useAddToCart();
+
+  useEffect(() => {
+    const fetchBook = async () => {
+      const bookId = params?.id as string;
+      
+      if (!bookId) {
+        setError("ID de libro no proporcionado");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const bookData = await getBookById(bookId);
+        setBook(bookData);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("No se pudo cargar el libro.");
+        }
+        setBook(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBook();
+  }, [params?.id]);
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
@@ -75,7 +108,7 @@ const BookDetail = ({ params }: IPropsId) => {
                 <div className="aspect-[3/4] w-full relative overflow-hidden rounded-xl shadow-lg">
                   <Image
                     src={book.image || "/placeholder-book.jpg"}
-                    alt={book.title}
+                    alt={book.title || book.author || "Portada del libro"}
                     fill
                     className="object-cover object-center"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

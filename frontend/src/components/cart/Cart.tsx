@@ -1,16 +1,18 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft, Loader2 } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ICartItem } from "@/types/Cart";
 import { getUserCart, removeFromCart, clearCart, updateCartItemQuantity } from "@/services/cartService";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
 
 const Cart = () => {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { refreshCart } = useCart();
   const [cartItems, setCartItems] = useState<ICartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,12 +35,18 @@ const Cart = () => {
   };
 
   useEffect(() => {
+    // Esperar a que termine de cargar la autenticación antes de verificar
+    if (authLoading) {
+      return;
+    }
+
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
+    
     fetchCart();
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authLoading]);
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -52,6 +60,9 @@ const Cart = () => {
 
       // Actualizar el estado local
       setCartItems((items) => items.map((item) => (item.id === itemId ? { ...item, quantity: newQuantity } : item)));
+      
+      // Actualizar el contexto del carrito para sincronizar el contador del Navbar
+      await refreshCart();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al actualizar la cantidad";
       setError(errorMessage);
@@ -68,6 +79,9 @@ const Cart = () => {
       await removeFromCart(itemId);
       // Actualizar el estado local
       setCartItems((items) => items.filter((item) => item.id !== itemId));
+      
+      // Actualizar el contexto del carrito para sincronizar el contador del Navbar
+      await refreshCart();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al eliminar el ítem";
       setError(errorMessage);
@@ -83,6 +97,9 @@ const Cart = () => {
       try {
         await clearCart();
         setCartItems([]);
+        
+        // Actualizar el contexto del carrito para sincronizar el contador del Navbar
+        await refreshCart();
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Error al vaciar el carrito";
         setError(errorMessage);
@@ -155,13 +172,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen bg-[#f5efe1] pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center mb-8">
-            <button
-              onClick={() => router.back()}
-              className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-2 rounded-lg transition-all duration-200 mr-4"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button>
+          <div className="mb-8">
             <h1 className="text-3xl font-bold text-[#2e4b30]">Carrito de Compras</h1>
           </div>
 
@@ -185,12 +196,6 @@ const Cart = () => {
     <div className="min-h-screen bg-[#f5efe1] pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center mb-8">
-          <button
-            onClick={() => router.back()}
-            className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-2 rounded-lg transition-all duration-200 mr-4"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
           <h1 className="text-3xl font-bold text-[#2e4b30]">Carrito de Compras</h1>
           <span className="ml-4 bg-[#2e4b30] text-[#f5efe1] px-3 py-1 rounded-full text-sm font-medium">
             {cartItems.length} {cartItems.length === 1 ? "artículo" : "artículos"}

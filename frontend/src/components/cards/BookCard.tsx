@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IBookCardProps } from "@/types/Book";
-import Link from "next/link";
 import Image from "next/image";
 import { Eye, ShoppingCart, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
+
 
 const BookCard: React.FC<IBookCardProps> = ({ book }) => {
   const router = useRouter();
@@ -49,10 +49,36 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
     }
   };
 
+  const handleViewDetails = (e?: React.MouseEvent<HTMLElement>) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (!book.id) {
+      console.error("El libro no tiene un ID válido");
+      return;
+    }
+    
+    router.push(`/book/${book.id}`);
+  };
+
+  // Validar que el libro tenga ID antes de renderizar
+  if (!book.id) {
+    return (
+      <div className="block bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 rounded-xl p-6 opacity-50">
+        <p className="text-red-500 text-sm">Error: Libro sin ID válido</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 rounded-xl p-6 hover:bg-opacity-10 transition-all duration-300 group cursor-pointer">
+    <div className="block bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 rounded-xl p-6 hover:bg-opacity-10 transition-all duration-300 group">
       {/* Imagen del libro */}
-      <div className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+      <div 
+        onClick={handleViewDetails}
+        className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-lg mb-4 flex items-center justify-center overflow-hidden cursor-pointer"
+      >
         {book.image && !imageError ? (
           <Image
             src={book.image}
@@ -70,7 +96,10 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
 
       {/* Información del libro */}
       <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-[#1a3a1c] line-clamp-2 group-hover:text-[#0f2410] transition-colors duration-300">
+        <h3 
+          onClick={handleViewDetails}
+          className="text-lg font-semibold text-[#1a3a1c] line-clamp-2 group-hover:text-[#0f2410] transition-colors duration-300 cursor-pointer hover:underline"
+        >
           {book.title}
         </h3>
 
@@ -127,14 +156,14 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
             )}
           </button>
           
-          {/* Botones de Detalles*/}
-          <Link
-            href={`/book/${book.id}`}
-            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm"
+          {/* Botón de Detalles*/}
+          <button
+            onClick={handleViewDetails}
+            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm cursor-pointer"
           >
             <Eye className="w-4 h-4" />
             Detalles
-          </Link>
+          </button>
         </div>
       </div>
     </div>

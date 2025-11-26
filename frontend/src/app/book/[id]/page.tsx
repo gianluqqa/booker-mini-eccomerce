@@ -1,11 +1,10 @@
-import { IPropsId } from "@/types/Props";
 import BookDetail from "@/components/book/BookDetail";
 import React from "react";
 
-const BookForIdPage = ({ params }: IPropsId) => {
+const BookForIdPage = () => {
   return (
     <div>
-      <BookDetail params={params} />
+      <BookDetail />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 // Servicios para operaciones relacionadas con libros
 
-import { apiClient } from '@/config/api'
+import { apiClient, extractData } from '@/config/api'
 import { IBook } from '@/types/Book'
 
 /**
@@ -29,8 +29,8 @@ export const getBooks = async (query?: string): Promise<IBook[]> => {
  */
 export const getBookById = async (id: string): Promise<IBook> => {
   try {
-    const response = await apiClient.get<IBook>(`/books/${id}`)
-    return response.data
+    const response = await apiClient.get(`/books/${id}`)
+    return extractData<IBook>(response)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cargar el libro'
     throw new Error(errorMessage)

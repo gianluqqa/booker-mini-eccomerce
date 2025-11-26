@@ -5,6 +5,7 @@ import { useBooks } from "@/hooks/useBooks";
 import { Loader2 } from "lucide-react";
 
 const Books = () => {
+  // Obtener todos los libros sin filtro
   const { books, loading, error } = useBooks();
   
   // Duplicar los libros para crear un carrusel infinito

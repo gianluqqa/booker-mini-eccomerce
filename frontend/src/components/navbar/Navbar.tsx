@@ -1,11 +1,14 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Search, ShoppingCart, User, LogOut, Menu, X, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { useSearch } from "@/hooks/useSearch";
+import { useSearchResults } from "@/hooks/useSearchResults";
+import SearchDropdown from "@/components/navbar/SearchDropdown";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +17,23 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { isAuthenticated, logout } = useAuth();
+  const { searchQuery, updateSearch, clearSearch } = useSearch();
+  
+  // Estado para controlar si el dropdown de búsqueda está abierto
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
+  
+  // Referencia al contenedor de búsqueda para detectar clicks fuera
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Referencia para guardar el pathname anterior y detectar cambios de ruta
+  const prevPathnameRef = useRef<string>(pathname);
+  
+  // Hook para obtener resultados de búsqueda en tiempo real
+  const { results: searchResults, loading: searchLoading } = useSearchResults(
+    searchQuery,
+    300, // Debounce de 300ms
+    5    // Máximo 5 resultados en el dropdown
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +45,39 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Limpiar el buscador cuando cambia la ruta
+  useEffect(() => {
+    // Si el pathname cambió (navegamos a otra página)
+    if (prevPathnameRef.current !== pathname) {
+      // Limpiar el buscador y cerrar el dropdown
+      clearSearch();
+      setIsSearchDropdownOpen(false);
+      // Actualizar la referencia al pathname actual
+      prevPathnameRef.current = pathname;
+    }
+  }, [pathname, clearSearch]);
+
+  // Cerrar el dropdown cuando se hace click fuera del contenedor de búsqueda
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchDropdownOpen(false);
+      }
+    };
+
+    if (isSearchDropdownOpen) {
+      // Usar 'click' en lugar de 'mousedown' para que no interfiera con los Links
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [isSearchDropdownOpen]);
+
   // Función para hacer scroll suave a una sección
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -35,6 +88,38 @@ const Navbar = () => {
       });
     }
     setIsMenuOpen(false);
+  };
+
+  // Función para manejar el cambio en el input de búsqueda
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    updateSearch(value);
+    
+    // Abrir el dropdown cuando hay texto en el input
+    if (value.trim() !== '') {
+      setIsSearchDropdownOpen(true);
+    } else {
+      setIsSearchDropdownOpen(false);
+    }
+  };
+
+  // Función para manejar el submit del formulario de búsqueda
+  const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Solo cerrar el dropdown, no redirigir
+    setIsSearchDropdownOpen(false);
+  };
+
+  // Función para manejar el focus en el input de búsqueda
+  const handleSearchFocus = () => {
+    if (searchQuery.trim() !== '') {
+      setIsSearchDropdownOpen(true);
+    }
+  };
+
+  // Función para cerrar el dropdown
+  const handleCloseDropdown = () => {
+    setIsSearchDropdownOpen(false);
   };
 
   const isHomePage = pathname === "/";
@@ -93,20 +178,40 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Barra de Búsqueda */}
+          {/* Barra de Búsqueda con Dropdown */}
           {isHomePage && (
             <div className="hidden lg:flex items-center flex-1 max-w-xs mx-6">
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  className={`w-full rounded-lg py-1.5 px-4 pr-8 border focus:outline-none focus:ring-1 transition-all duration-200 text-sm ${
-                    isScrolled
-                      ? "bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 border-[#2e4b30]/20 focus:border-[#2e4b30] focus:ring-[#2e4b30]/20"
-                      : "bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 border-[#2e4b30]/20 focus:border-[#2e4b30] focus:ring-[#2e4b30]/20"
-                  }`}
+              <div ref={searchContainerRef} className="relative w-full">
+                <form onSubmit={handleSearchSubmit} className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="Buscar libros..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    onFocus={handleSearchFocus}
+                    className={`w-full rounded-lg py-1.5 px-4 pr-8 border focus:outline-none focus:ring-1 transition-all duration-200 text-sm ${
+                      isScrolled
+                        ? "bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 border-[#2e4b30]/20 focus:border-[#2e4b30] focus:ring-[#2e4b30]/20"
+                        : "bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 border-[#2e4b30]/20 focus:border-[#2e4b30] focus:ring-[#2e4b30]/20"
+                    }`}
+                  />
+                  <button
+                    type="submit"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#2e4b30]/60 hover:text-[#2e4b30] transition-colors duration-200"
+                    aria-label="Buscar"
+                  >
+                    <Search className="w-4 h-4" />
+                  </button>
+                </form>
+                
+                {/* Dropdown de resultados de búsqueda */}
+                <SearchDropdown
+                  results={searchResults}
+                  loading={searchLoading}
+                  isOpen={isSearchDropdownOpen}
+                  onClose={handleCloseDropdown}
+                  searchQuery={searchQuery}
                 />
-                <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#2e4b30]/60 transition-colors duration-200" />
               </div>
             </div>
           )}
@@ -114,7 +219,7 @@ const Navbar = () => {
           {/* Iconos del Lado Derecho */}
           <div className="flex items-center space-x-3">
             {/* Carrito */}
-            {isAuthenticated && (
+            {isAuthenticated && pathname !== "/cart" && pathname !== "/checkout" && (
               <Link
                 href="/cart"
                 className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
@@ -168,16 +273,36 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Barra de Búsqueda Móvil */}
+        {/* Barra de Búsqueda Móvil con Dropdown */}
         {isHomePage && (
           <div className="lg:hidden pb-4 max-w-xs mx-auto">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                className="w-full bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 rounded-lg py-1.5 px-4 pr-8 border border-[#2e4b30]/20 focus:outline-none focus:border-[#2e4b30] focus:ring-1 focus:ring-[#2e4b30]/20 transition-all duration-200 text-sm"
+            <div ref={searchContainerRef} className="relative">
+              <form onSubmit={handleSearchSubmit} className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar libros..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={handleSearchFocus}
+                  className="w-full bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 rounded-lg py-1.5 px-4 pr-8 border border-[#2e4b30]/20 focus:outline-none focus:border-[#2e4b30] focus:ring-1 focus:ring-[#2e4b30]/20 transition-all duration-200 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#2e4b30]/60 hover:text-[#2e4b30] transition-colors duration-200"
+                  aria-label="Buscar"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              </form>
+              
+              {/* Dropdown de resultados de búsqueda móvil */}
+              <SearchDropdown
+                results={searchResults}
+                loading={searchLoading}
+                isOpen={isSearchDropdownOpen}
+                onClose={handleCloseDropdown}
+                searchQuery={searchQuery}
               />
-              <Search className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#2e4b30]/60 transition-colors duration-200" />
             </div>
           </div>
         )}

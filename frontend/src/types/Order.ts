@@ -15,7 +15,8 @@ export interface IOrderItem {
 // Estructura de datos para Order (respuesta del backend)
 export interface IOrder {
   id: string;
-  userId: string;
+  userId?: string;
+  total?: number;
   status: string; // OrderStatus enum: "pending" | "paid" | "shipped" | "cancelled"
   items: IOrderItem[];
   createdAt?: Date | string;

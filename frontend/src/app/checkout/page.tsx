@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { CheckCircle2, Loader2, ArrowLeft, CreditCard, Package, AlertCircle, ShoppingBag } from 'lucide-react'
+import { CheckCircle2, Loader2, CreditCard, Package, AlertCircle, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { checkout, getUserCart } from '@/services/cartService'
@@ -238,13 +238,7 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-[#f5efe1] pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Encabezado */}
-        <div className="flex items-center mb-8">
-          <button
-            onClick={() => router.back()}
-            className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-2 rounded-lg transition-all duration-200 mr-4"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+        <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#2e4b30]">Checkout</h1>
         </div>
 
