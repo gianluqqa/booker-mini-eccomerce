@@ -9,6 +9,7 @@ import {
 import { Order } from "./Order";
 import { Cart } from "./Cart";
 import { UserRole } from "../enums/UserRole";
+import { UserGender } from "../enums/UserGender";
 
 @Entity()
 export class User {
@@ -42,6 +43,13 @@ export class User {
   // Información breve del usuario
   @Column({ type: "text", nullable: true })
   bio!: string | null;
+
+  @Column({
+    type: "enum",
+    enum: UserGender,
+    default: UserGender.NOT_SPECIFIC,
+  })
+  gender!: UserGender;
 
   @Column({
     type: "enum",

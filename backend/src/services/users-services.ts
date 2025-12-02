@@ -3,6 +3,8 @@ import { validateLoginUser, validateRegisterUser } from "../middlewares/validate
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
 import { UserRole } from "../enums/UserRole";
+import { UserGender } from "../enums/UserGender";
+
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { excludeSensitiveData } from "../helpers/user-helpers";
@@ -38,7 +40,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
   // 3️⃣ Check duplicado
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
-    if (existingUser) throw new Error("Ya existe un usuario con ese email");
+  if (existingUser) throw new Error("Ya existe un usuario con ese email");
 
   // 4️⃣ Crear usuario
   const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -52,6 +54,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
     city: user.city ?? null,
     phone: user.phone ?? null,
     bio: user.bio ?? null,
+    gender: (user.gender as UserGender) ?? UserGender.NOT_SPECIFIC,
     role: (user.role as UserRole) ?? UserRole.CUSTOMER, // Usar el rol del request o CUSTOMER por defecto
   });
 

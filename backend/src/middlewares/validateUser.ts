@@ -1,5 +1,6 @@
 import { LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
 import { UserRole } from "../enums/UserRole";
+import { UserGender } from "../enums/UserGender";
 
 export const validateRegisterUser = (user: RegisterUserDTO) => {
   const errors: string[] = [];
@@ -16,6 +17,7 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     phone,
     role,
     bio,
+    gender,
   } = user;
 
   // Email validation
@@ -64,6 +66,10 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     errors.push("La biografía no puede superar los 500 caracteres");
   }
 
+  if (gender && !Object.values(UserGender).includes(gender as UserGender)) {
+    errors.push("El género debe ser 'hombre', 'mujer' o 'no_especifico'");
+  }
+
   // Role validation
   if (role && !Object.values(UserRole).includes(role as UserRole)) {
     errors.push("El rol debe ser 'customer' o 'admin'");
@@ -98,7 +104,7 @@ export const validateLoginUser = (user: LoginUserDTO) => {
 export const validateUpdateUser = (user: UpdateUserDTO) => {
   const errors: string[] = [];
 
-  const { name, surname, password, phone, address, country, city, role, bio } = user;
+  const { name, surname, password, phone, address, country, city, role, bio, gender } = user;
 
   // Name validation
   if (name !== undefined && name.trim().length === 0) {
@@ -140,6 +146,10 @@ export const validateUpdateUser = (user: UpdateUserDTO) => {
 
   if (bio !== undefined && bio !== null && bio.length > 500) {
     errors.push("La biografía no puede superar los 500 caracteres");
+  }
+
+  if (gender && !Object.values(UserGender).includes(gender as UserGender)) {
+    errors.push("El género debe ser 'hombre', 'mujer' o 'no_especifico'");
   }
 
   // Role validation

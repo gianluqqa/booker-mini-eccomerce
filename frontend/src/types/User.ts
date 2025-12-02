@@ -11,6 +11,7 @@ export interface IUser {
   role?: string;
   token?: string;
   bio?: string | null;
+  gender?: 'male' | 'female' | 'not_specific';
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -26,6 +27,7 @@ export interface IRegisterUser {
   country?: string;
   city?: string;
   phone?: string;
+  gender?: 'male' | 'female' | 'not_specific';
   role?: string;
 }
 
@@ -44,5 +46,6 @@ export interface IUpdateUser {
   country?: string;
   city?: string;
   phone?: string;
+  gender?: 'male' | 'female' | 'not_specific';
   role?: string;
 }
