@@ -16,6 +16,7 @@ export interface RegisterUserDTO {
   country?: string;
   city?: string;
   phone?: string;
+  bio?: string;
   role?: string;
 }
 
@@ -32,5 +33,6 @@ export interface UpdateUserDTO {
   country?: string;
   city?: string;
   phone?: string;
+  bio?: string | null;
   role?: string;
 }

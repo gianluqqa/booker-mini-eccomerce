@@ -10,6 +10,7 @@ export interface IUser {
   phone?: string | null;
   role?: string;
   token?: string;
+  bio?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
 }

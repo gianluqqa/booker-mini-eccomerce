@@ -1,11 +1,12 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { IUser } from '@/types/User'
 import { ICartItem } from '@/types/Cart'
 import { User, Mail, MapPin, Phone, Calendar, ShoppingCart, Package, Loader2 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { getUserProfile } from '@/services/userService'
+import UpdateUserForm, { UpdateUserFormData } from '@/components/forms/UpdateUserForm'
+import { getUserProfile, updateUserProfile } from '@/services/userService'
 import { getUserCart } from '@/services/cartService'
 import { getUserOrders, getUserPendingOrders } from '@/services/orderService'
 import { getRoleDisplay, getRoleColor, formatDate } from '@/utils/helpers'
@@ -13,6 +14,7 @@ import { IOrder } from '@/types/Order'
 
 const Profile = () => {
   const { isAuthenticated, loading: authLoading } = useAuth()
+
   const router = useRouter()
   const [userData, setUserData] = useState<IUser | null>(null)
   const [cartItems, setCartItems] = useState<ICartItem[]>([])
@@ -20,9 +22,13 @@ const Profile = () => {
   const [pendingOrders, setPendingOrders] = useState<IOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState<UpdateUserFormData | null>(null)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    // Esperar a que termine de cargar la autenticación antes de verificar
     if (authLoading) {
       return
     }
@@ -77,7 +83,87 @@ const Profile = () => {
     }
 
     fetchUserData()
-  }, [isAuthenticated, authLoading])
+  }, [isAuthenticated, authLoading, router])
+
+  const initialFormData = useMemo<UpdateUserFormData | null>(() => {
+    if (!userData) {
+      return null
+    }
+
+    return {
+      name: userData.name || '',
+      surname: userData.surname || '',
+      phone: userData.phone || '',
+      address: userData.address || '',
+      city: userData.city || '',
+      country: userData.country || '',
+      bio: userData.bio || '',
+    }
+  }, [userData])
+
+  const handleToggleForm = () => {
+    if (!initialFormData) {
+      return
+    }
+
+    setSuccessMessage(null)
+    setFormError(null)
+    setFormData(initialFormData)
+    setIsEditing((prev) => !prev)
+  }
+
+  const handleFormChange = (data: UpdateUserFormData) => {
+    setFormData(data)
+  }
+
+  const buildUpdatePayload = (data: UpdateUserFormData) => {
+    const sanitize = (value: string) => {
+      const trimmed = value?.trim()
+      return trimmed ? trimmed : null
+    }
+
+    return {
+      name: data.name.trim(),
+      surname: data.surname.trim(),
+      phone: sanitize(data.phone ?? ''),
+      address: sanitize(data.address ?? ''),
+      city: sanitize(data.city ?? ''),
+      country: sanitize(data.country ?? ''),
+      bio: sanitize(data.bio ?? ''),
+    }
+  }
+
+  const handleCancel = () => {
+    setIsEditing(false)
+    setFormError(null)
+    setFormData(initialFormData)
+  }
+
+  const handleSubmit = async (data: UpdateUserFormData) => {
+    if (!userData) {
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+      setFormError(null)
+
+      const payload = buildUpdatePayload(data)
+      const updatedUser = await updateUserProfile(userData.id, payload)
+      setUserData(updatedUser)
+      setSuccessMessage('Perfil actualizado correctamente.')
+      setIsEditing(false)
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('user', JSON.stringify(updatedUser))
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'No se pudieron guardar los cambios'
+      setFormError(message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   // Si no está autenticado, no renderizar nada (será redirigido)
   if (!isAuthenticated) {
@@ -113,8 +199,6 @@ const Profile = () => {
     )
   }
 
-
-
   return (
     <div className="min-h-screen bg-[#f5efe1] pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -140,11 +224,42 @@ const Profile = () => {
                 </span>
               </div>
               <p className="text-[#f5efe1] opacity-90">
-                Lector apasionado de literatura clásica y novelas contemporáneas.
+                {userData.bio || 'Agrega una biografía desde "Editar Perfil".'}
               </p>
+            </div>
+
+            <div className="w-full md:w-auto flex justify-end">
+              <button
+                onClick={handleToggleForm}
+                className="bg-[#f5efe1] text-[#2e4b30] px-5 py-2 rounded-lg font-semibold hover:bg-white transition-colors duration-200"
+              >
+                {isEditing ? 'Cerrar' : 'Editar Perfil'}
+              </button>
             </div>
           </div>
         </div>
+
+        {successMessage && (
+          <div className="bg-green-100 text-green-800 border border-green-200 rounded-xl p-4 mb-6 text-sm">
+            {successMessage}
+          </div>
+        )}
+
+        {isEditing && formData && (
+          <div className="bg-[#2e4b30] rounded-2xl p-6 mb-8 shadow-lg">
+            <h2 className="text-xl font-semibold text-[#f5efe1] mb-4">Actualizar información</h2>
+            <UpdateUserForm
+              value={formData}
+              onChange={handleFormChange}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              onFileChange={() => {}}
+              selectedFile={null}
+              errorMessage={formError}
+              isSubmitting={isSubmitting}
+            />
+          </div>
+        )}
 
         {/* Cuadrícula de Información */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
@@ -423,8 +538,11 @@ const Profile = () => {
 
         {/* Botones de Acción */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
-          <button className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200">
-            Editar Perfil
+          <button
+            onClick={handleToggleForm}
+            className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
+          >
+            {isEditing ? 'Cerrar formulario' : 'Editar Perfil'}
           </button>
           <button className="flex-1 bg-white text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-lg font-medium hover:bg-[#f5efe1] transition-colors duration-200">
             Ver Historial

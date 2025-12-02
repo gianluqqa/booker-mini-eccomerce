@@ -39,6 +39,10 @@ export class User {
   @Column({ type: "varchar", nullable: true })
   phone!: string | null;
 
+  // Información breve del usuario
+  @Column({ type: "text", nullable: true })
+  bio!: string | null;
+
   @Column({
     type: "enum",
     enum: UserRole,

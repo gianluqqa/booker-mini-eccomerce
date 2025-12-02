@@ -51,6 +51,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
     country: user.country ?? null,
     city: user.city ?? null,
     phone: user.phone ?? null,
+    bio: user.bio ?? null,
     role: (user.role as UserRole) ?? UserRole.CUSTOMER, // Usar el rol del request o CUSTOMER por defecto
   });
 

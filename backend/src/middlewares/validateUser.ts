@@ -15,6 +15,7 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     city,
     phone,
     role,
+    bio,
   } = user;
 
   // Email validation
@@ -59,6 +60,10 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
   if (city && city.length < 2)
     errors.push("La ciudad debe tener al menos 2 caracteres");
 
+  if (bio && bio.length > 500) {
+    errors.push("La biografía no puede superar los 500 caracteres");
+  }
+
   // Role validation
   if (role && !Object.values(UserRole).includes(role as UserRole)) {
     errors.push("El rol debe ser 'customer' o 'admin'");
@@ -93,7 +98,7 @@ export const validateLoginUser = (user: LoginUserDTO) => {
 export const validateUpdateUser = (user: UpdateUserDTO) => {
   const errors: string[] = [];
 
-  const { name, surname, password, phone, address, country, city, role } = user;
+  const { name, surname, password, phone, address, country, city, role, bio } = user;
 
   // Name validation
   if (name !== undefined && name.trim().length === 0) {
@@ -131,6 +136,10 @@ export const validateUpdateUser = (user: UpdateUserDTO) => {
   // City validation
   if (city !== undefined && city.length < 2) {
     errors.push("La ciudad debe tener al menos 2 caracteres");
+  }
+
+  if (bio !== undefined && bio !== null && bio.length > 500) {
+    errors.push("La biografía no puede superar los 500 caracteres");
   }
 
   // Role validation
