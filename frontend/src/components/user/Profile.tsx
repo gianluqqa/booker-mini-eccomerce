@@ -4,7 +4,6 @@ import { IUser } from '@/types/User'
 import { ICartItem } from '@/types/Cart'
 import Image from 'next/image'
 import { Mail, MapPin, Phone, Calendar, ShoppingCart, Loader2 } from 'lucide-react'
-
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import UpdateUserForm, { UpdateUserFormData } from '@/components/forms/UpdateUserForm'

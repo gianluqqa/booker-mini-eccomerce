@@ -1,38 +1,39 @@
 "use client";
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { ILoginUser } from '@/types/User';
-import Link from 'next/link';
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { ILoginUser } from "@/types/User";
+import Link from "next/link";
+import LoginWithGoogle from "@/components/buttons/LoginWithGoogle";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState<ILoginUser>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
   // Redirigir si ya está autenticado
   React.useEffect(() => {
     if (isAuthenticated) {
-      router.push('/profile');
+      router.push("/profile");
     }
   }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       await login(formData);
-      router.push('/profile');
+      router.push("/profile");
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
+      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
     } finally {
       setLoading(false);
     }
@@ -49,15 +50,9 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#f5efe1] pt-24 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-center mb-6 text-[#2c3e50]">
-            Iniciar Sesión
-          </h1>
+          <h1 className="text-3xl font-bold text-center mb-6 text-[#2c3e50]">Iniciar Sesión</h1>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
-            </div>
-          )}
+          {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -97,13 +92,15 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-[#2e4b30] text-[#f5efe1] py-2 px-4 rounded-md hover:bg-[#1a3a1c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </button>
+
+            <LoginWithGoogle />
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              ¿No tienes una cuenta?{' '}
+              ¿No tienes una cuenta?{" "}
               <Link href="/register" className="text-[#2e4b30] hover:text-[#1a3a1c] hover:underline font-medium">
                 Regístrate aquí
               </Link>
@@ -114,4 +111,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
