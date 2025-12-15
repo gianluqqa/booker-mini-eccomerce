@@ -137,10 +137,10 @@ const CreateBook: React.FC = () => {
 
   if (authLoading || (!isAuthenticated && !user)) {
     return (
-      <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 flex items-center justify-center min-h-[300px]">
+      <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 flex items-center justify-center min-h-[300px] text-xs">
         <div className="text-center">
           <Loader2 className="w-10 h-10 text-[#2e4b30] animate-spin mx-auto mb-3" />
-          <p className="text-[#2e4b30] text-base">Verificando permisos...</p>
+          <p className="text-[#2e4b30] text-xs">Verificando permisos...</p>
         </div>
       </div>
     )
@@ -151,26 +151,26 @@ const CreateBook: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className="flex items-center gap-3 mb-6">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-xs">
+      <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center">
           <BookOpen className="w-5 h-5 text-[#2e4b30]" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-[#2e4b30]">Crear nuevo libro</h2>
-          <p className="text-sm text-gray-600">Completa los campos para agregar un libro al catálogo.</p>
+          <h2 className="text-sm font-semibold text-[#2e4b30]">Crear nuevo libro</h2>
+          <p className="text-xs text-gray-600">Completa los campos para agregar un libro al catálogo.</p>
         </div>
       </div>
 
       {error && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 border border-red-200">
+        <div className="mb-3 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 border border-red-200">
           <AlertCircle className="w-4 h-4" />
           <span>{error}</span>
         </div>
       )}
 
       {successMessage && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700 border border-green-200">
+        <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-xs text-green-700 border border-green-200">
           <CheckCircle className="w-4 h-4" />
           <span>{successMessage}</span>
         </div>
@@ -179,7 +179,7 @@ const CreateBook: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="title">
+            <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="title">
               Título *
             </label>
             <input
@@ -189,13 +189,13 @@ const CreateBook: React.FC = () => {
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white"
+              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
               placeholder="Ej: El Señor de los Anillos"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="author">
+            <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="author">
               Autor *
             </label>
             <input
@@ -205,7 +205,7 @@ const CreateBook: React.FC = () => {
               value={formData.author}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white"
+              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
               placeholder="Ej: J.R.R. Tolkien"
             />
           </div>
@@ -213,7 +213,7 @@ const CreateBook: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">
+            <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="price">
               Precio (USD) *
             </label>
             <input
@@ -225,13 +225,13 @@ const CreateBook: React.FC = () => {
               value={formData.price}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white"
+              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
               placeholder="Ej: 19.99"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="stock">
+            <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="stock">
               Stock *
             </label>
             <input
@@ -243,13 +243,13 @@ const CreateBook: React.FC = () => {
               value={formData.stock}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white"
+              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
               placeholder="Ej: 100"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="genre">
+            <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="genre">
               Género *
             </label>
             <select
@@ -259,7 +259,7 @@ const CreateBook: React.FC = () => {
               onChange={handleChange}
               required
               disabled={loadingGenres}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 bg-white disabled:bg-gray-100 disabled:text-gray-400"
+              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 bg-white disabled:bg-gray-100 disabled:text-gray-400"
             >
               <option value="">
                 {loadingGenres ? 'Cargando géneros...' : 'Selecciona un género'}
@@ -274,7 +274,7 @@ const CreateBook: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">
+          <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="image">
             URL de imagen (opcional)
           </label>
           <input
@@ -283,13 +283,13 @@ const CreateBook: React.FC = () => {
             type="url"
             value={formData.image}
             onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white"
+            className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
             placeholder="https://..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="intro">
+          <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="intro">
             Introducción (opcional)
           </label>
           <textarea
@@ -298,13 +298,13 @@ const CreateBook: React.FC = () => {
             value={formData.intro}
             onChange={handleChange}
             rows={2}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white resize-none"
+            className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white resize-none"
             placeholder="Breve introducción del libro..."
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="description">
+          <label className="block text-xs font-medium text-gray-700 mb-1" htmlFor="description">
             Descripción *
           </label>
           <textarea
@@ -314,7 +314,7 @@ const CreateBook: React.FC = () => {
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white resize-none"
+            className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white resize-none"
             placeholder="Describe de qué trata el libro y por qué es interesante..."
           />
         </div>
@@ -323,7 +323,7 @@ const CreateBook: React.FC = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-[#2e4b30] text-[#f5efe1] px-6 py-2 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="bg-[#2e4b30] text-[#f5efe1] px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-[#1a3a1c] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <span className="flex items-center gap-2">

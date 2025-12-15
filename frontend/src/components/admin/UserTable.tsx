@@ -53,8 +53,8 @@ const UsersTable = () => {
     return (
       <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
-          <p className="text-[#2e4b30] text-lg">Cargando usuarios...</p>
+          <Loader2 className="w-10 h-10 text-[#2e4b30] animate-spin mx-auto mb-3" />
+          <p className="text-[#2e4b30] text-base">Cargando usuarios...</p>
         </div>
       </div>
     )
@@ -64,14 +64,14 @@ const UsersTable = () => {
   if (error) {
     return (
       <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-        <div className="flex items-center gap-3 text-red-600 mb-4">
-          <AlertCircle className="w-6 h-6" />
-          <h3 className="text-lg font-semibold">Error al cargar usuarios</h3>
+        <div className="flex items-center gap-3 text-red-600 mb-3">
+          <AlertCircle className="w-5 h-5" />
+          <h3 className="text-base font-semibold">Error al cargar usuarios</h3>
         </div>
-        <p className="text-gray-700 mb-4">{error}</p>
+        <p className="text-gray-700 mb-3 text-sm">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="bg-[#2e4b30] text-[#f5efe1] px-6 py-2 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
+          className="bg-[#2e4b30] text-[#f5efe1] px-5 py-1.5 rounded-lg text-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
         >
           Reintentar
         </button>
@@ -82,14 +82,14 @@ const UsersTable = () => {
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       {/* Encabezado */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center">
             <Users className="w-5 h-5 text-[#2e4b30]" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-[#2e4b30]">Gestión de Usuarios</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-lg font-semibold text-[#2e4b30]">Gestión de Usuarios</h2>
+            <p className="text-xs text-gray-600">
               {users.length} {users.length === 1 ? 'usuario registrado' : 'usuarios registrados'}
             </p>
           </div>
@@ -98,13 +98,13 @@ const UsersTable = () => {
 
       {/* Tabla de usuarios */}
       {users.length === 0 ? (
-        <div className="text-center py-12">
-          <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg">No hay usuarios registrados</p>
+        <div className="text-center py-10">
+          <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+          <p className="text-gray-500 text-base">No hay usuarios registrados</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#2e4b30]">Usuario</th>

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import { ShoppingCart, Star, BookOpen, User, DollarSign, Package, Tag, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useParams } from "next/navigation";
@@ -16,6 +15,7 @@ const BookDetail = () => {
   const [book, setBook] = useState<IBook | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false);
   const { addBookToCart, loading: addingToCart, error: cartError } = useAddToCart();
 
   useEffect(() => {
@@ -105,14 +105,17 @@ const BookDetail = () => {
             {/* Imagen del Libro */}
             <div className="flex justify-center items-center">
               <div className="relative w-full max-w-sm">
-                <div className="aspect-[3/4] w-full relative overflow-hidden rounded-xl shadow-lg">
-                  <Image
-                    src={book.image || "/placeholder-book.jpg"}
-                    alt={book.title || book.author || "Portada del libro"}
-                    fill
-                    className="object-cover object-center"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
+                <div className="aspect-[3/4] w-full relative overflow-hidden rounded-xl shadow-lg flex items-center justify-center bg-[#f5efe1] bg-opacity-20">
+                  {book.image && !imageError ? (
+                    <img
+                      src={book.image}
+                      alt={book.title || book.author || "Portada del libro"}
+                      className="w-full h-full object-cover object-center"
+                      onError={() => setImageError(true)}
+                    />
+                  ) : (
+                    <span className="text-5xl text-[#2e4b30] opacity-40">📚</span>
+                  )}
                 </div>
                 {/* Insignia de Stock */}
                 <div className="absolute top-4 right-4 bg-[#2e4b30] text-[#f5efe1] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">

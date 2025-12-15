@@ -75,16 +75,16 @@ const BookList: React.FC = () => {
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
             <BookOpen className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-[#2e4b30]">
+            <h2 className="text-lg font-semibold text-[#2e4b30]">
               Lista de libros
             </h2>
-            <p className="text-sm text-gray-600">
+            <p className="text-xs text-gray-600">
               {books.length} {books.length === 1 ? 'libro' : 'libros'} en el
               catálogo
             </p>
@@ -93,14 +93,14 @@ const BookList: React.FC = () => {
       </div>
 
       {error && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 border border-red-200">
+        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-xs text-red-700 border border-red-200">
           <AlertCircle className="w-4 h-4" />
           <span>{error}</span>
         </div>
       )}
 
       {actionError && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 border border-red-200">
+        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-xs text-red-700 border border-red-200">
           <AlertCircle className="w-4 h-4" />
           <span>{actionError}</span>
         </div>
@@ -111,12 +111,12 @@ const BookList: React.FC = () => {
           <Loader2 className="w-8 h-8 text-[#2e4b30] animate-spin" />
         </div>
       ) : books.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No hay libros en el catálogo.</p>
+        <div className="text-center py-10">
+          <p className="text-gray-500 text-base">No hay libros en el catálogo.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto max-h-[420px] overflow-y-auto rounded-xl border border-gray-100">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 font-semibold text-[#2e4b30]">
