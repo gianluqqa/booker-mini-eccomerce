@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService, getCurrentUserService } from "../services/users-services";
-import { LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
+import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService, getCurrentUserService, firebaseLoginService } from "../services/users-services";
+import { FirebaseLoginDTO, LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
 import { validateUpdateUser } from "../middlewares/validateUser";
 import { UserRole } from "../enums/UserRole";
 
@@ -58,6 +58,34 @@ export const loginUserController = async (req: Request, res: Response) => {
     } else {
       return res.status(400).json({ message: errorMessage });
     }
+  }
+};
+
+//? Login/registro vía Firebase (POST).
+export const firebaseLoginController = async (req: Request, res: Response) => {
+  try {
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({
+        message: "Email es requerido para el login con Firebase",
+      });
+    }
+
+    const payload = req.body as FirebaseLoginDTO;
+    const result = await firebaseLoginService(payload);
+
+    // Compatibilidad: devolver campos de usuario al nivel raíz + accessToken
+    return res
+      .status(200)
+      .json({ ...result.user, accessToken: result.accessToken });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Error desconocido";
+
+    if (errorMessage.includes("requerido")) {
+      return res.status(400).json({ message: errorMessage });
+    }
+
+    return res.status(400).json({ message: errorMessage });
   }
 };
 

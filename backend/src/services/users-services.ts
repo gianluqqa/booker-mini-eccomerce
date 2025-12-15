@@ -1,4 +1,4 @@
-import { LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
+import { FirebaseLoginDTO, LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
 import { validateLoginUser, validateRegisterUser } from "../middlewares/validateUser";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
@@ -89,6 +89,57 @@ export const loginUserService = async (user: LoginUserDTO) => {
   );
 
   // 5️⃣ Retornar usuario seguro + token
+  const { password: _, ...safeUser } = existingUser;
+  return { user: safeUser, accessToken };
+};
+
+//? Login/registro vía Firebase (POST).
+//  - Si el usuario NO existe, se crea con datos mínimos.
+//  - Si existe, simplemente se emite un token.
+//  - La contraseña no se usa; se genera una aleatoria solo para cumplir el esquema.
+export const firebaseLoginService = async (payload: FirebaseLoginDTO) => {
+  const { email, name, surname } = payload;
+
+  if (!email || email.trim() === "") {
+    throw new Error("Email es requerido para el login con Firebase");
+  }
+
+  const userRepo = AppDataSource.getRepository(User);
+
+  let existingUser = await userRepo.findOne({ where: { email } });
+
+  // Crear usuario si no existe
+  if (!existingUser) {
+    const randomPassword = await bcrypt.hash(
+      Math.random().toString(36).slice(-10),
+      10
+    );
+
+    const newUser = userRepo.create({
+      email,
+      password: randomPassword,
+      name: name && name.trim() !== "" ? name : "Usuario",
+      surname: surname && surname.trim() !== "" ? surname : "Google",
+      address: null,
+      country: null,
+      city: null,
+      phone: null,
+      bio: null,
+      gender: UserGender.NOT_SPECIFIC,
+      role: UserRole.CUSTOMER,
+    });
+
+    await userRepo.save(newUser);
+    existingUser = newUser;
+  }
+
+  // Emitir token igual que en login clásico
+  const accessToken = jwt.sign(
+    { sub: existingUser.id, role: existingUser.role },
+    JWT_SECRET,
+    { algorithm: "HS256", expiresIn: "15m" }
+  );
+
   const { password: _, ...safeUser } = existingUser;
   return { user: safeUser, accessToken };
 };

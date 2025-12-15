@@ -26,6 +26,13 @@ export interface LoginUserDTO {
   password: string;
 }
 
+// Login/registro vía Firebase (email ya verificado por Firebase en el cliente)
+export interface FirebaseLoginDTO {
+  email: string;
+  name?: string;
+  surname?: string;
+}
+
 export interface UpdateUserDTO {
   name?: string;
   surname?: string;

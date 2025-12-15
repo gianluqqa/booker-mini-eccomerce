@@ -15,8 +15,8 @@ export const AppDataSource = new DataSource({
   host: process.env.DB_HOST || "localhost",
   port: Number(process.env.DB_PORT) || 5432,
   username: process.env.DB_USERNAME || "postgres",
-  password: process.env.DB_PASSWORD || "glc2001luca2001",
-  database: process.env.DB_NAME || "booker",
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   synchronize: true, // solo para desarrollo
   //dropSchema: true,
   logging: false,

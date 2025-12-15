@@ -10,6 +10,7 @@ interface AuthContextType {
   loading: boolean;
   login: (credentials: ILoginUser) => Promise<void>;
   register: (userData: IRegisterUser) => Promise<void>;
+  setAuthFromExternal: (user: IUser, accessToken: string) => void; // Permitir setear auth desde proveedores externos (Firebase)
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -92,12 +93,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const setAuthFromExternal = (externalUser: IUser, accessToken: string) => {
+    setToken(accessToken);
+    setUser(externalUser);
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('user', JSON.stringify(externalUser));
+    }
+  };
+
   const value: AuthContextType = {
     user,
     token,
     loading,
     login,
     register,
+    setAuthFromExternal,
     logout,
     isAuthenticated: !!token && !!user,
   };
