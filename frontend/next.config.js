@@ -6,6 +6,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.cdn*.buscalibre.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'naruto-official.com',
+      },
     ],
   },
 };

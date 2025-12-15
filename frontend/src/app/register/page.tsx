@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { register, isAuthenticated } = useAuth();
+  const { register, isAuthenticated, user } = useAuth();
   const [formData, setFormData] = useState<IRegisterUser>({
     email: '',
     password: '',
@@ -24,12 +24,16 @@ export default function RegisterPage() {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
+  const getRedirectPath = () => {
+    return user?.role === "admin" ? "/admin" : "/profile";
+  };
+
   // Redirigir si ya está autenticado
   React.useEffect(() => {
     if (isAuthenticated) {
-      router.push('/profile');
+      router.push(getRedirectPath());
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -16,7 +16,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const { searchQuery, updateSearch, clearSearch } = useSearch();
   
   // Estado para controlar si el dropdown de búsqueda está abierto
@@ -238,7 +238,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 <Link
-                  href="/profile"
+                  href={user?.role === "admin" ? "/admin" : "/profile"}
                   className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80"
                 >
                   <User className="w-5 h-5" strokeWidth={2} />

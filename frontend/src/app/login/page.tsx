@@ -9,7 +9,7 @@ import LoginWithGoogle from "@/components/buttons/LoginWithGoogle";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
   const [formData, setFormData] = useState<ILoginUser>({
     email: "",
     password: "",
@@ -17,12 +17,16 @@ export default function LoginPage() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  const getRedirectPath = () => {
+    return user?.role === "admin" ? "/admin" : "/profile";
+  };
+
   // Redirigir si ya está autenticado
   React.useEffect(() => {
     if (isAuthenticated) {
-      router.push("/profile");
+      router.push(getRedirectPath());
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,7 +35,7 @@ export default function LoginPage() {
 
     try {
       await login(formData);
-      router.push("/profile");
+      router.push(getRedirectPath());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al iniciar sesión");
     } finally {

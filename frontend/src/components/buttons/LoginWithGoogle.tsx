@@ -39,8 +39,9 @@ const LoginWithGoogle: React.FC = () => {
       // 3) Guardar usuario y token en el contexto de auth
       setAuthFromExternal(userData, accessToken);
 
-      // 4) Redirigir al perfil
-      router.push("/profile");
+      // 4) Redirigir según rol
+      const redirectPath = userData.role === "admin" ? "/admin" : "/profile";
+      router.push(redirectPath);
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
     }

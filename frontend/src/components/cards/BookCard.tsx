@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IBookCardProps } from "@/types/Book";
-import Image from "next/image";
 import { Eye, ShoppingCart, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
@@ -80,14 +79,11 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
         className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-lg mb-4 flex items-center justify-center overflow-hidden cursor-pointer"
       >
         {book.image && !imageError ? (
-          <Image
+          <img
             src={book.image}
             alt={book.title}
-            width={200}
-            height={300}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={() => setImageError(true)}
-            unoptimized={book.image.includes('example.com')}
           />
         ) : (
           <div className="text-[#2e4b30] text-4xl opacity-50">📚</div>

@@ -3,6 +3,11 @@
 import { apiClient, extractData } from '@/config/api'
 import { IBook } from '@/types/Book'
 
+export interface IGenre {
+  id: string
+  name: string
+}
+
 /**
  * Obtiene todos los libros desde la API
  * @param query - Opcional: término de búsqueda para filtrar libros
@@ -36,4 +41,18 @@ export const getBookById = async (id: string): Promise<IBook> => {
     throw new Error(errorMessage)
   }
 }
+
+/**
+ * Obtiene todos los géneros disponibles
+ */
+export const getGenres = async (): Promise<IGenre[]> => {
+  try {
+    const response = await apiClient.get<IGenre[]>('/books/genres')
+    return Array.isArray(response.data) ? response.data : []
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error al cargar los géneros'
+    throw new Error(errorMessage)
+  }
+}
+
 
