@@ -26,7 +26,8 @@
     "test:debug": "jest --detectOpenHandles --forceExit",
     "seed:books": "ts-node src/seeds/books.seed.ts",
     "seed:genres": "ts-node src/seeds/genres.seed.ts",
-    "seed:all": "npm run seed:genres && npm run seed:books"
+    "seed:admin": "ts-node src/seeds/admin.seed.ts",
+    "seed:all": "npm run seed:genres && npm run seed:books && npm run seed:admin"
   },
   "keywords": [],
   "author": "",
