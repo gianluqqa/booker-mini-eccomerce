@@ -91,12 +91,12 @@ const Collections = () => {
 
   if (loading) {
     return (
-      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
+      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
-              <p className="text-[#2e4b30] text-lg">Cargando colecciones...</p>
+              <Loader2 className="w-10 h-10 text-[#2e4b30] animate-spin mx-auto mb-3" />
+              <p className="text-[#2e4b30] text-sm">Cargando colecciones...</p>
             </div>
           </div>
         </div>
@@ -106,12 +106,12 @@ const Collections = () => {
 
   if (error) {
     return (
-      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
+      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-red-600 text-lg mb-4">{error}</p>
-              <p className="text-[#2e4b30] opacity-70">No se pudieron cargar las colecciones</p>
+              <p className="text-red-600 text-sm mb-3">{error}</p>
+              <p className="text-[#2e4b30] opacity-70 text-xs">No se pudieron cargar las colecciones</p>
             </div>
           </div>
         </div>
@@ -121,11 +121,11 @@ const Collections = () => {
 
   if (books.length === 0) {
     return (
-      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
+      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-[#2e4b30] text-lg">No hay colecciones disponibles</p>
+              <p className="text-[#2e4b30] text-sm">No hay colecciones disponibles</p>
             </div>
           </div>
         </div>
@@ -134,16 +134,16 @@ const Collections = () => {
   }
 
   return (
-    <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1]">
+    <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto">
         {/* Encabezado */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-[#1a3a1c] mb-4 flex items-center justify-center gap-3">
-            <BookOpen className="w-8 h-8 text-[#2e4b30]" />
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-[#1a3a1c] mb-3 flex items-center justify-center gap-3">
+            <BookOpen className="w-6 h-6 text-[#2e4b30]" />
             Colecciones
-            <BookOpen className="w-8 h-8 text-[#2e4b30]" />
+            <BookOpen className="w-6 h-6 text-[#2e4b30]" />
           </h2>
-          <p className="text-lg text-[#2e4b30] opacity-80 max-w-2xl mx-auto">
+          <p className="text-sm text-[#2e4b30] opacity-80 max-w-2xl mx-auto">
             Descubre libros organizados por género y encuentra tu próxima lectura favorita
           </p>
         </div>

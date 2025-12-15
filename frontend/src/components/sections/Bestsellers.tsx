@@ -26,12 +26,12 @@ const Bestsellers = () => {
 
   if (loading) {
     return (
-      <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white">
+      <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
-              <p className="text-[#2e4b30] text-lg">Cargando bestsellers...</p>
+              <Loader2 className="w-10 h-10 text-[#2e4b30] animate-spin mx-auto mb-3" />
+              <p className="text-[#2e4b30] text-sm">Cargando bestsellers...</p>
             </div>
           </div>
         </div>
@@ -41,12 +41,12 @@ const Bestsellers = () => {
 
   if (error) {
     return (
-      <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white">
+      <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-red-600 text-lg mb-4">{error}</p>
-              <p className="text-[#2e4b30] opacity-70">No se pudieron cargar los bestsellers</p>
+              <p className="text-red-600 text-sm mb-3">{error}</p>
+              <p className="text-[#2e4b30] opacity-70 text-xs">No se pudieron cargar los bestsellers</p>
             </div>
           </div>
         </div>
@@ -56,11 +56,11 @@ const Bestsellers = () => {
 
   if (bestsellers.length === 0) {
     return (
-      <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white">
+      <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-[#2e4b30] text-lg">No hay bestsellers disponibles</p>
+              <p className="text-[#2e4b30] text-sm">No hay bestsellers disponibles</p>
             </div>
           </div>
         </div>
@@ -69,25 +69,25 @@ const Bestsellers = () => {
   }
 
   return (
-    <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white">
+    <section id="bestsellers" className="py-16 px-4 bg-gradient-to-b from-[#f5efe1] to-white text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Award className="w-8 h-8 text-[#2e4b30]" />
-            <h2 className="text-4xl font-bold text-[#1a3a1c]">
+            <Award className="w-6 h-6 text-[#2e4b30]" />
+            <h2 className="text-3xl font-bold text-[#1a3a1c]">
               Bestsellers
             </h2>
-            <Star className="w-8 h-8 text-[#2e4b30]" />
+            <Star className="w-6 h-6 text-[#2e4b30]" />
           </div>
-          <p className="text-lg text-[#2e4b30] opacity-80 max-w-2xl mx-auto flex items-center justify-center gap-2">
-            <TrendingUp className="w-5 h-5" />
+          <p className="text-sm text-[#2e4b30] opacity-80 max-w-2xl mx-auto flex items-center justify-center gap-2">
+            <TrendingUp className="w-4 h-4" />
             Descubre los libros más populares y mejor valorados de nuestra colección
           </p>
         </div>
 
         {/* Bestsellers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {bestsellers.map((book, index) => (
             <div key={book.id} className="relative">
               {/* Bestseller Badge */}

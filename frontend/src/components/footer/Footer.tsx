@@ -4,17 +4,17 @@ import Image from 'next/image'
 
 const Footer = () => {
   return ((
-        <footer className="bg-[#2E4B30] text-[#F5EFE1]">
+        <footer className="bg-[#2E4B30] text-[#F5EFE1] text-xs sm:text-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {/* Contenido Principal del Footer */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
               {/* Sección de la Marca */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-[#F5EFE1] p-2 rounded-lg">
-                    <Image src="/booker-new-logo.png" alt="Booker Logo" width={24} height={24} className="w-6 h-6" />
+                  <div className="bg-[#F5EFE1] p-1.5 rounded-lg">
+                    <Image src="/booker-new-logo.png" alt="Booker Logo" width={20} height={20} className="w-5 h-5" />
                   </div>
-                  <span className="text-2xl font-bold text-[#F5EFE1]">Booker</span>
+                  <span className="text-xl font-bold text-[#F5EFE1]">Booker</span>
                 </div>
                 <p className="text-[#F5EFE1]/80 text-sm leading-relaxed">
                   Tu destino definitivo para descubrir y coleccionar libros. Desde clásicos atemporales hasta bestsellers modernos.
@@ -122,9 +122,9 @@ const Footer = () => {
             </div>
     
             {/* Sección de Newsletter */}
-            <div className="border-t border-[#F5EFE1]/20 pt-8 pb-8">
+            <div className="border-t border-[#F5EFE1]/20 pt-6 pb-6">
               <div className="max-w-2xl mx-auto text-center">
-                <h3 className="text-[#F5EFE1] font-bold text-xl mb-2">Suscríbete a Nuestro Boletín</h3>
+                <h3 className="text-[#F5EFE1] font-bold text-lg mb-1.5">Suscríbete a Nuestro Boletín</h3>
                 <p className="text-[#F5EFE1]/80 text-sm mb-4">Recibe las últimas recomendaciones de libros y ofertas exclusivas</p>
                 <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
                   <input

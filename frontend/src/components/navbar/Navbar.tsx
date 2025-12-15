@@ -144,34 +144,34 @@ const Navbar = () => {
             )}
             <Link href="/" className="flex items-center space-x-2">
               <Image src="/booker-new-logo.png" alt="Booker Logo" width={32} height={32} className="h-8 w-auto" />
-              <span className="text-xl font-bold text-[#2e4b30] tracking-tight transition-colors duration-300">Booker</span>
+              <span className="text-lg font-bold text-[#2e4b30] tracking-tight transition-colors duration-300">Booker</span>
             </Link>
           </div>
 
           {/* Navegación de Desktop */}
           {isHomePage && (
-            <div className="hidden md:flex items-center space-x-6">
+            <div className="hidden md:flex items-center space-x-5 text-xs sm:text-sm">
               <button
                 onClick={() => scrollToSection("books")}
-                className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+                className="text-[#2e4b30] transition-colors duration-300 font-medium hover:opacity-80 cursor-pointer"
               >
                 Libros
               </button>
               <button
                 onClick={() => scrollToSection("bestsellers")}
-                className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+                className="text-[#2e4b30] transition-colors duration-300 font-medium hover:opacity-80 cursor-pointer"
               >
                 Más Vendidos
               </button>
               <button
                 onClick={() => scrollToSection("collections")}
-                className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+                className="text-[#2e4b30] transition-colors duration-300 font-medium hover:opacity-80 cursor-pointer"
               >
                 Colecciones
               </button>
               <button
                 onClick={() => scrollToSection("about")}
-                className="text-[#2e4b30] transition-colors duration-300 font-medium text-base hover:opacity-80 cursor-pointer"
+                className="text-[#2e4b30] transition-colors duration-300 font-medium hover:opacity-80 cursor-pointer"
               >
                 Sobre Nosotros
               </button>

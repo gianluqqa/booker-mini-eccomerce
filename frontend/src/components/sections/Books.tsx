@@ -13,12 +13,12 @@ const Books = () => {
 
   if (loading) {
     return (
-      <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
+      <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
-              <p className="text-[#2e4b30] text-lg">Cargando libros...</p>
+              <Loader2 className="w-10 h-10 text-[#2e4b30] animate-spin mx-auto mb-3" />
+              <p className="text-[#2e4b30] text-sm">Cargando libros...</p>
             </div>
           </div>
         </div>
@@ -28,11 +28,11 @@ const Books = () => {
 
   if (error) {
     return (
-      <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
+      <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-red-600 text-lg mb-4">{error}</p>
+              <p className="text-red-600 text-sm mb-3">{error}</p>
               <p className="text-[#2e4b30] opacity-70">No se pudieron cargar los libros</p>
             </div>
           </div>
@@ -43,11 +43,11 @@ const Books = () => {
 
   if (books.length === 0) {
     return (
-      <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
+      <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
-              <p className="text-[#2e4b30] text-lg">No hay libros disponibles</p>
+              <p className="text-[#2e4b30] text-sm">No hay libros disponibles</p>
             </div>
           </div>
         </div>
@@ -56,21 +56,21 @@ const Books = () => {
   }
 
   return (
-    <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8">
+    <section id="books" className="bg-[#f5efe1] min-h-screen pt-28 pb-20 px-4 sm:px-6 lg:px-8 text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-block px-4 py-2 bg-[#2e4b30] bg-opacity-10 rounded-full mb-6">
-            <span className="text-[#f5efe1] text-sm font-medium tracking-wide">
+          <div className="inline-block px-3 py-1.5 bg-[#2e4b30] bg-opacity-10 rounded-full mb-4">
+            <span className="text-[#f5efe1] text-[11px] font-medium tracking-wide">
               NUESTROS LIBROS
             </span>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#2e4b30] mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2e4b30] mb-4 leading-tight">
             Descubre Nuestra Colección
           </h2>
 
-          <p className="text-[#2e4b30] text-lg sm:text-xl opacity-80 max-w-3xl mx-auto">
+          <p className="text-[#2e4b30] text-sm sm:text-base opacity-80 max-w-3xl mx-auto">
             Explora nuestra cuidadosamente seleccionada colección de libros de todas
             las categorías
           </p>

@@ -69,7 +69,7 @@ const BookDetail = () => {
       <div className="min-h-screen bg-[#f5efe1] flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-16 h-16 text-[#2e4b30] animate-spin mx-auto mb-4" />
-          <p className="text-[#2e4b30] text-lg">Cargando libro...</p>
+          <p className="text-[#2e4b30] text-sm">Cargando libro...</p>
         </div>
       </div>
     );
@@ -80,13 +80,13 @@ const BookDetail = () => {
       <div className="min-h-screen bg-[#f5efe1] flex items-center justify-center">
         <div className="text-center">
           <BookOpen className="w-16 h-16 text-[#2e4b30] mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-[#2e4b30] mb-2">Libro no encontrado</h2>
-          <p className="text-[#2e4b30] opacity-70 mb-6">
+          <h2 className="text-lg font-bold text-[#2e4b30] mb-2">Libro no encontrado</h2>
+          <p className="text-[#2e4b30] opacity-70 mb-6 text-sm">
             {error || "El libro que buscas no existe."}
           </p>
           <Link 
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#2e4b30] text-[#f5efe1] rounded-lg hover:bg-[#1a3a1c] transition-all duration-300"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#2e4b30] text-[#f5efe1] rounded-lg hover:bg-[#1a3a1c] transition-all duration-300 text-sm"
           >
             <ArrowLeft className="w-4 h-4" />
             Volver al inicio
@@ -118,8 +118,8 @@ const BookDetail = () => {
                   )}
                 </div>
                 {/* Insignia de Stock */}
-                <div className="absolute top-4 right-4 bg-[#2e4b30] text-[#f5efe1] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                  <Package className="w-4 h-4" />
+                <div className="absolute top-4 right-4 bg-[#2e4b30] text-[#f5efe1] px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                  <Package className="w-3 h-3" />
                   {book.stock} en stock
                 </div>
               </div>
@@ -131,39 +131,39 @@ const BookDetail = () => {
               <div className="space-y-6">
                 {/* Título y Autor */}
                 <div>
-                  <h1 className="text-3xl sm:text-4xl font-bold text-[#1a3a1c] mb-3 leading-tight">
+                  <h1 className="text-xl sm:text-2xl font-bold text-[#1a3a1c] mb-3 leading-tight">
                     {book.title}
                   </h1>
-                  <div className="flex items-center gap-2 text-lg text-[#2e4b30] mb-4">
-                    <User className="w-5 h-5" />
+                  <div className="flex items-center gap-2 text-sm text-[#2e4b30] mb-4">
+                    <User className="w-4 h-4" />
                     <span className="font-medium">{book.author}</span>
                   </div>
                 </div>
 
                 {/* Género */}
                 <div className="flex items-center gap-2">
-                  <Tag className="w-5 h-5 text-[#2e4b30]" />
-                  <span className="text-[#2e4b30] font-medium">Género:</span>
-                  <span className="px-3 py-1 bg-[#2e4b30] bg-opacity-10 text-[#f5efe1] rounded-full text-sm font-medium">
+                  <Tag className="w-4 h-4 text-[#2e4b30]" />
+                  <span className="text-[#2e4b30] font-medium text-sm">Género:</span>
+                  <span className="px-2 py-1 bg-[#2e4b30] bg-opacity-10 text-[#f5efe1] rounded-full text-xs font-medium">
                     {book.genre}
                   </span>
                 </div>
 
                 {/* Precio */}
                 <div className="flex items-center gap-2">
-                  <DollarSign className="w-6 h-6 text-[#2e4b30]" />
-                  <span className="text-3xl font-bold text-[#2e4b30]">
+                  <DollarSign className="w-5 h-5 text-[#2e4b30]" />
+                  <span className="text-xl font-bold text-[#2e4b30]">
                     ${book.price}
                   </span>
                 </div>
 
                 {/* Descripción */}
                 <div className="space-y-3">
-                  <h3 className="text-xl font-semibold text-[#1a3a1c] flex items-center gap-2">
-                    <BookOpen className="w-5 h-5" />
+                  <h3 className="text-base font-semibold text-[#1a3a1c] flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
                     Descripción
                   </h3>
-                  <p className="text-[#2e4b30] leading-relaxed text-lg">
+                  <p className="text-[#2e4b30] leading-relaxed text-sm">
                     {book.description}
                   </p>
                 </div>
@@ -171,11 +171,11 @@ const BookDetail = () => {
                 {/* Introducción (si está disponible) */}
                 {book.intro && (
                   <div className="space-y-3">
-                    <h3 className="text-xl font-semibold text-[#1a3a1c] flex items-center gap-2">
-                      <Star className="w-5 h-5" />
+                    <h3 className="text-base font-semibold text-[#1a3a1c] flex items-center gap-2">
+                      <Star className="w-4 h-4" />
                       Introducción
                     </h3>
-                    <p className="text-[#2e4b30] leading-relaxed">
+                    <p className="text-[#2e4b30] leading-relaxed text-sm">
                       {book.intro}
                     </p>
                   </div>
@@ -185,14 +185,14 @@ const BookDetail = () => {
               {/* Botón de Añadir al Carrito */}
               <div className="mt-auto pt-6 space-y-3">
                 {cartError && (
-                  <div className="px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+                  <div className="px-3 py-2 bg-red-100 text-red-700 rounded-lg text-xs">
                     {cartError}
                   </div>
                 )}
                 <button
                   onClick={handleAddToCart}
                   disabled={book.stock === 0 || addingToCart}
-                  className={`w-full transition-all duration-300 py-4 px-6 rounded-xl font-semibold text-lg flex items-center justify-center gap-3 shadow-lg hover:shadow-xl ${
+                  className={`w-full transition-all duration-300 py-3 px-4 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 shadow-lg hover:shadow-xl ${
                     book.stock > 0 && !addingToCart
                       ? "bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c]"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -200,12 +200,12 @@ const BookDetail = () => {
                 >
                   {addingToCart ? (
                     <>
-                      <Loader2 className="w-6 h-6 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" />
                       Añadiendo...
                     </>
                   ) : (
                     <>
-                      <ShoppingCart className="w-6 h-6" />
+                      <ShoppingCart className="w-4 h-4" />
                       {book.stock > 0 ? "Añadir al Carrito" : "Sin Stock"}
                     </>
                   )}
