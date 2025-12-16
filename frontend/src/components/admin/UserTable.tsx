@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { getAllUsers } from '@/services/adminService'
 import { IUser } from '@/types/User'
+import Image from 'next/image'
 import { Users, Loader2, AlertCircle, Mail, Calendar, Shield, User as UserIcon } from 'lucide-react'
 import { getRoleDisplay, getRoleColor, formatDate } from '@/utils/helpers'
 
@@ -80,7 +81,7 @@ const UsersTable = () => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+    <div>
       {/* Encabezado */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -123,9 +124,14 @@ const UsersTable = () => {
                   {/* Columna Usuario */}
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center flex-shrink-0">
-                        <UserIcon className="w-5 h-5 text-[#2e4b30]" />
+                      <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {userItem.role === 'admin' ? (
+                          <Image src="/admin-logo.png" alt="Admin avatar" width={40} height={40} className="object-contain" />
+                        ) : (
+                          <UserIcon className="w-5 h-5 text-[#2e4b30]" />
+                        )}
                       </div>
+
                       <div>
                         <p className="font-medium text-gray-900">
                           {userItem.name} {userItem.surname}

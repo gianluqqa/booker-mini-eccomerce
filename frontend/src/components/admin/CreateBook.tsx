@@ -151,7 +151,7 @@ const CreateBook: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-xs">
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 text-xs">
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center">
           <BookOpen className="w-5 h-5 text-[#2e4b30]" />
