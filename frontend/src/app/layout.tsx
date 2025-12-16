@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/footer/Footer";
 import Navbar from "@/components/navbar/Navbar";
+import ReservationTimerBanner from "@/components/reservations/ReservationTimerBanner";
 import AuthProvider from "@/app/providers/AuthProvider";
 import { CartProvider } from "@/contexts/CartContext";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <Navbar />
+            <ReservationTimerBanner />
             {children}
             <Footer />
           </CartProvider>

@@ -16,6 +16,9 @@ export class Cart {
   @Column({ type: "int", default: 1 })
   quantity!: number;
 
+  @Column({ type: "timestamp", nullable: true })
+  reservedUntil!: Date | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

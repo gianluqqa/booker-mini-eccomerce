@@ -23,6 +23,7 @@ export interface ICartItem {
     stock: number;
   };
   quantity: number;
+  reservedUntil?: string | Date | null;
   createdAt: string | Date;
   updatedAt: string | Date;
 }

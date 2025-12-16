@@ -6,6 +6,52 @@ import { Order } from "../entities/Order";
 import { OrderItem } from "../entities/OrderItem";
 import { OrderStatus } from "../enums/OrderStatus";
 import { AddToCartDto, UpdateCartDto, CartResponseDto, CartItemDto } from "../dto/CartDto";
+import { LessThan } from "typeorm";
+
+const RESERVATION_TTL_MS = 10 * 60 * 1000; // 10 minutos
+
+const getReservationExpiry = () => new Date(Date.now() + RESERVATION_TTL_MS);
+
+const releaseExpiredCartReservations = async (): Promise<void> => {
+  const cartRepository = AppDataSource.getRepository(Cart);
+  const bookRepository = AppDataSource.getRepository(Book);
+
+  const now = new Date();
+  const expiredCartItems = await cartRepository.find({
+    where: { reservedUntil: LessThan(now) },
+    relations: ["book"],
+  });
+
+  if (expiredCartItems.length === 0) return;
+
+  const booksToUpdate = new Map<string, Book>();
+
+  for (const cartItem of expiredCartItems) {
+    const book = cartItem.book;
+    book.stock += cartItem.quantity;
+    booksToUpdate.set(book.id, book);
+  }
+
+  await bookRepository.save(Array.from(booksToUpdate.values()));
+  await cartRepository.remove(expiredCartItems);
+};
+
+const reserveStock = async (book: Book, quantity: number): Promise<void> => {
+  if (book.stock < quantity) {
+    throw {
+      status: 400,
+      message: `Stock insuficiente. Disponible: ${book.stock}`,
+    };
+  }
+
+  book.stock -= quantity;
+  await AppDataSource.getRepository(Book).save(book);
+};
+
+const releaseStock = async (book: Book, quantity: number): Promise<void> => {
+  book.stock += quantity;
+  await AppDataSource.getRepository(Book).save(book);
+};
 
 //? Añadir un libro al carrito (POST).
 export const addBookToCartService = async (userId: string, addToCartDto: AddToCartDto): Promise<CartItemDto> => {
@@ -14,6 +60,8 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
   const userRepository = AppDataSource.getRepository(User);
 
   try {
+    await releaseExpiredCartReservations();
+
     // Verificar que el usuario existe
     const user = await userRepository.findOne({ where: { id: userId } });
     if (!user) {
@@ -26,11 +74,7 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
       throw { status: 404, message: "Libro no encontrado" };
     }
 
-    // Verificar stock disponible
     const requestedQuantity = addToCartDto.quantity || 1;
-    if (book.stock < requestedQuantity) {
-      throw { status: 400, message: `Stock insuficiente. Disponible: ${book.stock}` };
-    }
 
     // Buscar si el libro ya está en el carrito del usuario
     const existingCartItem = await cartRepository.findOne({
@@ -44,25 +88,19 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
     let cartItem: Cart;
 
     if (existingCartItem) {
-      // Si ya existe, actualizar la cantidad
-      const newQuantity = existingCartItem.quantity + requestedQuantity;
-      
-      // Verificar que la nueva cantidad no exceda el stock
-      if (newQuantity > book.stock) {
-        throw { 
-          status: 400, 
-          message: `No se pueden agregar ${requestedQuantity} items. El total excedería el stock disponible (${book.stock})` 
-        };
-      }
-
-      existingCartItem.quantity = newQuantity;
+      // Validar stock adicional requerido (ya hay cantidad reservada)
+      await reserveStock(book, requestedQuantity);
+      existingCartItem.quantity += requestedQuantity;
+      existingCartItem.reservedUntil = getReservationExpiry();
       cartItem = await cartRepository.save(existingCartItem);
     } else {
       // Si no existe, crear nuevo item en el carrito
+      await reserveStock(book, requestedQuantity);
       cartItem = cartRepository.create({
         user: { id: userId } as User,
         book: { id: addToCartDto.bookId } as Book,
         quantity: requestedQuantity,
+        reservedUntil: getReservationExpiry(),
       });
       cartItem = await cartRepository.save(cartItem);
     }
@@ -88,6 +126,7 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
         stock: savedCartItem.book.stock,
       },
       quantity: savedCartItem.quantity,
+      reservedUntil: savedCartItem.reservedUntil,
       createdAt: savedCartItem.createdAt,
       updatedAt: savedCartItem.updatedAt,
     };
@@ -103,6 +142,8 @@ export const getUserCartService = async (userId: string): Promise<CartResponseDt
   const cartRepository = AppDataSource.getRepository(Cart);
 
   try {
+    await releaseExpiredCartReservations();
+
     const cartItems = await cartRepository.find({
       where: { user: { id: userId } },
       relations: ["book"],
@@ -120,6 +161,7 @@ export const getUserCartService = async (userId: string): Promise<CartResponseDt
         stock: item.book.stock,
       },
       quantity: item.quantity,
+      reservedUntil: item.reservedUntil,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
     }));
@@ -150,6 +192,8 @@ export const updateCartItemQuantityService = async (
   const cartRepository = AppDataSource.getRepository(Cart);
 
   try {
+    await releaseExpiredCartReservations();
+
     if (updateCartDto.quantity <= 0) {
       throw { status: 400, message: "La cantidad debe ser mayor que 0" };
     }
@@ -163,15 +207,19 @@ export const updateCartItemQuantityService = async (
       throw { status: 404, message: "Item del carrito no encontrado" };
     }
 
-    // Verificar stock disponible
-    if (updateCartDto.quantity > cartItem.book.stock) {
-      throw {
-        status: 400,
-        message: `Stock insuficiente. Disponible: ${cartItem.book.stock}`,
-      };
+    const currentQuantity = cartItem.quantity;
+    const newQuantity = updateCartDto.quantity;
+
+    if (newQuantity > currentQuantity) {
+      const difference = newQuantity - currentQuantity;
+      await reserveStock(cartItem.book, difference);
+    } else if (newQuantity < currentQuantity) {
+      const difference = currentQuantity - newQuantity;
+      await releaseStock(cartItem.book, difference);
     }
 
-    cartItem.quantity = updateCartDto.quantity;
+    cartItem.quantity = newQuantity;
+    cartItem.reservedUntil = getReservationExpiry();
     const updatedCartItem = await cartRepository.save(cartItem);
 
     return {
@@ -185,6 +233,7 @@ export const updateCartItemQuantityService = async (
         stock: updatedCartItem.book.stock,
       },
       quantity: updatedCartItem.quantity,
+      reservedUntil: updatedCartItem.reservedUntil,
       createdAt: updatedCartItem.createdAt,
       updatedAt: updatedCartItem.updatedAt,
     };
@@ -203,14 +252,18 @@ export const removeBookFromCartService = async (
   const cartRepository = AppDataSource.getRepository(Cart);
 
   try {
+    await releaseExpiredCartReservations();
+
     const cartItem = await cartRepository.findOne({
       where: { id: cartId, user: { id: userId } },
+      relations: ["book"],
     });
 
     if (!cartItem) {
       throw { status: 404, message: "Item del carrito no encontrado" };
     }
 
+    await releaseStock(cartItem.book, cartItem.quantity);
     await cartRepository.remove(cartItem);
   } catch (error: any) {
     console.error("Error removing book from cart:", error);
@@ -224,11 +277,17 @@ export const clearCartService = async (userId: string): Promise<void> => {
   const cartRepository = AppDataSource.getRepository(Cart);
 
   try {
+    await releaseExpiredCartReservations();
+
     const cartItems = await cartRepository.find({
       where: { user: { id: userId } },
+      relations: ["book"],
     });
 
     if (cartItems.length > 0) {
+      for (const cartItem of cartItems) {
+        await releaseStock(cartItem.book, cartItem.quantity);
+      }
       await cartRepository.remove(cartItems);
     }
   } catch (error) {
@@ -246,6 +305,8 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
   const userRepository = AppDataSource.getRepository(User);
 
   try {
+    await releaseExpiredCartReservations();
+
     // Obtener todos los items del carrito
     const cartItems = await cartRepository.find({
       where: { user: { id: userId } },
@@ -260,16 +321,6 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
     const user = await userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw { status: 404, message: "Usuario no encontrado" };
-    }
-
-    // Validar stock antes de crear la orden
-    for (const cartItem of cartItems) {
-      if (cartItem.quantity > cartItem.book.stock) {
-        throw {
-          status: 400,
-          message: `Stock insuficiente para el libro "${cartItem.book.title}". Disponible: ${cartItem.book.stock}, Solicitado: ${cartItem.quantity}`,
-        };
-      }
     }
 
     // Crear la orden primero
@@ -296,10 +347,6 @@ export const checkoutCartService = async (userId: string): Promise<Order> => {
 
       const savedOrderItem = await orderItemRepository.save(orderItem);
       orderItems.push(savedOrderItem);
-
-      // Actualizar stock del libro
-      cartItem.book.stock -= cartItem.quantity;
-      await bookRepository.save(cartItem.book);
     }
 
     // Limpiar el carrito después de crear la orden

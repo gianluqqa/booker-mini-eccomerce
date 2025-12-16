@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -18,21 +18,37 @@ const Cart = () => {
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState<{ [key: string]: boolean }>({});
   const [isRemoving, setIsRemoving] = useState<{ [key: string]: boolean }>({});
+  const [timeLeft, setTimeLeft] = useState<Record<string, number>>({});
 
-  const fetchCart = async () => {
+  const computeTimeLeft = useCallback((items: ICartItem[]) => {
+    const map: Record<string, number> = {};
+    items.forEach((item) => {
+      if (!item.reservedUntil) return;
+      const expiresAt = new Date(item.reservedUntil).getTime();
+      map[item.id] = Math.max(0, expiresAt - Date.now());
+    });
+    return map;
+  }, []);
+
+  const applyCartState = useCallback((items: ICartItem[]) => {
+    setCartItems(items);
+    setTimeLeft(computeTimeLeft(items));
+  }, [computeTimeLeft]);
+
+  const fetchCart = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const cartData = await getUserCart();
-      setCartItems(cartData.items || []);
+      applyCartState(cartData.items || []);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al cargar el carrito";
       setError(errorMessage);
-      setCartItems([]);
+      applyCartState([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [applyCartState]);
 
   useEffect(() => {
     // Esperar a que termine de cargar la autenticación antes de verificar
@@ -46,7 +62,7 @@ const Cart = () => {
     }
     
     fetchCart();
-  }, [isAuthenticated, authLoading]);
+  }, [isAuthenticated, authLoading, fetchCart, router]);
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
@@ -56,10 +72,16 @@ const Cart = () => {
 
     try {
       setIsUpdating((prev) => ({ ...prev, [itemId]: true }));
-      await updateCartItemQuantity(itemId, newQuantity);
+      const updatedItem = await updateCartItemQuantity(itemId, newQuantity);
 
       // Actualizar el estado local
-      setCartItems((items) => items.map((item) => (item.id === itemId ? { ...item, quantity: newQuantity } : item)));
+      setCartItems((items) => {
+        const updatedItems = items.map((item) =>
+          item.id === itemId ? { ...item, quantity: updatedItem.quantity, reservedUntil: updatedItem.reservedUntil } : item
+        );
+        setTimeLeft(computeTimeLeft(updatedItems));
+        return updatedItems;
+      });
       
       // Actualizar el contexto del carrito para sincronizar el contador del Navbar
       await refreshCart();
@@ -78,7 +100,11 @@ const Cart = () => {
       setIsRemoving((prev) => ({ ...prev, [itemId]: true }));
       await removeFromCart(itemId);
       // Actualizar el estado local
-      setCartItems((items) => items.filter((item) => item.id !== itemId));
+      setCartItems((items) => {
+        const updatedItems = items.filter((item) => item.id !== itemId);
+        setTimeLeft(computeTimeLeft(updatedItems));
+        return updatedItems;
+      });
       
       // Actualizar el contexto del carrito para sincronizar el contador del Navbar
       await refreshCart();
@@ -96,7 +122,7 @@ const Cart = () => {
     if (window.confirm("¿Estás seguro de que quieres vaciar el carrito?")) {
       try {
         await clearCart();
-        setCartItems([]);
+        applyCartState([]);
         
         // Actualizar el contexto del carrito para sincronizar el contador del Navbar
         await refreshCart();
@@ -104,6 +130,22 @@ const Cart = () => {
         const errorMessage = error instanceof Error ? error.message : "Error al vaciar el carrito";
         setError(errorMessage);
       }
+    }
+  };
+
+  const handleCancelReservation = async () => {
+    if (!cartItems.length) return;
+    if (!window.confirm("¿Deseas cancelar la operación y liberar la reserva de stock?")) {
+      return;
+    }
+
+    try {
+      await clearCart();
+      applyCartState([]);
+      await refreshCart();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "No se pudo cancelar la operación";
+      setError(errorMessage);
     }
   };
 
@@ -119,13 +161,40 @@ const Cart = () => {
     return calculateSubtotal() + calculateTax();
   };
 
+  const formatTimeLeft = (ms: number) => {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
+
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       alert("Tu carrito está vacío");
       return;
     }
+
+    const hasExpiredReservation = cartItems.some(
+      (item) => item.reservedUntil && (!timeLeft[item.id] || timeLeft[item.id] <= 0)
+    );
+
+    if (hasExpiredReservation) {
+      alert("Algunos ítems expiraron. Actualiza las cantidades para intentar reservar nuevamente.");
+      fetchCart();
+      return;
+    }
     router.push("/checkout");
   };
+
+  useEffect(() => {
+    if (cartItems.length === 0) return;
+
+    const interval = setInterval(() => {
+      setTimeLeft(computeTimeLeft(cartItems));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [cartItems, computeTimeLeft]);
 
   if (loading) {
     return (
@@ -223,6 +292,17 @@ const Cart = () => {
                         <h3 className="text-lg font-semibold text-[#2e4b30]">{item.book.title}</h3>
                         <p className="text-[#2e4b30]/70 text-sm mb-2">por {item.book.author}</p>
                         <p className="text-lg font-bold text-[#2e4b30]">${(item.book.price * item.quantity).toFixed(2)}</p>
+                        {item.reservedUntil && (
+                          <p
+                            className={`mt-2 text-sm font-medium ${
+                              timeLeft[item.id] && timeLeft[item.id] > 0 ? "text-amber-600" : "text-red-600"
+                            }`}
+                          >
+                            {timeLeft[item.id] && timeLeft[item.id] > 0
+                              ? `Reserva expira en ${formatTimeLeft(timeLeft[item.id])}`
+                              : "Reserva expirada. Actualiza la cantidad para volver a reservar."}
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex items-center space-x-4">
@@ -292,6 +372,13 @@ const Cart = () => {
                 className="w-full bg-[#2e4b30] hover:bg-[#2e4b30]/90 text-[#f5efe1] py-3 px-6 rounded-lg font-medium transition-all duration-200 mb-4"
               >
                 Proceder al Pago
+              </button>
+
+              <button
+                onClick={handleCancelReservation}
+                className="w-full border border-[#2e4b30]/30 text-[#2e4b30] py-3 px-6 rounded-lg font-medium transition-all duration-200 hover:bg-[#2e4b30]/10"
+              >
+                Cancelar operación
               </button>
 
               <Link
