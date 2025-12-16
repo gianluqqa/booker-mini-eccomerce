@@ -1,19 +1,19 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { IBook, IUpdateBook } from '@/types/Book'
-import { updateBookAdmin } from '@/services/adminService'
-import { BookOpen, Loader2, AlertCircle, CheckCircle, X } from 'lucide-react'
+import React, { useState } from "react";
+import { IBook, IUpdateBook } from "@/types/Book";
+import { updateBookAdmin } from "@/services/adminService";
+import { Loader2, AlertCircle, CheckCircle, X } from "lucide-react";
 
 interface UpdateBookProps {
-  book: IBook
-  onClose: () => void
-  onUpdated: () => void
+  book: IBook;
+  onClose: () => void;
+  onUpdated: () => void;
 }
 
 const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => {
   const [formData, setFormData] = useState<IUpdateBook>({
-    id: book.id || '',
+    id: book.id || "",
     title: book.title,
     author: book.author,
     price: book.price,
@@ -22,27 +22,25 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
     genre: book.genre,
     intro: book.intro,
     description: book.description,
-  })
+  });
 
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setSuccessMessage(null)
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
 
     if (!formData.id) {
-      setError('El libro no tiene un ID válido')
-      return
+      setError("El libro no tiene un ID válido");
+      return;
     }
 
     const payload: IUpdateBook = {
@@ -55,47 +53,35 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
       intro: formData.intro,
       price: Number(formData.price),
       stock: Number(formData.stock),
-    }
+    };
 
     try {
-      setSubmitting(true)
-      await updateBookAdmin(formData.id, payload)
-      setSuccessMessage('Libro actualizado correctamente.')
-      await onUpdated()
+      setSubmitting(true);
+      await updateBookAdmin(formData.id, payload);
+      setSuccessMessage("Libro actualizado correctamente.");
+      await onUpdated();
       // Opcional: cerrar automáticamente después de un corto tiempo
       setTimeout(() => {
-        onClose()
-      }, 800)
+        onClose();
+      }, 800);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'No se pudo actualizar el libro'
-      setError(message)
+      const message = err instanceof Error ? err.message : "No se pudo actualizar el libro";
+      setError(message);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <div>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-[#2e4b30]" />
-          </div>
           <div>
-            <h2 className="text-lg font-semibold text-[#2e4b30]">
-              Editar libro
-            </h2>
-            <p className="text-xs text-gray-600">
-              Modifica los campos y guarda los cambios.
-            </p>
+            <h2 className="text-lg font-semibold text-[#2e4b30]">Editar libro</h2>
+            <p className="text-xs text-gray-600">Modifica los campos y guarda los cambios.</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-1"
-        >
+        <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-1">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -124,7 +110,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
               id="title"
               name="title"
               type="text"
-              value={formData.title || ''}
+              value={formData.title || ""}
               onChange={handleChange}
               className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30]"
             />
@@ -138,7 +124,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
               id="author"
               name="author"
               type="text"
-              value={formData.author || ''}
+              value={formData.author || ""}
               onChange={handleChange}
               className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30]"
             />
@@ -156,7 +142,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
               type="number"
               min="0"
               step="0.01"
-              value={formData.price ?? ''}
+              value={formData.price ?? ""}
               onChange={handleChange}
               className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30]"
             />
@@ -171,7 +157,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
               type="number"
               min="0"
               step="1"
-              value={formData.stock ?? ''}
+              value={formData.stock ?? ""}
               onChange={handleChange}
               className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30]"
             />
@@ -186,7 +172,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
             id="image"
             name="image"
             type="url"
-            value={formData.image || ''}
+            value={formData.image || ""}
             onChange={handleChange}
             className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30]"
           />
@@ -200,7 +186,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
             id="genre"
             name="genre"
             type="text"
-            value={formData.genre || ''}
+            value={formData.genre || ""}
             onChange={handleChange}
             className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30]"
           />
@@ -213,7 +199,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
           <textarea
             id="intro"
             name="intro"
-            value={formData.intro || ''}
+            value={formData.intro || ""}
             onChange={handleChange}
             rows={2}
             className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] resize-none"
@@ -227,7 +213,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
           <textarea
             id="description"
             name="description"
-            value={formData.description || ''}
+            value={formData.description || ""}
             onChange={handleChange}
             rows={3}
             className="w-full px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] resize-none"
@@ -252,13 +238,13 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
                 <Loader2 className="w-4 h-4 animate-spin" /> Guardando...
               </span>
             ) : (
-              'Guardar cambios'
+              "Guardar cambios"
             )}
           </button>
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default UpdateBook
+export default UpdateBook;

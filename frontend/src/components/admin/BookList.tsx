@@ -77,9 +77,6 @@ const BookList: React.FC = () => {
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-blue-600" />
-          </div>
           <div>
             <h2 className="text-lg font-semibold text-[#2e4b30]">
               Lista de libros

@@ -1,52 +1,52 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
-import { getAllUsers } from '@/services/adminService'
-import { IUser } from '@/types/User'
-import Image from 'next/image'
-import { Users, Loader2, AlertCircle, Mail, Calendar, Shield, User as UserIcon } from 'lucide-react'
-import { getRoleDisplay, getRoleColor, formatDate } from '@/utils/helpers'
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
+import { getAllUsers } from "@/services/adminService";
+import { IUser } from "@/types/User";
+import Image from "next/image";
+import { Users, Loader2, AlertCircle, Mail, Calendar, Shield, User as UserIcon } from "lucide-react";
+import { getRoleDisplay, getRoleColor, formatDate } from "@/utils/helpers";
 
 const UsersTable = () => {
-  const { user, isAuthenticated, loading: authLoading } = useAuth()
-  const router = useRouter()
-  const [users, setUsers] = useState<IUser[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const router = useRouter();
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Verificar autenticación y rol de admin
-    if (authLoading) return
+    if (authLoading) return;
 
-    if (!isAuthenticated || user?.role !== 'admin') {
-      router.push('/login')
-      return
+    if (!isAuthenticated || user?.role !== "admin") {
+      router.push("/login");
+      return;
     }
 
     // Cargar usuarios
     const fetchUsers = async () => {
       try {
-        setLoading(true)
-        setError(null)
-        const allUsers = await getAllUsers()
-        setUsers(allUsers)
+        setLoading(true);
+        setError(null);
+        const allUsers = await getAllUsers();
+        setUsers(allUsers);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Error al cargar los usuarios'
-        setError(errorMessage)
-        console.error('Error fetching users:', err)
+        const errorMessage = err instanceof Error ? err.message : "Error al cargar los usuarios";
+        setError(errorMessage);
+        console.error("Error fetching users:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUsers()
-  }, [isAuthenticated, authLoading, user, router])
+    fetchUsers();
+  }, [isAuthenticated, authLoading, user, router]);
 
   // No renderizar si no es admin
-  if (!isAuthenticated || user?.role !== 'admin') {
-    return null
+  if (!isAuthenticated || user?.role !== "admin") {
+    return null;
   }
 
   // Estado de carga
@@ -58,7 +58,7 @@ const UsersTable = () => {
           <p className="text-[#2e4b30] text-base">Cargando usuarios...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Estado de error
@@ -77,7 +77,7 @@ const UsersTable = () => {
           Reintentar
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -85,13 +85,13 @@ const UsersTable = () => {
       {/* Encabezado */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center">
-            <Users className="w-5 h-5 text-[#2e4b30]" />
+          <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+            <Users className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-[#2e4b30]">Gestión de Usuarios</h2>
             <p className="text-xs text-gray-600">
-              {users.length} {users.length === 1 ? 'usuario registrado' : 'usuarios registrados'}
+              {users.length} {users.length === 1 ? "usuario registrado" : "usuarios registrados"}
             </p>
           </div>
         </div>
@@ -125,7 +125,7 @@ const UsersTable = () => {
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-[#2e4b30] bg-opacity-10 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                        {userItem.role === 'admin' ? (
+                        {userItem.role === "admin" ? (
                           <Image src="/admin-logo.png" alt="Admin avatar" width={40} height={40} className="object-contain" />
                         ) : (
                           <UserIcon className="w-5 h-5 text-[#2e4b30]" />
@@ -152,11 +152,9 @@ const UsersTable = () => {
                   {/* Columna Rol */}
                   <td className="py-4 px-4">
                     <span
-                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getRoleColor(
-                        userItem.role
-                      )}`}
+                      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${getRoleColor(userItem.role)}`}
                     >
-                      {userItem.role === 'admin' && <Shield className="w-3 h-3" />}
+                      {userItem.role === "admin" && <Shield className="w-3 h-3" />}
                       {getRoleDisplay(userItem.role)}
                     </span>
                   </td>
@@ -166,7 +164,7 @@ const UsersTable = () => {
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">
-                        {formatDate(userItem.createdAt, { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {formatDate(userItem.createdAt, { day: "numeric", month: "short", year: "numeric" })}
                       </span>
                     </div>
                   </td>
@@ -188,7 +186,7 @@ const UsersTable = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default UsersTable
+export default UsersTable;

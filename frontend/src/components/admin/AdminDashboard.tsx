@@ -178,13 +178,18 @@ const AdminDashboard: React.FC = () => {
 
         {/* Gestión de libros */}
         <div className="bg-[#fcfaf5] rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200/50 space-y-6">
-          <div>
-            <h2 className="text-lg font-semibold text-[#2e4b30]">
-              Gestión de catálogo de libros
-            </h2>
-            <p className="text-xs text-gray-600 mt-1">
-              Primero crea nuevos libros y luego administra el listado completo del catálogo.
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-[#2e4b30]">
+                Gestión de catálogo de libros
+              </h2>
+              <p className="text-xs text-gray-600">
+                Crea nuevos libros y administra el listado completo del catálogo.
+              </p>
+            </div>
           </div>
 
           <CreateBook />
