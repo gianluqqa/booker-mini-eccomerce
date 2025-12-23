@@ -20,7 +20,6 @@ export interface CartItemDto {
     stock: number;
   };
   quantity: number;
-  reservedUntil: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }

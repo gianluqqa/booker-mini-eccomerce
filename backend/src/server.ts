@@ -8,6 +8,7 @@ import booksRoutes from "./routes/books-routes";
 import cartRoutes from "./routes/carts-routes";
 import paymentRoutes from "./routes/payments-routes";
 import orderRoutes from "./routes/orders-routes";
+import checkoutRoutes from "./routes/checkout-routes";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use("/books", booksRoutes);
 app.use("/carts", cartRoutes);
 app.use("/orders", orderRoutes);
 app.use("/payments", paymentRoutes);
+app.use("/checkout", checkoutRoutes);
 
 const PORT = process.env.PORT || 5000;
 

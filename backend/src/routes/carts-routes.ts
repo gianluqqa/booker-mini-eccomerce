@@ -5,7 +5,6 @@ import {
   updateCartItemQuantityController,
   removeBookFromCartController,
   clearCartController,
-  checkoutCartController,
 } from "../controllers/carts-controllers";
 import { authenticateJWT } from "../middlewares/auth";
 
@@ -17,6 +16,5 @@ cartRoutes.get("/", authenticateJWT, getUserCartController); //? Obtener carrito
 cartRoutes.put("/:cartId", authenticateJWT, updateCartItemQuantityController); //? Actualizar cantidad de un item
 cartRoutes.delete("/:cartId", authenticateJWT, removeBookFromCartController); //? Eliminar un item del carrito
 cartRoutes.delete("/", authenticateJWT, clearCartController); //? Limpiar todo el carrito
-cartRoutes.post("/checkout", authenticateJWT, checkoutCartController); //? Convertir carrito a orden
 
 export default cartRoutes;

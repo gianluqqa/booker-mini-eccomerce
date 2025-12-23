@@ -2,7 +2,6 @@
 
 import { apiClient, extractData } from '@/config/api'
 import { ICartResponse, IAddToCart, ICartItem } from '@/types/Cart'
-import { IOrder } from '@/types/Order'
 
 /**
  * Obtiene el carrito del usuario actual
@@ -31,21 +30,6 @@ export const addToCart = async (addToCartData: IAddToCart): Promise<ICartItem> =
     return extractData<ICartItem>(response)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al añadir el libro al carrito'
-    throw new Error(errorMessage)
-  }
-}
-
-/**
- * Procesa el checkout del carrito (convierte el carrito en una orden)
- * @returns Orden creada
- * @throws Error si no se puede procesar el checkout
- */
-export const checkout = async (): Promise<IOrder> => {
-  try {
-    const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/carts/checkout')
-    return extractData<IOrder>(response)
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al procesar el checkout'
     throw new Error(errorMessage)
   }
 }

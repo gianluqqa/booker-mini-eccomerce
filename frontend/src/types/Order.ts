@@ -4,20 +4,20 @@ export interface IOrderItem {
   book: {
     id: string;
     title: string;
-    author: string;
-    price: number; // precio unitario del libro
+    author?: string;
+    price: number;
   };
   quantity: number;
-  unitPrice: number; // precio unitario al momento de la compra
-  totalPrice: number; // precio total (unitario * cantidad)
+  price: number; // precio unitario
+  unitPrice?: number; // precio unitario (para compatibilidad)
+  totalPrice?: number; // precio total (para compatibilidad)
 }
 
 // Estructura de datos para Order (respuesta del backend)
 export interface IOrder {
   id: string;
-  userId?: string;
-  total?: number;
+  total: number;
   status: string; // OrderStatus enum: "pending" | "paid" | "shipped" | "cancelled"
+  createdAt: Date | string;
   items: IOrderItem[];
-  createdAt?: Date | string;
 }

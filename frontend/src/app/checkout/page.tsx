@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { CheckCircle2, Loader2, CreditCard, Package, AlertCircle, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { checkout, getUserCart } from '@/services/cartService'
+import { processCheckout, getUserCart } from '@/services/checkoutService'
 import { IOrder } from '@/types/Order'
 import { ICartItem, ICartResponse } from '@/types/Cart'
 
@@ -57,9 +57,10 @@ const CheckoutPage = () => {
     setError(null)
     
     try {
-      const orderData = await checkout()
+      const orderData = await processCheckout()
       setOrder(orderData)
       setLoading(false)
+      setProcessing(false)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago'
       setError(errorMessage)
@@ -68,8 +69,8 @@ const CheckoutPage = () => {
   }
 
   const calculateSubtotal = () => {
-    if (order) {
-      return order.items.reduce((total, item) => total + item.totalPrice, 0)
+    if (order && order.items) {
+      return order.items.reduce((total, item) => total + (item.totalPrice || (item.price * item.quantity)), 0)
     }
     // Calcular desde el carrito si aún no hay orden
     return cartItems.reduce((total, item) => total + (item.book.price * item.quantity), 0)
@@ -135,30 +136,32 @@ const CheckoutPage = () => {
 
             {/* Detalles de la Orden */}
             <div className="bg-[#f5efe1]/30 rounded-lg p-6 mb-6 text-left">
-              <div className="mb-4">
-                <p className="text-sm text-[#2e4b30]/70">Número de Orden</p>
-                <p className="text-lg font-bold text-[#2e4b30]">{order.id}</p>
-              </div>
-              <div className="mb-4">
-                <p className="text-sm text-[#2e4b30]/70">Estado</p>
-                <p className="text-lg font-semibold text-[#2e4b30] capitalize">
-                  {order.status === 'pending' ? 'Pendiente' : order.status}
-                </p>
-              </div>
-              {order.createdAt && (
-                <div>
-                  <p className="text-sm text-[#2e4b30]/70">Fecha</p>
-                  <p className="text-lg font-medium text-[#2e4b30]">
-                    {new Date(order.createdAt).toLocaleDateString('es-ES', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="text-center sm:text-left">
+                  <p className="text-sm text-[#2e4b30]/70 mb-1">Número de Orden</p>
+                  <p className="text-lg font-bold text-[#2e4b30]">{order.id}</p>
                 </div>
-              )}
+                <div className="text-center sm:text-left">
+                  <p className="text-sm text-[#2e4b30]/70 mb-1">Estado</p>
+                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    {order.status === 'pending' ? 'Pendiente' : order.status}
+                  </div>
+                </div>
+                {order.createdAt && (
+                  <div className="text-center sm:text-left">
+                    <p className="text-sm text-[#2e4b30]/70 mb-1">Fecha</p>
+                    <p className="text-sm font-medium text-[#2e4b30]">
+                      {new Date(order.createdAt).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Resumen de Items */}
@@ -167,7 +170,7 @@ const CheckoutPage = () => {
                 Resumen de tu Pedido
               </h2>
               <div className="space-y-3">
-                {order.items.map((item) => (
+                {order.items?.map((item) => (
                   <div
                     key={item.id}
                     className="flex justify-between items-center p-4 bg-[#f5efe1]/30 rounded-lg"
@@ -177,30 +180,34 @@ const CheckoutPage = () => {
                         {item.book.title}
                       </p>
                       <p className="text-sm text-[#2e4b30]/70">
-                        {item.quantity} x ${item.unitPrice.toFixed(2)}
+                        {item.quantity} x ${(item.unitPrice || item.price).toFixed(2)}
                       </p>
                     </div>
                     <p className="font-bold text-[#2e4b30]">
-                      ${item.totalPrice.toFixed(2)}
+                      ${(item.totalPrice || (item.price * item.quantity)).toFixed(2)}
                     </p>
                   </div>
-                ))}
+                )) || []}
               </div>
             </div>
 
             {/* Total */}
-            <div className="border-t border-[#2e4b30]/20 pt-4 mb-6">
-              <div className="flex justify-between text-lg font-bold text-[#2e4b30] mb-2">
-                <span>Subtotal</span>
-                <span>${calculateSubtotal().toFixed(2)}</span>
+            <div className="bg-white rounded-lg p-6 border border-[#2e4b30]/10">
+              <div className="space-y-3 mb-4">
+                <div className="flex justify-between text-[#2e4b30]">
+                  <span>Subtotal</span>
+                  <span>${calculateSubtotal().toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-[#2e4b30]">
+                  <span>Impuestos (21%)</span>
+                  <span>${calculateTax().toFixed(2)}</span>
+                </div>
               </div>
-              <div className="flex justify-between text-lg font-bold text-[#2e4b30] mb-2">
-                <span>Impuestos (21%)</span>
-                <span>${calculateTax().toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-2xl font-bold text-[#2e4b30] pt-2 border-t border-[#2e4b30]/20">
-                <span>Total</span>
-                <span>${calculateTotal().toFixed(2)}</span>
+              <div className="border-t border-[#2e4b30]/20 pt-4">
+                <div className="flex justify-between text-xl font-bold text-[#2e4b30]">
+                  <span>Total</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
+                </div>
               </div>
             </div>
 

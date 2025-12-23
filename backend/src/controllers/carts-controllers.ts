@@ -5,7 +5,6 @@ import {
   updateCartItemQuantityService,
   removeBookFromCartService,
   clearCartService,
-  checkoutCartService,
 } from "../services/carts-services";
 import { AddToCartDto, UpdateCartDto } from "../dto/CartDto";
 
@@ -208,54 +207,6 @@ export const clearCartController = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "Carrito vaciado exitosamente",
-    });
-  } catch (error: any) {
-    const status = error.status || 500;
-    const message = error.message || "Error interno del servidor";
-
-    return res.status(status).json({
-      success: false,
-      message,
-    });
-  }
-};
-
-//? Convertir carrito a orden (checkout) (POST).
-export const checkoutCartController = async (req: Request, res: Response) => {
-  try {
-    const authUser = (req as any).authUser as
-      | { id: string; role: string }
-      | undefined;
-    if (!authUser) {
-      return res.status(401).json({
-        success: false,
-        message: "No autorizado",
-      });
-    }
-
-    const order = await checkoutCartService(authUser.id);
-
-    return res.status(201).json({
-      success: true,
-      message: "Orden creada exitosamente",
-      data: {
-        id: order.id,
-        userId: order.user.id,
-        status: order.status,
-        items: order.items.map((item) => ({
-          id: item.id,
-          book: {
-            id: item.book.id,
-            title: item.book.title,
-            author: item.book.author,
-            price: Number(item.book.price), // Precio unitario del libro
-          },
-          quantity: item.quantity,
-          unitPrice: Number(item.book.price), // Precio unitario al momento de la compra
-          totalPrice: Number(item.price), // Precio total (unitario * cantidad)
-        })),
-        createdAt: order.createdAt,
-      },
     });
   } catch (error: any) {
     const status = error.status || 500;
