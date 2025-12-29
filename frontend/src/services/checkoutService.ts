@@ -21,6 +21,28 @@ export const getUserCart = async (): Promise<ICartResponse> => {
 }
 
 /**
+ * Verifica si existe una reserva activa para el usuario
+ * @returns Datos de la reserva existente o null si no hay
+ */
+export const checkExistingReservation = async (): Promise<IStockReservationResponse | null> => {
+  try {
+    const response = await apiClient.get<{ 
+      success: boolean; 
+      message: string; 
+      data: IStockReservationResponse 
+    }>('/checkout/reservation/check');
+    
+    return extractData<IStockReservationResponse>(response);
+  } catch (error: unknown) {
+    // Si no hay reserva, devuelve null
+    if (error instanceof Error && error.message.includes('No hay reserva')) {
+      return null;
+    }
+    throw error;
+  }
+}
+
+/**
  * Crea reserva de stock para el checkout (10 minutos)
  * @returns Datos de la reserva creada
  * @throws Error si no se puede crear la reserva

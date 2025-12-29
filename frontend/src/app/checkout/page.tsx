@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { CheckCircle2, Loader2, CreditCard, Package, AlertCircle, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { processCheckout, getUserCart, createStockReservation } from '@/services/checkoutService'
+import { processCheckout, getUserCart, createStockReservation, checkExistingReservation } from '@/services/checkoutService'
 import { IOrder } from '@/types/Order'
 import { ICartItem, ICartResponse } from '@/types/Cart'
 import { IStockReservationResponse } from '@/types/StockReservation'
@@ -50,10 +50,19 @@ const CheckoutPage = () => {
           return
         }
 
-        // 2. Crear reserva de stock automáticamente
+        // 2. Verificar si ya existe una reserva activa
         setCreatingReservation(true)
-        const reservationData = await createStockReservation()
-        setReservation(reservationData)
+        const existingReservation = await checkExistingReservation()
+        
+        if (existingReservation) {
+          // Usar reserva existente
+          setReservation(existingReservation)
+        } else {
+          // Crear nueva reserva
+          const reservationData = await createStockReservation()
+          setReservation(reservationData)
+        }
+        
         setCreatingReservation(false)
         
       } catch (error: unknown) {

@@ -81,11 +81,11 @@ export const loginUserService = async (user: LoginUserDTO) => {
   const isPasswordValid = await bcrypt.compare(user.password, existingUser.password);
   if (!isPasswordValid) throw new Error("Invalid credentials");
 
-  // 4️⃣ Emitir access token (15m)
+  // 4️⃣ Emitir access token (30m)
   const accessToken = jwt.sign(
     { sub: existingUser.id, role: existingUser.role },
     JWT_SECRET,
-    { algorithm: "HS256", expiresIn: "15m" }
+    { algorithm: "HS256", expiresIn: "30m" }
   );
 
   // 5️⃣ Retornar usuario seguro + token
@@ -133,11 +133,11 @@ export const firebaseLoginService = async (payload: FirebaseLoginDTO) => {
     existingUser = newUser;
   }
 
-  // Emitir token igual que en login clásico
+  // Emitir token igual que en login clásico (30m)
   const accessToken = jwt.sign(
     { sub: existingUser.id, role: existingUser.role },
     JWT_SECRET,
-    { algorithm: "HS256", expiresIn: "15m" }
+    { algorithm: "HS256", expiresIn: "30m" }
   );
 
   const { password: _, ...safeUser } = existingUser;
