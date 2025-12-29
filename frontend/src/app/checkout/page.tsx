@@ -5,9 +5,11 @@ import Image from 'next/image'
 import { CheckCircle2, Loader2, CreditCard, Package, AlertCircle, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { processCheckout, getUserCart } from '@/services/checkoutService'
+import { processCheckout, getUserCart, createStockReservation } from '@/services/checkoutService'
 import { IOrder } from '@/types/Order'
 import { ICartItem, ICartResponse } from '@/types/Cart'
+import { IStockReservationResponse } from '@/types/StockReservation'
+import { ReservationTimer } from '@/components/checkout/ReservationTimer'
 
 const CheckoutPage = () => {
   const router = useRouter()
@@ -17,6 +19,9 @@ const CheckoutPage = () => {
   const [order, setOrder] = useState<IOrder | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [processing, setProcessing] = useState<boolean>(false)
+  const [reservation, setReservation] = useState<IStockReservationResponse | null>(null)
+  const [reservationExpired, setReservationExpired] = useState<boolean>(false)
+  const [creatingReservation, setCreatingReservation] = useState<boolean>(false)
   const [cardData, setCardData] = useState({
     cardNumber: '',
     cardName: '',
@@ -30,10 +35,13 @@ const CheckoutPage = () => {
       return
     }
 
-    const fetchCart = async () => {
+    const initializeCheckout = async () => {
       setLoading(true)
       setError(null)
+      setReservationExpired(false)
+      
       try {
+        // 1. Cargar carrito
         const cartData: ICartResponse = await getUserCart()
         setCartItems(cartData.items || [])
         
@@ -41,18 +49,53 @@ const CheckoutPage = () => {
           router.push('/cart')
           return
         }
+
+        // 2. Crear reserva de stock automáticamente
+        setCreatingReservation(true)
+        const reservationData = await createStockReservation()
+        setReservation(reservationData)
+        setCreatingReservation(false)
+        
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
+        const errorMessage = error instanceof Error ? error.message : 'Error al inicializar el checkout'
         setError(errorMessage)
+        setCreatingReservation(false)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchCart()
+    initializeCheckout()
   }, [isAuthenticated, router])
 
+  const handleReservationExpired = () => {
+    setReservationExpired(true)
+    setError('Tu reserva de stock ha expirado. Por favor, crea una nueva reserva para continuar.')
+  }
+
+  const handleExtendReservation = async () => {
+    setCreatingReservation(true)
+    setError(null)
+    setReservationExpired(false)
+    
+    try {
+      const reservationData = await createStockReservation()
+      setReservation(reservationData)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al extender la reserva'
+      setError(errorMessage)
+    } finally {
+      setCreatingReservation(false)
+    }
+  }
+
   const handleCheckout = async () => {
+    // Verificar que la reserva no haya expirado
+    if (reservationExpired || !reservation) {
+      setError('No puedes procesar el pago sin una reserva válida. Por favor, crea una nueva reserva.')
+      return
+    }
+
     setProcessing(true)
     setError(null)
     
@@ -398,6 +441,43 @@ const CheckoutPage = () => {
                 Resumen del Pedido
               </h2>
               
+              {/* Temporizador de Reserva */}
+              {reservation && (
+                <div className="mb-6">
+                  <ReservationTimer
+                    expiresAt={reservation.expiresAt}
+                    onExpired={handleReservationExpired}
+                    onExtendReservation={handleExtendReservation}
+                  />
+                </div>
+              )}
+
+              {/* Estado de la reserva */}
+              {creatingReservation && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center">
+                  <Loader2 className="w-5 h-5 text-blue-600 animate-spin mr-3" />
+                  <p className="text-blue-800">Creando reserva de stock...</p>
+                </div>
+              )}
+
+              {reservationExpired && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-red-800 font-medium">Reserva expirada</p>
+                      <p className="text-red-600 text-sm">Tu reserva ha expirado. Por favor, crea una nueva.</p>
+                    </div>
+                    <button
+                      onClick={handleExtendReservation}
+                      disabled={creatingReservation}
+                      className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm disabled:opacity-50"
+                    >
+                      {creatingReservation ? 'Creando...' : 'Reservar nuevamente'}
+                    </button>
+                  </div>
+                </div>
+              )}
+              
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-[#2e4b30]">
                   <span>
@@ -420,15 +500,40 @@ const CheckoutPage = () => {
               <div className="flex flex-col gap-4">
                 <button
                   onClick={handleCheckout}
-                  disabled={processing || !cardData.cardNumber || !cardData.cardName || !cardData.expiryDate || !cardData.cvc}
+                  disabled={
+                    processing || 
+                    creatingReservation ||
+                    reservationExpired ||
+                    !reservation ||
+                    !cardData.cardNumber || 
+                    !cardData.cardName || 
+                    !cardData.expiryDate || 
+                    !cardData.cvc
+                  }
                   className="w-full bg-[#2e4b30] text-[#f5efe1] py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  title={!cardData.cardNumber || !cardData.cardName || !cardData.expiryDate || !cardData.cvc ? "Por favor complete todos los datos de la tarjeta" : ""}
+                  title={
+                    !reservation ? 'No hay reserva de stock activa' :
+                    reservationExpired ? 'La reserva ha expirado' :
+                    creatingReservation ? 'Creando reserva...' :
+                    !cardData.cardNumber || !cardData.cardName || !cardData.expiryDate || !cardData.cvc ? 
+                    "Por favor complete todos los datos de la tarjeta" : 
+                    "Confirmar pago"
+                  }
                 >
                   {processing ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                       Procesando...
                     </>
+                  ) : creatingReservation ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Creando reserva...
+                    </>
+                  ) : reservationExpired ? (
+                    'Reserva expirada'
+                  ) : !reservation ? (
+                    'Sin reserva activa'
                   ) : (
                     'Confirmar Pago'
                   )}

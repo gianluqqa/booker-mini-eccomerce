@@ -3,6 +3,7 @@
 import { apiClient, extractData } from '@/config/api'
 import { IOrder } from '@/types/Order'
 import { ICartResponse } from '@/types/Cart'
+import { IStockReservationResponse } from '@/types/StockReservation'
 
 /**
  * Obtiene el carrito del usuario actual
@@ -16,6 +17,26 @@ export const getUserCart = async (): Promise<ICartResponse> => {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
     throw new Error(errorMessage)
+  }
+}
+
+/**
+ * Crea reserva de stock para el checkout (10 minutos)
+ * @returns Datos de la reserva creada
+ * @throws Error si no se puede crear la reserva
+ */
+export const createStockReservation = async (): Promise<IStockReservationResponse> => {
+  try {
+    const response = await apiClient.post<{ 
+      success: boolean; 
+      message: string; 
+      data: IStockReservationResponse 
+    }>('/checkout/reserve');
+    
+    return extractData<IStockReservationResponse>(response);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error al crear la reserva de stock';
+    throw new Error(errorMessage);
   }
 }
 
