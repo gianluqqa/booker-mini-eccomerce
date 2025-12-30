@@ -6,6 +6,7 @@ import { CheckCircle2, Loader2, CreditCard, Package, AlertCircle, ShoppingBag } 
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { processCheckout, getUserCart, createStockReservation, checkExistingReservation } from '@/services/checkoutService'
+import { createMercadoPagoPayment } from '@/services/paymentService'
 import { IOrder } from '@/types/Order'
 import { ICartItem, ICartResponse } from '@/types/Cart'
 import { IStockReservationResponse } from '@/types/StockReservation'
@@ -22,12 +23,6 @@ const CheckoutPage = () => {
   const [reservation, setReservation] = useState<IStockReservationResponse | null>(null)
   const [reservationExpired, setReservationExpired] = useState<boolean>(false)
   const [creatingReservation, setCreatingReservation] = useState<boolean>(false)
-  const [cardData, setCardData] = useState({
-    cardNumber: '',
-    cardName: '',
-    expiryDate: '',
-    cvc: ''
-  })
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -109,11 +104,51 @@ const CheckoutPage = () => {
     setError(null)
     
     try {
+      console.log('🔄 Iniciando proceso de checkout...')
+      
+      // 1. Procesar el checkout para crear la orden
+      console.log('📦 Creando orden...')
       const orderData = await processCheckout()
+      console.log('✅ Orden creada:', orderData.id)
       setOrder(orderData)
-      setLoading(false)
-      setProcessing(false)
+      
+      // 2. Crear el pago con Mercado Pago
+      console.log('💳 Creando preferencia de pago...')
+      const paymentResponse = await createMercadoPagoPayment({
+        orderId: orderData.id
+      })
+      console.log('✅ Preferencia de pago creada:', paymentResponse)
+      
+      // 3. Redirigir a página de pago pendiente
+      console.log('🔍 Estructura completa de paymentResponse:', JSON.stringify(paymentResponse, null, 2))
+      
+      // Acceder a la URL según la estructura real de la respuesta
+      let initPoint: string | undefined
+      
+      if (paymentResponse && typeof paymentResponse === 'object') {
+        // Si la respuesta tiene la estructura {data: {init_point}}
+        if ('data' in paymentResponse && paymentResponse.data && typeof paymentResponse.data === 'object' && 'init_point' in paymentResponse.data) {
+          const dataWithInitPoint = paymentResponse.data as {init_point?: string}
+          initPoint = dataWithInitPoint.init_point
+        }
+        // Si la respuesta tiene la estructura directa {init_point}
+        else if ('init_point' in paymentResponse) {
+          const responseWithInitPoint = paymentResponse as {init_point?: string}
+          initPoint = responseWithInitPoint.init_point
+        }
+      }
+      
+      if (initPoint) {
+        console.log('🔗 Redirigiendo a página de pago pendiente:', initPoint)
+        // Redirigir a página de pago pendiente con el orderId y la URL de Mercado Pago
+        router.push(`/pending-payment?orderId=${orderData.id}&redirectUrl=${encodeURIComponent(initPoint)}`)
+      } else {
+        console.error('❌ No se recibió URL de redirección:', paymentResponse)
+        throw new Error('No se recibió URL de redirección de Mercado Pago')
+      }
+      
     } catch (error: unknown) {
+      console.error('❌ Error en el proceso de pago:', error)
       const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago'
       setError(errorMessage)
       setProcessing(false)
@@ -368,77 +403,47 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            {/* Información de Pago */}
+            {/* Información de Pago - Mercado Pago */}
             <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6">
               <div className="flex items-center mb-4">
                 <CreditCard className="w-6 h-6 text-[#2e4b30] mr-2" />
                 <h2 className="text-xl font-bold text-[#2e4b30]">
-                  Información de Pago
+                  Método de Pago
                 </h2>
-              </div>
-              <div className="space-y-4 mb-4">
-                <div>
-                  <label htmlFor="cardNumber" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                    Número de tarjeta
-                  </label>
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                    value={cardData.cardNumber}
-                    onChange={(e) => setCardData({...cardData, cardNumber: e.target.value})}
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="cardName" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                    Nombre en la tarjeta
-                  </label>
-                  <input
-                    type="text"
-                    id="cardName"
-                    placeholder="JUAN PEREZ"
-                    className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                    value={cardData.cardName}
-                    onChange={(e) => setCardData({...cardData, cardName: e.target.value})}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="expiryDate" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                      Vencimiento (MM/AA)
-                    </label>
-                    <input
-                      type="text"
-                      id="expiryDate"
-                      placeholder="12/25"
-                      className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                      value={cardData.expiryDate}
-                      onChange={(e) => setCardData({...cardData, expiryDate: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="cvc" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                      CVC
-                    </label>
-                    <input
-                      type="text"
-                      id="cvc"
-                      placeholder="123"
-                      className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                      value={cardData.cvc}
-                      onChange={(e) => setCardData({...cardData, cvc: e.target.value})}
-                    />
-                  </div>
-                </div>
               </div>
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-blue-800">
-                  <strong>Nota:</strong> Esta es una simulación. Los datos de pago no se envían a ningún servidor.
+                <div className="flex items-center mb-2">
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-white font-bold text-sm">MP</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-blue-800">Mercado Pago</p>
+                    <p className="text-sm text-blue-600">Pago seguro y procesado por Mercado Pago</p>
+                  </div>
+                </div>
+                <p className="text-sm text-blue-700 mt-2">
+                  Al hacer clic en &quot;Pagar con Mercado Pago&quot;, serás redirigido a la plataforma de pago segura de Mercado Pago donde podrás elegir tu método de pago preferido.
                 </p>
+              </div>
+              
+              <div className="space-y-2 text-sm text-[#2e4b30]/70">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span>Tarjeta de crédito/débito</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span>Transferencia bancaria</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span>Efectivo (Pago Fácil, Rapipago, etc.)</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                  <span>Y muchos más métodos</span>
+                </div>
               </div>
             </div>
           </div>
@@ -513,20 +518,14 @@ const CheckoutPage = () => {
                     processing || 
                     creatingReservation ||
                     reservationExpired ||
-                    !reservation ||
-                    !cardData.cardNumber || 
-                    !cardData.cardName || 
-                    !cardData.expiryDate || 
-                    !cardData.cvc
+                    !reservation
                   }
                   className="w-full bg-[#2e4b30] text-[#f5efe1] py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   title={
                     !reservation ? 'No hay reserva de stock activa' :
                     reservationExpired ? 'La reserva ha expirado' :
                     creatingReservation ? 'Creando reserva...' :
-                    !cardData.cardNumber || !cardData.cardName || !cardData.expiryDate || !cardData.cvc ? 
-                    "Por favor complete todos los datos de la tarjeta" : 
-                    "Confirmar pago"
+                    "Pagar con Mercado Pago"
                   }
                 >
                   {processing ? (
@@ -544,7 +543,7 @@ const CheckoutPage = () => {
                   ) : !reservation ? (
                     'Sin reserva activa'
                   ) : (
-                    'Confirmar Pago'
+                    'Pagar con Mercado Pago'
                   )}
                 </button>
                 <button

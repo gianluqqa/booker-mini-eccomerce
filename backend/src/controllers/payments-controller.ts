@@ -57,17 +57,20 @@ export const createPayment = async (req: Request, res: Response) => {
     }
 
     // Configurar cliente de Mercado Pago
+    console.log('🔑 Configurando cliente de Mercado Pago...');
     const client = new MercadoPagoConfig({
       accessToken: process.env.MP_ACCESS_TOKEN!,
     });
 
     if (!process.env.MP_ACCESS_TOKEN) {
+      console.error('❌ Token de Mercado Pago no configurado');
       return res.status(500).json({
         success: false,
         message: "Token de Mercado Pago no configurado",
       });
     }
 
+    console.log('✅ Token de Mercado Pago configurado correctamente');
     const preference = new Preference(client);
 
     // Construir items para Mercado Pago
@@ -101,20 +104,27 @@ export const createPayment = async (req: Request, res: Response) => {
 
     // Obtener URLs del frontend desde variables de entorno
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    console.log('🌐 FRONTEND_URL:', frontendUrl);
+    console.log('🔗 MP_WEBHOOK_URL:', process.env.MP_WEBHOOK_URL);
 
     // Crear preferencia de pago
+    console.log('🛒 Creando preferencia de pago con Mercado Pago...');
     const result = await preference.create({
       body: {
         items: items,
         back_urls: {
-          success: `${frontendUrl}/success?orderId=${orderId}`,
-          failure: `${frontendUrl}/failure?orderId=${orderId}`,
-          pending: `${frontendUrl}/pending?orderId=${orderId}`,
+          success: `${frontendUrl}/success`,
+          failure: `${frontendUrl}/failure`,
+          pending: `${frontendUrl}/pending`,
         },
-        auto_return: "approved",
         external_reference: orderId, // Referencia externa para identificar la orden
-        notification_url: process.env.MP_WEBHOOK_URL || undefined, // URL para webhooks (opcional)
       },
+    });
+
+    console.log('✅ Preferencia de pago creada exitosamente:', {
+      id: result.id,
+      init_point: result.init_point,
+      sandbox_init_point: result.sandbox_init_point
     });
 
     return res.status(200).json({
@@ -122,6 +132,7 @@ export const createPayment = async (req: Request, res: Response) => {
       message: "Preferencia de pago creada exitosamente",
       data: {
         init_point: result.init_point,
+        preferenceId: result.id,
         orderId: orderId,
       },
     });
@@ -130,6 +141,37 @@ export const createPayment = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: error.message || "Error creando pago",
+    });
+  }
+};
+
+export const handleWebhook = async (req: Request, res: Response) => {
+  try {
+    const { type, data } = req.body;
+    
+    console.log("Webhook recibido:", { type, data });
+
+    // Verificar si es una notificación de pago
+    if (type === "payment") {
+      const paymentId = data.id;
+      
+      // Aquí puedes procesar el pago:
+      // 1. Obtener detalles del pago desde Mercado Pago
+      // 2. Verificar el estado del pago
+      // 3. Actualizar el estado de la orden en tu base de datos
+      
+      console.log(`Pago recibido: ${paymentId}`);
+      
+      // Por ahora, solo logueamos el pago
+      // TODO: Implementar lógica de actualización de estado de orden
+    }
+
+    return res.status(200).json({ received: true });
+  } catch (error: any) {
+    console.error("Error en webhook:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Error procesando webhook",
     });
   }
 };
