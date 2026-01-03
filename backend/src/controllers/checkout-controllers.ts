@@ -22,9 +22,10 @@ export const checkExistingReservationController = async (req: Request, res: Resp
     });
 
     if (!reservation) {
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
         message: "No hay reserva activa",
+        data: null,
       });
     }
 
@@ -33,9 +34,10 @@ export const checkExistingReservationController = async (req: Request, res: Resp
     if (reservation.expiresAt <= now) {
       // Eliminar reserva expirada
       await stockReservationRepository.remove(reservation);
-      return res.status(404).json({
+      return res.status(200).json({
         success: false,
         message: "No hay reserva activa",
+        data: null,
       });
     }
 

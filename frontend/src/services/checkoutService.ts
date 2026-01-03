@@ -26,18 +26,32 @@ export const getUserCart = async (): Promise<ICartResponse> => {
  */
 export const checkExistingReservation = async (): Promise<IStockReservationResponse | null> => {
   try {
+    console.log('🔍 Verificando reserva existente...');
     const response = await apiClient.get<{ 
       success: boolean; 
       message: string; 
       data: IStockReservationResponse 
     }>('/checkout/reservation/check');
     
+    console.log('✅ Respuesta de reserva:', response);
     return extractData<IStockReservationResponse>(response);
   } catch (error: unknown) {
+    console.error('❌ Error verificando reserva:', error);
+    
     // Si no hay reserva, devuelve null
-    if (error instanceof Error && error.message.includes('No hay reserva')) {
-      return null;
+    if (error instanceof Error) {
+      if (error.message.includes('No hay reserva')) {
+        console.log('📝 No hay reserva activa, devolviendo null');
+        return null;
+      }
+      
+      // Si es error de autenticación, también devuelve null para no bloquear
+      if (error.message.includes('Token inválido') || error.message.includes('401') || error.message.includes('404')) {
+        console.log('🔐 Error de autenticación o no encontrado, devolviendo null');
+        return null;
+      }
     }
+    
     throw error;
   }
 }
@@ -69,9 +83,12 @@ export const createStockReservation = async (): Promise<IStockReservationRespons
  */
 export const processCheckout = async (): Promise<IOrder> => {
   try {
+    console.log('🔄 Iniciando proceso de checkout...');
     const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout')
+    console.log('✅ Respuesta del checkout:', response);
     return extractData<IOrder>(response)
   } catch (error: unknown) {
+    console.error('❌ Error en el proceso de checkout:', error);
     const errorMessage = error instanceof Error ? error.message : 'Error al procesar el checkout'
     throw new Error(errorMessage)
   }

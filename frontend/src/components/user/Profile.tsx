@@ -61,18 +61,24 @@ const Profile = () => {
 
         // Obtener órdenes confirmadas del usuario
         try {
+          console.log('🔍 Obteniendo órdenes confirmadas...')
           const userOrders = await getUserOrders()
+          console.log('✅ Órdenes confirmadas:', userOrders)
           setOrders(userOrders)
-        } catch {
+        } catch (err) {
+          console.error('❌ Error al obtener órdenes confirmadas:', err)
           // Si no hay órdenes o hay error, simplemente no mostrar órdenes
           setOrders([])
         }
 
         // Obtener órdenes pendientes del usuario
         try {
+          console.log('🔍 Obteniendo órdenes pendientes...')
           const userPendingOrders = await getUserPendingOrders()
+          console.log('✅ Órdenes pendientes:', userPendingOrders)
           setPendingOrders(userPendingOrders)
-        } catch {
+        } catch (err) {
+          console.error('❌ Error al obtener órdenes pendientes:', err)
           // Si no hay órdenes pendientes o hay error, simplemente no mostrar órdenes
           setPendingOrders([])
         }
