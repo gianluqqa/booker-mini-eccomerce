@@ -1,19 +1,38 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { CheckCircle2, Loader2, CreditCard, Package, AlertCircle, ShoppingBag } from 'lucide-react'
-import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
+import { useReservation } from '@/contexts/ReservationContext'
 import { processCheckout, getUserCart, createStockReservation } from '@/services/checkoutService'
 import { IOrder } from '@/types/Order'
 import { ICartItem, ICartResponse } from '@/types/Cart'
 import { IStockReservationResponse } from '@/types/StockReservation'
-import { ReservationTimer } from '@/components/checkout/ReservationTimer'
 
-const CheckoutPage = () => {
+// Componentes modularizados
+import { ReservationTimer } from '@/components/checkout/ReservationTimer'
+import { PaymentForm } from '@/components/checkout/PaymentForm'
+import { OrderConfirmation } from '@/components/checkout/OrderConfirmation'
+import { CartPreview } from '@/components/checkout/CartPreview'
+import { LoadingState, EmptyCartState, CheckoutErrorState } from '@/components/checkout/CheckoutStates'
+
+// Utilidades
+import { 
+  cleanPaymentData
+} from '@/utils/paymentFormatters'
+import { 
+  calculateSubtotalFromCart, 
+  calculateSubtotalFromOrder,
+  calculateTax,
+  calculateTotal,
+  validatePaymentData
+} from '@/utils/checkoutHelpers'
+
+// Hook personalizado para la lógica del checkout
+const useCheckoutLogic = () => {
   const router = useRouter()
-  const { isAuthenticated } = useAuth()
+  const { setReservation: setGlobalReservation, clearReservation } = useReservation()
+  
+  // Estados
   const [loading, setLoading] = useState<boolean>(true)
   const [cartItems, setCartItems] = useState<ICartItem[]>([])
   const [order, setOrder] = useState<IOrder | null>(null)
@@ -21,7 +40,6 @@ const CheckoutPage = () => {
   const [processing, setProcessing] = useState<boolean>(false)
   const [reservation, setReservation] = useState<IStockReservationResponse | null>(null)
   const [reservationExpired, setReservationExpired] = useState<boolean>(false)
-  const [creatingReservation, setCreatingReservation] = useState<boolean>(false)
   const [cardData, setCardData] = useState({
     cardNumber: '',
     cardName: '',
@@ -29,19 +47,14 @@ const CheckoutPage = () => {
     cvc: ''
   })
 
+  // Efecto de inicialización
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-      return
-    }
-
     const initializeCheckout = async () => {
       setLoading(true)
       setError(null)
       setReservationExpired(false)
       
       try {
-        // 1. Cargar carrito
         const cartData: ICartResponse = await getUserCart()
         setCartItems(cartData.items || [])
         
@@ -50,49 +63,32 @@ const CheckoutPage = () => {
           return
         }
 
-        // 2. Crear reserva de stock automáticamente
-        setCreatingReservation(true)
         const reservationData = await createStockReservation()
         setReservation(reservationData)
-        setCreatingReservation(false)
+        setGlobalReservation(reservationData)
         
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Error al inicializar el checkout'
         setError(errorMessage)
-        setCreatingReservation(false)
       } finally {
         setLoading(false)
       }
     }
 
     initializeCheckout()
-  }, [isAuthenticated, router])
-
-  const handleReservationExpired = () => {
-    setReservationExpired(true)
-    setError('Tu reserva de stock ha expirado. Por favor, crea una nueva reserva para continuar.')
-  }
-
-  const handleExtendReservation = async () => {
-    setCreatingReservation(true)
-    setError(null)
-    setReservationExpired(false)
-    
-    try {
-      const reservationData = await createStockReservation()
-      setReservation(reservationData)
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error al extender la reserva'
-      setError(errorMessage)
-    } finally {
-      setCreatingReservation(false)
-    }
-  }
+  }, [router, setGlobalReservation])
 
   const handleCheckout = async () => {
-    // Verificar que la reserva no haya expirado
+    // Validar reserva
     if (reservationExpired || !reservation) {
       setError('No puedes procesar el pago sin una reserva válida. Por favor, crea una nueva reserva.')
+      return
+    }
+
+    // Validar datos de pago
+    const validationError = validatePaymentData(cardData)
+    if (validationError) {
+      setError(validationError)
       return
     }
 
@@ -100,10 +96,12 @@ const CheckoutPage = () => {
     setError(null)
     
     try {
-      const orderData = await processCheckout()
+      const cleanData = cleanPaymentData(cardData)
+      const orderData = await processCheckout(cleanData)
       setOrder(orderData)
       setLoading(false)
       setProcessing(false)
+      clearReservation()
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago'
       setError(errorMessage)
@@ -111,444 +109,249 @@ const CheckoutPage = () => {
     }
   }
 
-  const calculateSubtotal = () => {
-    if (order && order.items) {
-      return order.items.reduce((total, item) => total + (item.totalPrice || (item.price * item.quantity)), 0)
+  const handleReservationExpired = () => {
+    setReservationExpired(true)
+    setError('Tu reserva de stock ha expirado. Por favor, crea una nueva reserva para continuar.')
+  }
+
+  const handleExtendReservation = async () => {
+    try {
+      const reservationData = await createStockReservation()
+      setReservation(reservationData)
+      setGlobalReservation(reservationData)
+      setReservationExpired(false)
+      setError(null)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al extender la reserva'
+      setError(errorMessage)
     }
-    // Calcular desde el carrito si aún no hay orden
-    return cartItems.reduce((total, item) => total + (item.book.price * item.quantity), 0)
   }
 
-  const calculateTax = () => {
-    return calculateSubtotal() * 0.21 // 21% IVA
+  // Cálculos
+  const calculateSubtotal = () => {
+    return order ? calculateSubtotalFromOrder(order) : calculateSubtotalFromCart(cartItems)
   }
 
-  const calculateTotal = () => {
-    return calculateSubtotal() + calculateTax()
+  const subtotal = calculateSubtotal()
+  const tax = calculateTax(subtotal)
+  const total = calculateTotal(subtotal)
+
+  return {
+    // Estados
+    loading,
+    cartItems,
+    order,
+    error,
+    processing,
+    reservation,
+    reservationExpired,
+    cardData,
+    
+    // Cálculos
+    subtotal,
+    tax,
+    total,
+    
+    // Acciones
+    handleCheckout,
+    handleReservationExpired,
+    handleExtendReservation,
+    setCardData,
+    
+    // Utilidades
+    router
+  }
+}
+
+// Componente principal
+const CheckoutPage = () => {
+  const { isAuthenticated } = useAuth()
+  const router = useRouter()
+  const checkoutLogic = useCheckoutLogic()
+
+  // Redirección si no está autenticado
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/login')
+    }
+  }, [isAuthenticated, router])
+
+  // Estados de carga
+  if (checkoutLogic.loading) {
+    return <LoadingState />
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f5efe1] pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="text-center">
-              <Loader2 className="w-12 h-12 text-[#2e4b30] animate-spin mx-auto mb-4" />
-              <p className="text-[#2e4b30] text-lg">Cargando carrito...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+  if (checkoutLogic.cartItems.length === 0 && !checkoutLogic.order) {
+    return <EmptyCartState onBackToCart={() => router.push('/cart')} />
   }
 
-  if (cartItems.length === 0 && !order) {
-    return (
-      <div className="min-h-screen bg-[#f5efe1] pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-8 text-center">
-            <ShoppingBag className="w-24 h-24 text-[#2e4b30]/30 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold text-[#2e4b30] mb-4">Tu carrito está vacío</h2>
-            <p className="text-[#2e4b30]/70 mb-8">No hay productos para procesar el checkout</p>
-            <Link
-              href="/cart"
-              className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium inline-block"
-            >
-              Volver al Carrito
-            </Link>
-          </div>
-        </div>
-      </div>
-    )
+  // Confirmación de orden
+  if (checkoutLogic.order) {
+    return <OrderConfirmation order={checkoutLogic.order} />
   }
 
-  // Si ya se procesó la orden, mostrar confirmación
-  if (order) {
-    return (
-      <div className="min-h-screen bg-[#f5efe1] pt-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Confirmación de Orden */}
-          <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-8 text-center">
-            <CheckCircle2 className="w-20 h-20 text-green-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-[#2e4b30] mb-4">
-              ¡Orden Confirmada!
-            </h1>
-            <p className="text-[#2e4b30]/70 text-lg mb-8">
-              Tu pedido ha sido procesado exitosamente
-            </p>
+  // Vista principal de checkout
+  return <CheckoutMainView {...checkoutLogic} />
+}
 
-            {/* Detalles de la Orden */}
-            <div className="bg-[#f5efe1]/30 rounded-lg p-6 mb-6 text-left">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="text-center sm:text-left">
-                  <p className="text-sm text-[#2e4b30]/70 mb-1">Número de Orden</p>
-                  <p className="text-lg font-bold text-[#2e4b30]">{order.id}</p>
-                </div>
-                <div className="text-center sm:text-left">
-                  <p className="text-sm text-[#2e4b30]/70 mb-1">Estado</p>
-                  <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                    {order.status === 'pending' ? 'Pendiente' : order.status}
-                  </div>
-                </div>
-                {order.createdAt && (
-                  <div className="text-center sm:text-left">
-                    <p className="text-sm text-[#2e4b30]/70 mb-1">Fecha</p>
-                    <p className="text-sm font-medium text-[#2e4b30]">
-                      {new Date(order.createdAt).toLocaleDateString('es-ES', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Resumen de Items */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-[#2e4b30] mb-4 text-left">
-                Resumen de tu Pedido
-              </h2>
-              <div className="space-y-3">
-                {order.items?.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex justify-between items-center p-4 bg-[#f5efe1]/30 rounded-lg"
-                  >
-                    <div className="flex-1">
-                      <p className="font-semibold text-[#2e4b30]">
-                        {item.book.title}
-                      </p>
-                      <p className="text-sm text-[#2e4b30]/70">
-                        {item.quantity} x ${(item.unitPrice || item.price).toFixed(2)}
-                      </p>
-                    </div>
-                    <p className="font-bold text-[#2e4b30]">
-                      ${(item.totalPrice || (item.price * item.quantity)).toFixed(2)}
-                    </p>
-                  </div>
-                )) || []}
-              </div>
-            </div>
-
-            {/* Total */}
-            <div className="bg-white rounded-lg p-6 border border-[#2e4b30]/10">
-              <div className="space-y-3 mb-4">
-                <div className="flex justify-between text-[#2e4b30]">
-                  <span>Subtotal</span>
-                  <span>${calculateSubtotal().toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-[#2e4b30]">
-                  <span>Impuestos (21%)</span>
-                  <span>${calculateTax().toFixed(2)}</span>
-                </div>
-              </div>
-              <div className="border-t border-[#2e4b30]/20 pt-4">
-                <div className="flex justify-between text-xl font-bold text-[#2e4b30]">
-                  <span>Total</span>
-                  <span>${calculateTotal().toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Nota sobre el pago */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800">
-                <strong>Nota:</strong> Por ahora, el pago se procesa de forma simple. 
-                Próximamente se integrará Mercado Pago para procesar los pagos de forma segura.
-              </p>
-            </div>
-
-            {/* Botones */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/"
-                className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium text-center"
-              >
-                Volver al Inicio
-              </Link>
-              <Link
-                href="/profile"
-                className="flex-1 bg-[#2e4b30]/10 text-[#2e4b30] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium text-center"
-              >
-                Ver Mis Pedidos
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Página de checkout inicial con previsualización
+// Vista principal del checkout
+const CheckoutMainView: React.FC<ReturnType<typeof useCheckoutLogic>> = ({
+  cartItems,
+  error,
+  processing,
+  reservation,
+  reservationExpired,
+  cardData,
+  subtotal,
+  tax,
+  total,
+  handleCheckout,
+  handleReservationExpired,
+  handleExtendReservation,
+  setCardData
+}) => {
   return (
     <div className="min-h-screen bg-[#f5efe1] pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Encabezado */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#2e4b30]">Checkout</h1>
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start">
-            <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="font-semibold text-red-800">Error</p>
-              <p className="text-sm text-red-700">{error}</p>
-            </div>
-          </div>
-        )}
-
+        <CheckoutHeader />
+        
+        {error && <CheckoutErrorState error={error} />}
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Previsualización de Productos */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6 mb-6">
-              <div className="flex items-center mb-6">
-                <Package className="w-6 h-6 text-[#2e4b30] mr-2" />
-                <h2 className="text-xl font-bold text-[#2e4b30]">
-                  Previsualización de tu Pedido
-                </h2>
-              </div>
-              
-              <div className="space-y-4">
-                {cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center space-x-4 p-4 bg-[#f5efe1]/30 rounded-lg"
-                  >
-                    {/* Imagen del Libro */}
-                    <div className="flex-shrink-0">
-                      <Image
-                        src={item.book.image || ''}
-                        alt={item.book.title}
-                        width={80}
-                        height={120}
-                        className="w-20 h-28 object-cover rounded-lg shadow-sm"
-                      />
-                    </div>
-
-                    {/* Detalles del Libro */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-lg font-semibold text-[#2e4b30] truncate">
-                        {item.book.title}
-                      </h3>
-                      <p className="text-[#2e4b30]/70 text-sm mb-1">
-                        por {item.book.author}
-                      </p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <p className="text-sm text-[#2e4b30]/70">
-                          Cantidad: <span className="font-semibold">{item.quantity}</span>
-                        </p>
-                        <p className="text-sm text-[#2e4b30]/70">
-                          Precio unitario: <span className="font-semibold">${item.book.price.toFixed(2)}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Precio Total del Item */}
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-[#2e4b30]">
-                        ${(item.book.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Información de Pago */}
-            <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6">
-              <div className="flex items-center mb-4">
-                <CreditCard className="w-6 h-6 text-[#2e4b30] mr-2" />
-                <h2 className="text-xl font-bold text-[#2e4b30]">
-                  Información de Pago
-                </h2>
-              </div>
-              <div className="space-y-4 mb-4">
-                <div>
-                  <label htmlFor="cardNumber" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                    Número de tarjeta
-                  </label>
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                    value={cardData.cardNumber}
-                    onChange={(e) => setCardData({...cardData, cardNumber: e.target.value})}
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="cardName" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                    Nombre en la tarjeta
-                  </label>
-                  <input
-                    type="text"
-                    id="cardName"
-                    placeholder="JUAN PEREZ"
-                    className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                    value={cardData.cardName}
-                    onChange={(e) => setCardData({...cardData, cardName: e.target.value})}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="expiryDate" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                      Vencimiento (MM/AA)
-                    </label>
-                    <input
-                      type="text"
-                      id="expiryDate"
-                      placeholder="12/25"
-                      className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                      value={cardData.expiryDate}
-                      onChange={(e) => setCardData({...cardData, expiryDate: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="cvc" className="block text-sm font-medium text-[#2e4b30] mb-1">
-                      CVC
-                    </label>
-                    <input
-                      type="text"
-                      id="cvc"
-                      placeholder="123"
-                      className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
-                      value={cardData.cvc}
-                      onChange={(e) => setCardData({...cardData, cvc: e.target.value})}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-blue-800">
-                  <strong>Nota:</strong> Esta es una simulación. Los datos de pago no se envían a ningún servidor.
-                </p>
-              </div>
-            </div>
+            <CartPreview cartItems={cartItems} />
+            <PaymentForm 
+              cardData={cardData}
+              setCardData={setCardData}
+            />
           </div>
-
-          {/* Resumen del Pedido */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6 sticky top-24">
-              <h2 className="text-xl font-bold text-[#2e4b30] mb-6">
-                Resumen del Pedido
-              </h2>
-              
-              {/* Temporizador de Reserva */}
-              {reservation && (
-                <div className="mb-6">
-                  <ReservationTimer
-                    expiresAt={reservation.expiresAt}
-                    onExpired={handleReservationExpired}
-                    onExtendReservation={handleExtendReservation}
-                  />
-                </div>
-              )}
-
-              {/* Estado de la reserva */}
-              {creatingReservation && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center">
-                  <Loader2 className="w-5 h-5 text-blue-600 animate-spin mr-3" />
-                  <p className="text-blue-800">Creando reserva de stock...</p>
-                </div>
-              )}
-
-              {reservationExpired && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-red-800 font-medium">Reserva expirada</p>
-                      <p className="text-red-600 text-sm">Tu reserva ha expirado. Por favor, crea una nueva.</p>
-                    </div>
-                    <button
-                      onClick={handleExtendReservation}
-                      disabled={creatingReservation}
-                      className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm disabled:opacity-50"
-                    >
-                      {creatingReservation ? 'Creando...' : 'Reservar nuevamente'}
-                    </button>
+          
+          <div>
+            <CheckoutSummary 
+              subtotal={subtotal}
+              tax={tax}
+              total={total}
+              processing={processing}
+              reservationExpired={reservationExpired}
+              reservation={reservation}
+              onCheckout={handleCheckout}
+              onReservationExpired={handleReservationExpired}
+              onExtendReservation={handleExtendReservation}
+            />
                   </div>
-                </div>
-              )}
-              
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between text-[#2e4b30]">
-                  <span>
-                    Subtotal ({cartItems.reduce((total, item) => total + item.quantity, 0)} artículos)
-                  </span>
-                  <span className="font-medium">${calculateSubtotal().toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-[#2e4b30]">
-                  <span>Impuestos (21%)</span>
-                  <span className="font-medium">${calculateTax().toFixed(2)}</span>
-                </div>
-                <div className="border-t border-[#2e4b30]/20 pt-4">
-                  <div className="flex justify-between text-[#2e4b30] text-lg font-bold">
-                    <span>Total</span>
-                    <span>${calculateTotal().toFixed(2)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <button
-                  onClick={handleCheckout}
-                  disabled={
-                    processing || 
-                    creatingReservation ||
-                    reservationExpired ||
-                    !reservation ||
-                    !cardData.cardNumber || 
-                    !cardData.cardName || 
-                    !cardData.expiryDate || 
-                    !cardData.cvc
-                  }
-                  className="w-full bg-[#2e4b30] text-[#f5efe1] py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  title={
-                    !reservation ? 'No hay reserva de stock activa' :
-                    reservationExpired ? 'La reserva ha expirado' :
-                    creatingReservation ? 'Creando reserva...' :
-                    !cardData.cardNumber || !cardData.cardName || !cardData.expiryDate || !cardData.cvc ? 
-                    "Por favor complete todos los datos de la tarjeta" : 
-                    "Confirmar pago"
-                  }
-                >
-                  {processing ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Procesando...
-                    </>
-                  ) : creatingReservation ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Creando reserva...
-                    </>
-                  ) : reservationExpired ? (
-                    'Reserva expirada'
-                  ) : !reservation ? (
-                    'Sin reserva activa'
-                  ) : (
-                    'Confirmar Pago'
-                  )}
-                </button>
-                <button
-                  onClick={() => router.back()}
-                  className="w-full bg-[#2e4b30]/10 text-[#2e4b30] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium"
-                >
-                  Volver al Carrito
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// Header del checkout
+const CheckoutHeader: React.FC = () => {
+  return (
+    <div className="mb-8">
+      <h1 className="text-3xl font-bold text-[#2e4b30]">Checkout</h1>
+    </div>
+  )
+}
+
+// Resumen del checkout
+const CheckoutSummary: React.FC<{
+  subtotal: number
+  tax: number
+  total: number
+  processing: boolean
+  reservationExpired: boolean
+  reservation: IStockReservationResponse | null
+  onCheckout: () => void
+  onReservationExpired: () => void
+  onExtendReservation: () => void
+}> = ({
+  subtotal,
+  tax,
+  total,
+  processing,
+  reservationExpired,
+  reservation,
+  onCheckout,
+  onReservationExpired,
+  onExtendReservation
+}) => {
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6">
+      <ReservationTimer 
+        reservation={reservation}
+        onExpired={onReservationExpired}
+        onExtend={onExtendReservation}
+      />
+      
+      <CheckoutTotals subtotal={subtotal} tax={tax} total={total} />
+      
+      <CheckoutActions 
+        processing={processing}
+        reservationExpired={reservationExpired}
+        onCheckout={onCheckout}
+      />
+    </div>
+  )
+}
+
+// Totales del checkout
+const CheckoutTotals: React.FC<{
+  subtotal: number
+  tax: number
+  total: number
+}> = ({ subtotal, tax, total }) => {
+  return (
+    <div className="bg-white rounded-lg p-6 border border-[#2e4b30]/10">
+      <div className="space-y-3 mb-4">
+        <div className="flex justify-between text-[#2e4b30]">
+          <span>Subtotal</span>
+          <span>${subtotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between text-[#2e4b30]">
+          <span>Impuestos (21%)</span>
+          <span>${tax.toFixed(2)}</span>
+        </div>
+      </div>
+      <div className="border-t border-[#2e4b30]/20 pt-4">
+        <div className="flex justify-between text-xl font-bold text-[#2e4b30]">
+          <span>Total</span>
+          <span>${total.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Acciones del checkout
+const CheckoutActions: React.FC<{
+  processing: boolean
+  reservationExpired: boolean
+  onCheckout: () => void
+}> = ({ processing, reservationExpired, onCheckout }) => {
+  return (
+    <div className="mt-6 space-y-3">
+      <button
+        onClick={onCheckout}
+        disabled={processing || reservationExpired}
+        className="w-full bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+      >
+        {processing ? (
+          <>
+            <span className="animate-spin mr-2">⏳</span>
+            Procesando...
+          </>
+        ) : (
+          'Confirmar Pago'
+        )}
+      </button>
+      
+      <button
+        onClick={() => window.history.back()}
+        className="w-full bg-[#2e4b30]/10 text-[#2e4b30] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium"
+      >
+        Volver al Carrito
+      </button>
     </div>
   )
 }

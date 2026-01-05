@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { MercadoPagoConfig, Preference } from "mercadopago";
 import { AppDataSource } from "../config/data-source";
 import { Order } from "../entities/Order";
 
@@ -56,80 +55,21 @@ export const createPayment = async (req: Request, res: Response) => {
       });
     }
 
-    // Configurar cliente de Mercado Pago
-    const client = new MercadoPagoConfig({
-      accessToken: process.env.MP_ACCESS_TOKEN!,
-    });
-
-    if (!process.env.MP_ACCESS_TOKEN) {
-      return res.status(500).json({
-        success: false,
-        message: "Token de Mercado Pago no configurado",
-      });
-    }
-
-    const preference = new Preference(client);
-
-    // Construir items para Mercado Pago
-    const items = order.items.map((item) => ({
-      id: item.id,
-      title: item.book.title,
-      description: `Libro: ${item.book.title} - Autor: ${item.book.author}`,
-      quantity: item.quantity,
-      unit_price: Number(item.book.price), // Precio unitario
-    }));
-
-    // Calcular subtotal (suma de todos los totalPrice de los items)
-    const subtotal = order.items.reduce(
-      (total, item) => total + Number(item.price),
-      0
-    );
-
-    // Calcular impuestos (21% IVA)
-    const tax = subtotal * 0.21;
-
-    // Agregar item de impuestos si es mayor a 0
-    if (tax > 0) {
-      items.push({
-        id: `tax-${orderId}`,
-        title: "Impuestos (IVA 21%)",
-        description: "Impuesto al Valor Agregado",
-        quantity: 1,
-        unit_price: tax,
-      });
-    }
-
-    // Obtener URLs del frontend desde variables de entorno
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
-
-    // Crear preferencia de pago
-    const result = await preference.create({
-      body: {
-        items: items,
-        back_urls: {
-          success: `${frontendUrl}/success?orderId=${orderId}`,
-          failure: `${frontendUrl}/failure?orderId=${orderId}`,
-          pending: `${frontendUrl}/pending?orderId=${orderId}`,
-        },
-        auto_return: "approved",
-        external_reference: orderId, // Referencia externa para identificar la orden
-        notification_url: process.env.MP_WEBHOOK_URL || undefined, // URL para webhooks (opcional)
-      },
-    });
-
-    return res.status(200).json({
-      success: true,
-      message: "Preferencia de pago creada exitosamente",
+    // Respuesta temporal - sistema de pagos desactivado
+    return res.status(503).json({
+      success: false,
+      message: "Sistema de pagos temporalmente desactivado",
       data: {
-        init_point: result.init_point,
         orderId: orderId,
+        total: order.total,
+        items: order.items.length,
       },
     });
   } catch (error: any) {
-    console.error("Error creando pago:", error);
+    console.error("Error en procesamiento de pago:", error);
     return res.status(500).json({
       success: false,
-      message: error.message || "Error creando pago",
+      message: error.message || "Error procesando pago",
     });
   }
 };

@@ -41,16 +41,26 @@ export const createStockReservation = async (): Promise<IStockReservationRespons
 }
 
 /**
- * Procesa el checkout del carrito (convierte el carrito en una orden)
- * @returns Orden creada
+ * Procesa el checkout del carrito (convierte el carrito en una orden confirmada)
+ * @param paymentData Datos de pago para procesar la orden
+ * @returns Orden creada con estado "confirmed"
  * @throws Error si no se puede procesar el checkout
  */
-export const processCheckout = async (): Promise<IOrder> => {
+export const processCheckout = async (paymentData: {
+  cardNumber: string;
+  cardName: string;
+  expiryDate: string;
+  cvc: string;
+}): Promise<IOrder> => {
   try {
-    const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout')
-    return extractData<IOrder>(response)
+    console.log('Enviando datos de pago al backend:', paymentData)
+    const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', paymentData)
+    const order = extractData<IOrder>(response)
+    console.log('Respuesta del backend:', order)
+    return order
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al procesar el checkout'
+    console.error('Error en processCheckout:', error)
     throw new Error(errorMessage)
   }
 }

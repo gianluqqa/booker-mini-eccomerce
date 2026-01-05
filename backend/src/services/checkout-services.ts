@@ -87,7 +87,12 @@ export const createStockReservationForCheckoutService = async (userId: string): 
 };
 
 //? Procesar checkout y crear orden (POST).
-export const processCheckoutService = async (userId: string): Promise<OrderResponseDto> => {
+export const processCheckoutService = async (userId: string, paymentData?: {
+  cardNumber: string;
+  cardName: string;
+  expiryDate: string;
+  cvc: string;
+}): Promise<OrderResponseDto> => {
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
   await queryRunner.startTransaction();
@@ -99,6 +104,8 @@ export const processCheckoutService = async (userId: string): Promise<OrderRespo
     const bookRepository = queryRunner.manager.getRepository(Book);
     const userRepository = queryRunner.manager.getRepository(User);
     const stockReservationRepository = queryRunner.manager.getRepository(StockReservation);
+
+    console.log('Procesando checkout con datos de pago:', paymentData);
 
     // Obtener reserva válida del usuario
     const reservation = await stockReservationRepository.findOne({
@@ -164,13 +171,34 @@ export const processCheckoutService = async (userId: string): Promise<OrderRespo
       await bookRepository.save(book);
     }
 
-    // Crear la orden
+    // Determinar el estado de la orden
+    let orderStatus = OrderStatus.PENDING;
+    
+    // Si se recibieron datos de pago, procesar el pago y cambiar a confirmed
+    if (paymentData && paymentData.cardNumber && paymentData.cardName && paymentData.expiryDate && paymentData.cvc) {
+      console.log('Procesando pago con datos completos...');
+      // Simulación de procesamiento de pago (aquí iría la integración real con pasarela de pago)
+      const paymentSuccessful = true; // Simulación exitosa
+      
+      if (paymentSuccessful) {
+        orderStatus = OrderStatus.PAID;
+        console.log('Pago procesado exitosamente, orden confirmada');
+      } else {
+        throw { status: 400, message: "El pago fue rechazado" };
+      }
+    } else {
+      console.log('No se recibieron datos de pago completos, orden queda como pendiente');
+    }
+
+    // Crear la orden con el estado determinado
     const order = orderRepository.create({
       user: user,
-      status: OrderStatus.PENDING,
+      status: orderStatus,
       total: total,
     });
     const savedOrder = await orderRepository.save(order);
+
+    console.log('Orden creada con estado:', orderStatus);
 
     // Asignar la orden a los items y guardarlos
     for (const orderItem of orderItems) {

@@ -45,7 +45,11 @@ export const processCheckoutController = async (req: Request, res: Response) => 
       });
     }
 
-    const order = await processCheckoutService(authUser.id);
+    // Recibir datos de pago del frontend
+    const paymentData = req.body;
+    console.log('Datos de pago recibidos:', paymentData);
+
+    const order = await processCheckoutService(authUser.id, paymentData);
 
     return res.status(201).json({
       success: true,
