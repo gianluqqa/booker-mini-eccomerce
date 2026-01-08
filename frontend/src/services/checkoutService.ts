@@ -41,6 +41,25 @@ export const createStockReservation = async (): Promise<IStockReservationRespons
 }
 
 /**
+ * Cancela el checkout y elimina la reserva de stock
+ * @returns Confirmación de cancelación
+ * @throws Error si no se puede cancelar el checkout
+ */
+export const cancelCheckout = async (): Promise<{ message: string; reservationId: string }> => {
+  try {
+    const response = await apiClient.delete<{ 
+      success: boolean; 
+      message: string; 
+      data: { message: string; reservationId: string }
+    }>('/checkout/cancel');
+    
+    return extractData<{ message: string; reservationId: string }>(response);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Error al cancelar el checkout';
+    throw new Error(errorMessage);
+  }
+}
+/**
  * Procesa el checkout del carrito (convierte el carrito en una orden confirmada)
  * @param paymentData Datos de pago para procesar la orden
  * @returns Orden creada con estado "confirmed"

@@ -3,7 +3,6 @@ import { Order } from "../entities/Order";
 import { OrderItem } from "../entities/OrderItem";
 import { Book } from "../entities/Book";
 import { OrderStatus } from "../enums/OrderStatus";
-import { In } from "typeorm";
 import { OrderResponseDto } from "../dto/OrderDto";
 
 //? Obtener una orden por ID (GET).
@@ -64,11 +63,11 @@ export const getUserOrdersService = async (
   try {
     const orderRepository = AppDataSource.getRepository(Order);
     
-    // Obtener órdenes confirmadas (PAID o SHIPPED) del usuario
+    // Obtener órdenes confirmadas (PAID) del usuario
     const orders = await orderRepository.find({
       where: {
         user: { id: userId },
-        status: In([OrderStatus.PAID, OrderStatus.SHIPPED]),
+        status: OrderStatus.PAID,
       },
       relations: ["items", "items.book"],
       order: { createdAt: "DESC" },

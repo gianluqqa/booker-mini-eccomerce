@@ -1,11 +1,14 @@
 import { Router } from "express";
-import { processCheckoutController, createStockReservationForCheckoutController } from "../controllers/checkout-controllers";
+import { processCheckoutController, createStockReservationForCheckoutController, cancelCheckoutController } from "../controllers/checkout-controllers";
 import { authenticateJWT } from "../middlewares/auth";
 
 const router = Router();
 
 //? Crear reserva de stock para checkout (POST).
 router.post("/reserve", authenticateJWT, createStockReservationForCheckoutController);
+
+//? Cancelar checkout y liberar reserva de stock (DELETE).
+router.delete("/cancel", authenticateJWT, cancelCheckoutController);
 
 //? Procesar checkout y crear orden (POST).
 router.post("/", authenticateJWT, processCheckoutController);

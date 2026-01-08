@@ -86,6 +86,31 @@ export const createStockReservationForCheckoutService = async (userId: string): 
   }
 };
 
+//? Cancelar checkout y liberar reserva de stock
+export const cancelCheckoutService = async (userId: string): Promise<any> => {
+  const stockReservationRepository = AppDataSource.getRepository(StockReservation);
+
+  try {
+    const reservation = await stockReservationRepository.findOne({
+      where: { userId: userId },
+    });
+
+    if (!reservation) {
+      throw { status: 404, message: "No hay reserva de stock activa para cancelar" };
+    }
+
+    await stockReservationRepository.remove(reservation);
+
+    return {
+      message: "Reserva de stock cancelada exitosamente",
+      reservationId: reservation.id,
+    };
+  } catch (error: any) {
+    if (error.status && error.message) throw error;
+    throw { status: 500, message: "No se pudo cancelar la reserva de stock" };
+  }
+};
+
 //? Procesar checkout y crear orden (POST).
 export const processCheckoutService = async (userId: string, paymentData?: {
   cardNumber: string;

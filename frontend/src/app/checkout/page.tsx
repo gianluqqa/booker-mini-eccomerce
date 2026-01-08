@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useReservation } from '@/contexts/ReservationContext'
-import { processCheckout, getUserCart, createStockReservation } from '@/services/checkoutService'
+import { processCheckout, getUserCart, createStockReservation, cancelCheckout } from '@/services/checkoutService'
 import { IOrder } from '@/types/Order'
 import { ICartItem, ICartResponse } from '@/types/Cart'
 import { IStockReservationResponse } from '@/types/StockReservation'
@@ -109,6 +109,17 @@ const useCheckoutLogic = () => {
     }
   }
 
+  const handleCancelCheckout = async () => {
+    try {
+      await cancelCheckout()
+      clearReservation()
+      router.push('/cart')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error al cancelar el checkout'
+      setError(errorMessage)
+    }
+  }
+
   const handleReservationExpired = () => {
     setReservationExpired(true)
     setError('Tu reserva de stock ha expirado. Por favor, crea una nueva reserva para continuar.')
@@ -154,6 +165,7 @@ const useCheckoutLogic = () => {
     
     // Acciones
     handleCheckout,
+    handleCancelCheckout,
     handleReservationExpired,
     handleExtendReservation,
     setCardData,
@@ -206,6 +218,7 @@ const CheckoutMainView: React.FC<ReturnType<typeof useCheckoutLogic>> = ({
   tax,
   total,
   handleCheckout,
+  handleCancelCheckout,
   handleReservationExpired,
   handleExtendReservation,
   setCardData
@@ -235,6 +248,7 @@ const CheckoutMainView: React.FC<ReturnType<typeof useCheckoutLogic>> = ({
               reservationExpired={reservationExpired}
               reservation={reservation}
               onCheckout={handleCheckout}
+              onCancelCheckout={handleCancelCheckout}
               onReservationExpired={handleReservationExpired}
               onExtendReservation={handleExtendReservation}
             />
@@ -263,6 +277,7 @@ const CheckoutSummary: React.FC<{
   reservationExpired: boolean
   reservation: IStockReservationResponse | null
   onCheckout: () => void
+  onCancelCheckout: () => void
   onReservationExpired: () => void
   onExtendReservation: () => void
 }> = ({
@@ -273,6 +288,7 @@ const CheckoutSummary: React.FC<{
   reservationExpired,
   reservation,
   onCheckout,
+  onCancelCheckout,
   onReservationExpired,
   onExtendReservation
 }) => {
@@ -290,6 +306,7 @@ const CheckoutSummary: React.FC<{
         processing={processing}
         reservationExpired={reservationExpired}
         onCheckout={onCheckout}
+        onCancelCheckout={onCancelCheckout}
       />
     </div>
   )
@@ -328,7 +345,8 @@ const CheckoutActions: React.FC<{
   processing: boolean
   reservationExpired: boolean
   onCheckout: () => void
-}> = ({ processing, reservationExpired, onCheckout }) => {
+  onCancelCheckout: () => void
+}> = ({ processing, reservationExpired, onCheckout, onCancelCheckout }) => {
   return (
     <div className="mt-6 space-y-3">
       <button
@@ -344,6 +362,14 @@ const CheckoutActions: React.FC<{
         ) : (
           'Confirmar Pago'
         )}
+      </button>
+      
+      <button
+        onClick={onCancelCheckout}
+        disabled={processing}
+        className="w-full bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Cancelar Checkout
       </button>
       
       <button
