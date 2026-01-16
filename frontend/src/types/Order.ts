@@ -19,5 +19,6 @@ export interface IOrder {
   total: number;
   status: string; // OrderStatus enum: "pending" | "paid" | "shipped" | "cancelled"
   createdAt: Date | string;
+  expiresAt?: Date | string;
   items: IOrderItem[];
 }

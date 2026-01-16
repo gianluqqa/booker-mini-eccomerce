@@ -3,10 +3,9 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useReservation } from '@/contexts/ReservationContext'
-import { processCheckout, getUserCart, createStockReservation, cancelCheckout } from '@/services/checkoutService'
+import { startCheckout, processPayment, checkPendingOrder, cancelCheckout, getUserCart } from '@/services/checkoutService'
 import { IOrder } from '@/types/Order'
 import { ICartItem, ICartResponse } from '@/types/Cart'
-import { IStockReservationResponse } from '@/types/StockReservation'
 
 // Componentes modularizados
 import { ReservationTimer } from '@/components/checkout/ReservationTimer'
@@ -30,7 +29,7 @@ import {
 // Hook personalizado para la lógica del checkout
 const useCheckoutLogic = () => {
   const router = useRouter()
-  const { setReservation: setGlobalReservation, clearReservation } = useReservation()
+  const { clearReservation } = useReservation()
   
   // Estados
   const [loading, setLoading] = useState<boolean>(true)
@@ -38,8 +37,7 @@ const useCheckoutLogic = () => {
   const [order, setOrder] = useState<IOrder | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [processing, setProcessing] = useState<boolean>(false)
-  const [reservation, setReservation] = useState<IStockReservationResponse | null>(null)
-  const [reservationExpired, setReservationExpired] = useState<boolean>(false)
+  const [orderExpired, setOrderExpired] = useState<boolean>(false)
   const [cardData, setCardData] = useState({
     cardNumber: '',
     cardName: '',
@@ -52,9 +50,10 @@ const useCheckoutLogic = () => {
     const initializeCheckout = async () => {
       setLoading(true)
       setError(null)
-      setReservationExpired(false)
+      setOrderExpired(false)
       
       try {
+        // Obtener carrito primero
         const cartData: ICartResponse = await getUserCart()
         setCartItems(cartData.items || [])
         
@@ -63,25 +62,54 @@ const useCheckoutLogic = () => {
           return
         }
 
-        const reservationData = await createStockReservation()
-        setReservation(reservationData)
-        setGlobalReservation(reservationData)
+        // Verificar si ya existe una orden PENDING
+        console.log('🔍 Verificando si existe orden PENDING...')
+        const existingOrder = await checkPendingOrder()
+        
+        if (existingOrder) {
+          console.log('✅ Orden PENDING existente encontrada:', existingOrder)
+          setOrder(existingOrder)
+          
+          // Verificar si la orden ha expirado
+          if (existingOrder.expiresAt) {
+            const expiryTime = new Date(existingOrder.expiresAt).getTime()
+            const now = new Date().getTime()
+            
+            if (expiryTime <= now) {
+              console.log('⏰ La orden PENDING ha expirado')
+              setOrderExpired(true)
+              setError('Tu orden ha expirado. Por favor, inicia un nuevo checkout.')
+            }
+          }
+        } else {
+          // Crear nueva orden PENDING
+          console.log('🆕 Creando nueva orden PENDING...')
+          const newOrder = await startCheckout()
+          setOrder(newOrder)
+          console.log('✅ Orden PENDING creada:', newOrder)
+        }
         
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'Error al inicializar el checkout'
         setError(errorMessage)
+        console.error('❌ Error en initializeCheckout:', error)
       } finally {
         setLoading(false)
       }
     }
 
     initializeCheckout()
-  }, [router, setGlobalReservation])
+  }, [router])
 
   const handleCheckout = async () => {
-    // Validar reserva
-    if (reservationExpired || !reservation) {
-      setError('No puedes procesar el pago sin una reserva válida. Por favor, crea una nueva reserva.')
+    // Validar que haya una orden PENDING y no haya expirado
+    if (!order || order.status !== 'pending') {
+      setError('No hay una orden válida para procesar el pago.')
+      return
+    }
+
+    if (orderExpired) {
+      setError('Tu orden ha expirado. Por favor, inicia un nuevo checkout.')
       return
     }
 
@@ -97,15 +125,18 @@ const useCheckoutLogic = () => {
     
     try {
       const cleanData = cleanPaymentData(cardData)
-      const orderData = await processCheckout(cleanData)
-      setOrder(orderData)
+      console.log('💳 Procesando pago de orden PENDING...')
+      const paidOrder = await processPayment(cleanData)
+      setOrder(paidOrder)
       setLoading(false)
       setProcessing(false)
       clearReservation()
+      console.log('✅ Pago procesado exitosamente:', paidOrder)
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago'
       setError(errorMessage)
       setProcessing(false)
+      console.error('❌ Error en handleCheckout:', error)
     }
   }
 
@@ -113,6 +144,7 @@ const useCheckoutLogic = () => {
     try {
       await cancelCheckout()
       clearReservation()
+      setOrder(null)
       router.push('/cart')
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Error al cancelar el checkout'
@@ -120,21 +152,31 @@ const useCheckoutLogic = () => {
     }
   }
 
-  const handleReservationExpired = () => {
-    setReservationExpired(true)
-    setError('Tu reserva de stock ha expirado. Por favor, crea una nueva reserva para continuar.')
+  const handleOrderExpired = () => {
+    setOrderExpired(true)
+    setError('Tu orden ha expirado. Por favor, inicia un nuevo checkout para continuar.')
   }
 
-  const handleExtendReservation = async () => {
+  const handleRestartCheckout = async () => {
     try {
-      const reservationData = await createStockReservation()
-      setReservation(reservationData)
-      setGlobalReservation(reservationData)
-      setReservationExpired(false)
+      setLoading(true)
       setError(null)
+      setOrderExpired(false)
+      
+      // Cancelar checkout actual
+      await cancelCheckout()
+      setOrder(null)
+      
+      // Crear nueva orden PENDING
+      const newOrder = await startCheckout()
+      setOrder(newOrder)
+      
+      setLoading(false)
+      console.log('✅ Nuevo checkout iniciado:', newOrder)
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error al extender la reserva'
+      const errorMessage = error instanceof Error ? error.message : 'Error al reiniciar el checkout'
       setError(errorMessage)
+      setLoading(false)
     }
   }
 
@@ -154,8 +196,7 @@ const useCheckoutLogic = () => {
     order,
     error,
     processing,
-    reservation,
-    reservationExpired,
+    orderExpired,
     cardData,
     
     // Cálculos
@@ -166,8 +207,8 @@ const useCheckoutLogic = () => {
     // Acciones
     handleCheckout,
     handleCancelCheckout,
-    handleReservationExpired,
-    handleExtendReservation,
+    handleOrderExpired,
+    handleRestartCheckout,
     setCardData,
     
     // Utilidades
@@ -197,8 +238,8 @@ const CheckoutPage = () => {
     return <EmptyCartState onBackToCart={() => router.push('/cart')} />
   }
 
-  // Confirmación de orden
-  if (checkoutLogic.order) {
+  // Confirmación de orden solo si está PAID
+  if (checkoutLogic.order && checkoutLogic.order.status === 'paid') {
     return <OrderConfirmation order={checkoutLogic.order} />
   }
 
@@ -209,18 +250,18 @@ const CheckoutPage = () => {
 // Vista principal del checkout
 const CheckoutMainView: React.FC<ReturnType<typeof useCheckoutLogic>> = ({
   cartItems,
+  order,
   error,
   processing,
-  reservation,
-  reservationExpired,
+  orderExpired,
   cardData,
   subtotal,
   tax,
   total,
   handleCheckout,
   handleCancelCheckout,
-  handleReservationExpired,
-  handleExtendReservation,
+  handleOrderExpired,
+  handleRestartCheckout,
   setCardData
 }) => {
   return (
@@ -245,12 +286,12 @@ const CheckoutMainView: React.FC<ReturnType<typeof useCheckoutLogic>> = ({
               tax={tax}
               total={total}
               processing={processing}
-              reservationExpired={reservationExpired}
-              reservation={reservation}
+              orderExpired={orderExpired}
+              order={order}
               onCheckout={handleCheckout}
               onCancelCheckout={handleCancelCheckout}
-              onReservationExpired={handleReservationExpired}
-              onExtendReservation={handleExtendReservation}
+              onOrderExpired={handleOrderExpired}
+              onRestartCheckout={handleRestartCheckout}
             />
                   </div>
         </div>
@@ -274,39 +315,39 @@ const CheckoutSummary: React.FC<{
   tax: number
   total: number
   processing: boolean
-  reservationExpired: boolean
-  reservation: IStockReservationResponse | null
+  orderExpired: boolean
+  order: IOrder | null
   onCheckout: () => void
   onCancelCheckout: () => void
-  onReservationExpired: () => void
-  onExtendReservation: () => void
+  onOrderExpired: () => void
+  onRestartCheckout: () => void
 }> = ({
   subtotal,
   tax,
   total,
   processing,
-  reservationExpired,
-  reservation,
+  orderExpired,
+  order,
   onCheckout,
   onCancelCheckout,
-  onReservationExpired,
-  onExtendReservation
+  onOrderExpired,
+  onRestartCheckout
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6">
       <ReservationTimer 
-        reservation={reservation}
-        onExpired={onReservationExpired}
-        onExtend={onExtendReservation}
+        order={order}
+        onExpired={onOrderExpired}
       />
       
       <CheckoutTotals subtotal={subtotal} tax={tax} total={total} />
       
       <CheckoutActions 
         processing={processing}
-        reservationExpired={reservationExpired}
+        orderExpired={orderExpired}
         onCheckout={onCheckout}
         onCancelCheckout={onCancelCheckout}
+        onRestartCheckout={onRestartCheckout}
       />
     </div>
   )
@@ -343,26 +384,44 @@ const CheckoutTotals: React.FC<{
 // Acciones del checkout
 const CheckoutActions: React.FC<{
   processing: boolean
-  reservationExpired: boolean
+  orderExpired: boolean
   onCheckout: () => void
   onCancelCheckout: () => void
-}> = ({ processing, reservationExpired, onCheckout, onCancelCheckout }) => {
+  onRestartCheckout: () => void
+}> = ({ processing, orderExpired, onCheckout, onCancelCheckout, onRestartCheckout }) => {
   return (
     <div className="mt-6 space-y-3">
-      <button
-        onClick={onCheckout}
-        disabled={processing || reservationExpired}
-        className="w-full bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-      >
-        {processing ? (
-          <>
-            <span className="animate-spin mr-2">⏳</span>
-            Procesando...
-          </>
-        ) : (
-          'Confirmar Pago'
-        )}
-      </button>
+      {!orderExpired ? (
+        <button
+          onClick={onCheckout}
+          disabled={processing}
+          className="w-full bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {processing ? (
+            <>
+              <span className="animate-spin mr-2">⏳</span>
+              Procesando...
+            </>
+          ) : (
+            'Confirmar Pago'
+          )}
+        </button>
+      ) : (
+        <button
+          onClick={onRestartCheckout}
+          disabled={processing}
+          className="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+        >
+          {processing ? (
+            <>
+              <span className="animate-spin mr-2">⏳</span>
+              Reiniciando...
+            </>
+          ) : (
+            'Iniciar Nuevo Checkout'
+          )}
+        </button>
+      )}
       
       <button
         onClick={onCancelCheckout}

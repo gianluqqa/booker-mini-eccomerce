@@ -5,6 +5,7 @@ export interface OrderResponseDto {
   total: number;
   status: OrderStatus;
   createdAt: Date;
+  expiresAt?: Date;
   items: {
     id: string;
     book: {

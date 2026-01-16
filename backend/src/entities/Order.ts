@@ -35,4 +35,7 @@ export class Order {
 
   @CreateDateColumn()
   createdAt!: Date;
+
+  @Column({ nullable: true })
+  expiresAt?: Date;
 }
