@@ -85,18 +85,20 @@ export const processPayment = async (paymentData: {
 }
 
 /**
- * Verifica si existe una orden PENDING para el usuario
+ * Verifica si existe una orden PENDING para el usuario (solo verificación, no crea)
  * @returns Orden PENDING existente o null
  * @throws Error si no se puede verificar
  */
 export const checkPendingOrder = async (): Promise<IOrder | null> => {
   try {
     console.log('🔍 Verificando orden PENDING existente...')
-    const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', {})
-    const order = extractData<IOrder>(response)
     
-    // Si el backend devuelve una orden PENDING existente, la retornamos
-    if (order.status === 'pending') {
+    // Usar un endpoint dedicado para solo verificar, no crear
+    // Por ahora, modificamos la llamada para que no cree órdenes
+    const response = await apiClient.get<{ success: boolean; message: string; data: IOrder | null }>('/orders/pending')
+    
+    if (response.data.success && response.data.data) {
+      const order = response.data.data
       console.log('✅ Orden PENDING encontrada:', order)
       return order
     }
@@ -106,6 +108,14 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al verificar orden PENDING'
     console.error('❌ Error en checkPendingOrder:', error)
+    
+    // Si el error es "El carrito está vacío", lo tratamos como un caso normal (no hay orden PENDING)
+    if (errorMessage.includes('carrito está vacío') || errorMessage.includes('carrito vacio')) {
+      console.log('🛒 Carrito vacío - No hay orden PENDING posible')
+      return null
+    }
+    
+    // Para otros errores, lanzamos la excepción
     throw new Error(errorMessage)
   }
 }

@@ -1,7 +1,5 @@
 import { AppDataSource } from "../config/data-source";
 import { Order } from "../entities/Order";
-import { OrderItem } from "../entities/OrderItem";
-import { Book } from "../entities/Book";
 import { OrderStatus } from "../enums/OrderStatus";
 import { OrderResponseDto } from "../dto/OrderDto";
 
@@ -30,6 +28,8 @@ export const getOrderByIdService = async (
       id: order.id,
       total: order.total,
       status: order.status,
+      createdAt: order.createdAt,
+      expiresAt: order.expiresAt,
       items: order.items.map((item) => {
         const unitPrice = Number(item.price); // precio unitario guardado
         const totalPrice = unitPrice * item.quantity;
@@ -47,7 +47,6 @@ export const getOrderByIdService = async (
           totalPrice: totalPrice,
         };
       }),
-      createdAt: order.createdAt,
     };
   } catch (error: any) {
     console.error("Error al obtener la orden:", error);
@@ -62,7 +61,7 @@ export const getUserOrdersService = async (
 ): Promise<OrderResponseDto[]> => {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
-    
+
     // Obtener órdenes confirmadas (PAID) del usuario
     const orders = await orderRepository.find({
       where: {
@@ -78,6 +77,7 @@ export const getUserOrdersService = async (
       total: order.total,
       status: order.status,
       createdAt: order.createdAt,
+      expiresAt: order.expiresAt,
       items: order.items.map((item) => {
         const unitPrice = Number(item.book.price); // precio unitario del libro
         const totalPrice = Number(item.price); // precio total guardado
@@ -109,7 +109,7 @@ export const getUserPendingOrdersService = async (
 ): Promise<OrderResponseDto[]> => {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
-    
+
     // Obtener órdenes pendientes (PENDING) del usuario
     const orders = await orderRepository.find({
       where: {
@@ -125,6 +125,7 @@ export const getUserPendingOrdersService = async (
       total: order.total,
       status: order.status,
       createdAt: order.createdAt,
+      expiresAt: order.expiresAt,
       items: order.items.map((item) => {
         const unitPrice = Number(item.book.price); // precio unitario del libro
         const totalPrice = Number(item.price); // precio total guardado

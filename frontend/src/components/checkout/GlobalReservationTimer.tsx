@@ -76,7 +76,7 @@ export const GlobalReservationTimer: React.FC = () => {
             <div
               className={`h-1.5 rounded-full transition-all duration-1000 ${getProgressColor()}`}
               style={{
-                width: `${((minutes * 60 + seconds) / 600) * 100}%`,
+                width: `${((minutes * 60 + seconds) / 120) * 100}%`,
               }}
             />
           </div>

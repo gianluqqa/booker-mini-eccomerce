@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { ITimerState } from '@/types/StockReservation'
 
 /**
@@ -17,25 +17,25 @@ export const useReservationTimer = (
     isExpired: false
   })
 
-  const calculateTimeRemaining = useCallback(() => {
-    if (!expiresAt) return { minutes: 0, seconds: 0, isExpired: true }
-
-    const now = new Date().getTime()
-    const expiry = new Date(expiresAt).getTime()
-    const difference = expiry - now
-
-    if (difference <= 0) {
-      return { minutes: 0, seconds: 0, isExpired: true }
-    }
-
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000)
-
-    return { minutes, seconds, isExpired: false }
-  }, [expiresAt])
-
   useEffect(() => {
     if (!expiresAt) return
+
+    const calculateTimeRemaining = () => {
+      if (!expiresAt) return { minutes: 0, seconds: 0, isExpired: true }
+
+      const now = new Date().getTime()
+      const expiry = new Date(expiresAt).getTime()
+      const difference = expiry - now
+
+      if (difference <= 0) {
+        return { minutes: 0, seconds: 0, isExpired: true }
+      }
+
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+      return { minutes, seconds, isExpired: false }
+    }
 
     const updateTimer = () => {
       const newTimer = calculateTimeRemaining()
@@ -53,7 +53,7 @@ export const useReservationTimer = (
     const interval = setInterval(updateTimer, 1000)
 
     return () => clearInterval(interval)
-  }, [expiresAt, calculateTimeRemaining, onExpired])
+  }, [expiresAt, onExpired])
 
   const formatTime = (minutes: number, seconds: number): string => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
@@ -62,7 +62,7 @@ export const useReservationTimer = (
   return {
     ...timer,
     formattedTime: formatTime(timer.minutes, timer.seconds),
-    isWarning: timer.minutes <= 2 && !timer.isExpired,
-    isDanger: timer.minutes === 0 && timer.seconds <= 30 && !timer.isExpired
+    isWarning: timer.minutes === 0 && timer.seconds <= 30 && !timer.isExpired,
+    isDanger: timer.minutes === 0 && timer.seconds <= 10 && !timer.isExpired
   }
 }

@@ -82,11 +82,22 @@ const useCheckoutLogic = () => {
             }
           }
         } else {
-          // Crear nueva orden PENDING
-          console.log('🆕 Creando nueva orden PENDING...')
-          const newOrder = await startCheckout()
-          setOrder(newOrder)
-          console.log('✅ Orden PENDING creada:', newOrder)
+          // Verificar si hay items en el carrito antes de crear nueva orden
+          if (cartData.items.length === 0) {
+            console.log('🛒 Carrito vacío - No se puede crear nueva orden')
+            router.push('/cart')
+            return
+          }
+          
+          // Crear nueva orden PENDING solo si no hay error de expiración
+          if (!orderExpired) {
+            console.log('🆕 Creando nueva orden PENDING...')
+            const newOrder = await startCheckout()
+            setOrder(newOrder)
+            console.log('✅ Orden PENDING creada:', newOrder)
+          } else {
+            console.log('⏰ Orden expirada - Esperando acción del usuario para crear nueva orden')
+          }
         }
         
       } catch (error: unknown) {
@@ -99,7 +110,7 @@ const useCheckoutLogic = () => {
     }
 
     initializeCheckout()
-  }, [router])
+  }, [router]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCheckout = async () => {
     // Validar que haya una orden PENDING y no haya expirado

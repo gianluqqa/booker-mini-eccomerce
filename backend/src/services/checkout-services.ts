@@ -7,8 +7,9 @@ import { User } from "../entities/User";
 import { StockReservation } from "../entities/StockReservation";
 import { OrderStatus } from "../enums/OrderStatus";
 import { OrderResponseDto } from "../dto/OrderDto";
+import { setupOrderExpiration, cancelOrderExpiration } from "./order-expiration-service";
 
-const RESERVATION_MINUTES = 10;
+const RESERVATION_MINUTES = 2;
 
 //? Crear reserva de stock para checkout
 export const createStockReservationForCheckoutService = async (userId: string): Promise<any> => {
@@ -58,7 +59,7 @@ export const createStockReservationForCheckoutService = async (userId: string): 
     // Calcular total
     const totalAmount = reservationItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    // Crear expiración (10 minutos)
+    // Crear expiración (2 minutos)
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + RESERVATION_MINUTES);
 
@@ -78,7 +79,7 @@ export const createStockReservationForCheckoutService = async (userId: string): 
       totalAmount: totalAmount,
       expiresAt: expiresAt,
       totalMinutes: RESERVATION_MINUTES,
-      message: "Reserva creada. Tienes 10 minutos para completar la compra."
+      message: "Reserva creada. Tienes 2 minutos para completar la compra."
     };
   } catch (error: any) {
     if (error.status && error.message) throw error;
@@ -111,6 +112,10 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
 
     if (pendingOrder) {
       console.log('📋 Orden PENDING encontrada, cancelando:', pendingOrder.id);
+      
+      // Cancelar expiración automática
+      cancelOrderExpiration(pendingOrder.id);
+      console.log('⏹️ Expiración automática cancelada por cancelación manual');
       
       // Devolver stock de los items de la orden
       for (const item of pendingOrder.items) {
@@ -263,7 +268,11 @@ export const processCheckoutService = async (userId: string, paymentData?: {
       existingPendingOrder.expiresAt = undefined;
       await orderRepository.save(existingPendingOrder);
 
-      console.log('✅ Orden PAGADA exitosamente - ID:', existingPendingOrder.id);
+      console.log(' Orden PAGADA exitosamente - ID:', existingPendingOrder.id);
+
+      // Cancelar expiración automática
+      cancelOrderExpiration(existingPendingOrder.id);
+      console.log(' Expiración automática cancelada por pago');
 
       // Eliminar cualquier reserva de stock existente
       const reservation = await stockReservationRepository.findOne({
@@ -381,7 +390,7 @@ export const processCheckoutService = async (userId: string, paymentData?: {
         throw { status: 400, message: "El pago fue rechazado" };
       }
     } else {
-      // Si no hay datos de pago, crear expiración de 10 minutos y reservar stock
+      // Si no hay datos de pago, crear expiración de 2 minutos y reservar stock
       expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + RESERVATION_MINUTES);
       console.log('⏰ Orden PENDING creada con expiración:', expiresAt);
@@ -427,7 +436,7 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     });
 
     const savedOrder = await orderRepository.save(order);
-    console.log('✅ Orden creada - ID:', savedOrder.id, 'Estado:', orderStatus);
+    console.log(' Orden creada - ID:', savedOrder.id, 'Estado:', orderStatus);
 
     // Asignar orden a los items y guardar
     for (const orderItem of orderItems) {
@@ -436,6 +445,12 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     await orderItemRepository.save(orderItems);
 
     await queryRunner.commitTransaction();
+
+    // Configurar expiración automática solo si es PENDING
+    if (orderStatus === OrderStatus.PENDING) {
+      setupOrderExpiration(savedOrder.id, RESERVATION_MINUTES);
+      console.log(` Expiración automática configurada para orden ${savedOrder.id} (${RESERVATION_MINUTES} minutos)`);
+    }
 
     // Recargar la orden con relaciones para la respuesta
     const orderWithRelations = await orderRepository.findOne({

@@ -82,7 +82,7 @@ export const ReservationTimer: React.FC<ReservationTimerProps> = ({ order, reser
           <div
             className={`h-2 rounded-full transition-all duration-1000 ${isDanger ? "bg-red-600" : isWarning ? "bg-yellow-600" : "bg-blue-600"}`}
             style={{
-              width: `${((minutes * 60 + seconds) / 600) * 100}%`,
+              width: `${((minutes * 60 + seconds) / 120) * 100}%`,
             }}
           />
         </div>
