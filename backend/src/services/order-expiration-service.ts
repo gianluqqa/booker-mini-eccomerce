@@ -118,11 +118,12 @@ export const deleteExpiredOrder = async (orderId: string): Promise<void> => {
   try {
     const orderRepository = queryRunner.manager.getRepository(Order);
     const orderItemRepository = queryRunner.manager.getRepository(OrderItem);
+    const stockReservationRepository = queryRunner.manager.getRepository(StockReservation);
 
     // Buscar la orden EXPIRED
     const order = await orderRepository.findOne({
       where: { id: orderId, status: OrderStatus.EXPIRED },
-      relations: ['items']
+      relations: ['items', 'user']
     });
 
     if (!order) {
@@ -131,6 +132,16 @@ export const deleteExpiredOrder = async (orderId: string): Promise<void> => {
     }
 
     console.log(`🗑️ Eliminando orden EXPIRED ${orderId} de la base de datos`);
+
+    // Eliminar reserva de stock si existe
+    const reservation = await stockReservationRepository.findOne({
+      where: { userId: order.user.id },
+    });
+
+    if (reservation) {
+      await stockReservationRepository.remove(reservation);
+      console.log('🗑️ Reserva de stock eliminada durante limpieza de orden EXPIRED');
+    }
 
     // Eliminar items de la orden
     await orderItemRepository.delete({ order: { id: orderId } });
@@ -143,7 +154,7 @@ export const deleteExpiredOrder = async (orderId: string): Promise<void> => {
     activeTimeouts.delete(`${orderId}_deletion`);
 
     await queryRunner.commitTransaction();
-    console.log(`✅ Orden ${orderId} eliminada completamente de la BD`);
+    console.log(`✅ Orden ${orderId} eliminada completamente de la BD con su reserva de stock`);
 
   } catch (error: any) {
     await queryRunner.rollbackTransaction();
