@@ -1,15 +1,22 @@
 "use client"
 
 import React from 'react'
-import { Package } from 'lucide-react'
+import { Package, Clock, ArrowRight } from 'lucide-react'
 import { IOrder } from '@/types/Order'
 import { formatDate } from '@/utils/helpers'
+import { useRouter } from 'next/navigation'
 
 interface PendingOrdersProps {
   orders: IOrder[]
 }
 
 const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
+  const router = useRouter()
+
+  const handleOrderClick = (orderId: string) => {
+    router.push(`/checkout?orderId=${orderId}`)
+  }
+
   if (!orders || orders.length === 0) {
     return (
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
@@ -32,7 +39,8 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
         {orders.map((order) => (
           <div
             key={order.id}
-            className="border-2 border-yellow-200 bg-yellow-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+            onClick={() => handleOrderClick(order.id)}
+            className="border-2 border-yellow-200 bg-yellow-50 rounded-lg p-4 hover:shadow-md hover:border-yellow-300 transition-all cursor-pointer group"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
               <div>
@@ -51,6 +59,10 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
                 {order.total && (
                   <span className="text-lg font-bold text-[#2e4b30]">${Number(order.total).toFixed(2)}</span>
                 )}
+                <div className="flex items-center gap-1 text-xs text-yellow-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span>Haz clic para continuar</span>
+                  <ArrowRight className="w-3 h-3" />
+                </div>
               </div>
             </div>
             <div className="border-t border-yellow-200 pt-3">
@@ -69,7 +81,7 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
                         <p className="font-semibold text-[#2e4b30]">${item.totalPrice.toFixed(2)}</p>
                       ) : (
                         <p className="font-semibold text-[#2e4b30]">
-                          ${(item.unitPrice * item.quantity).toFixed(2)}
+                          ${((item.unitPrice || item.price) * item.quantity).toFixed(2)}
                         </p>
                       )}
                     </div>
@@ -78,9 +90,13 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
               </div>
             </div>
             <div className="mt-3 pt-3 border-t border-yellow-200">
-              <p className="text-xs text-yellow-700 bg-yellow-100 rounded-lg p-2">
-                ⏳ Esta orden está esperando confirmación de pago. Una vez procesado el pago, aparecerá en tus pedidos
-                confirmados.
+              <p className="text-xs text-yellow-700 bg-yellow-100 rounded-lg p-2 flex items-center gap-2">
+                <Clock className="w-3 h-3" />
+                {order.expiresAt ? (
+                  <>Esta orden expira el {formatDate(order.expiresAt)}. Haz clic para completar el pago.</>
+                ) : (
+                  <>Esta orden está esperando confirmación de pago. Haz clic para continuar.</>
+                )}
               </p>
             </div>
           </div>

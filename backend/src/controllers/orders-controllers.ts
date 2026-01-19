@@ -86,7 +86,7 @@ export const getUserPendingOrdersController = async (req: Request, res: Response
 
     return res.json({
       success: true,
-      data: pendingOrder,
+      orders: pendingOrder ? [pendingOrder] : [],
     });
   } catch (error: any) {
     const status = error.status || 500;
