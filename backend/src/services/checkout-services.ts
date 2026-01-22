@@ -94,6 +94,7 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
   await queryRunner.startTransaction();
 
   try {
+    console.log('🔄 Backend - Cancelando checkout para usuario:', userId);
     const orderRepository = queryRunner.manager.getRepository(Order);
     const orderItemRepository = queryRunner.manager.getRepository(OrderItem);
     const bookRepository = queryRunner.manager.getRepository(Book);

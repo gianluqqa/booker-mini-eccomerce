@@ -8,11 +8,14 @@ import { ICartItem } from "@/types/Cart";
 import { getUserCart, removeFromCart, clearCart, updateCartItemQuantity } from "@/services/cartService";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { usePendingOrderCheck } from "@/hooks/usePendingOrderCheck";
+import PendingOrderAlert from "@/components/alerts/PendingOrderAlert";
 
 const Cart = () => {
   const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { refreshCart } = useCart();
+  const { pendingOrder, hasPendingOrder } = usePendingOrderCheck();
   const [cartItems, setCartItems] = useState<ICartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,6 +52,11 @@ const Cart = () => {
   }, [isAuthenticated, authLoading, fetchCart, router]);
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
+    if (hasPendingOrder) {
+      alert("No puedes modificar el carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
+      return;
+    }
+    
     if (newQuantity <= 0) {
       await removeItem(itemId);
       return;
@@ -79,6 +87,11 @@ const Cart = () => {
   };
 
   const removeItem = async (itemId: string) => {
+    if (hasPendingOrder) {
+      alert("No puedes eliminar productos del carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
+      return;
+    }
+    
     try {
       setIsRemoving((prev) => ({ ...prev, [itemId]: true }));
       await removeFromCart(itemId);
@@ -101,6 +114,11 @@ const Cart = () => {
   };
 
   const handleClearCart = async () => {
+    if (hasPendingOrder) {
+      alert("No puedes vaciar el carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
+      return;
+    }
+    
     if (window.confirm("¿Estás seguro de que quieres vaciar el carrito?")) {
       try {
         await clearCart();
@@ -112,22 +130,6 @@ const Cart = () => {
         const errorMessage = error instanceof Error ? error.message : "Error al vaciar el carrito";
         setError(errorMessage);
       }
-    }
-  };
-
-  const handleCancelReservation = async () => {
-    if (!cartItems.length) return;
-    if (!window.confirm("¿Deseas vaciar el carrito?")) {
-      return;
-    }
-
-    try {
-      await clearCart();
-      setCartItems([]);
-      await refreshCart();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "No se pudo vaciar el carrito";
-      setError(errorMessage);
     }
   };
 
@@ -148,6 +150,12 @@ const Cart = () => {
       alert("Tu carrito está vacío");
       return;
     }
+    
+    if (hasPendingOrder) {
+      alert("Ya tienes una orden pendiente. Debes completarla o cancelarla antes de crear una nueva.");
+      return;
+    }
+    
     router.push("/checkout");
   };
 
@@ -226,6 +234,16 @@ const Cart = () => {
           </span>
         </div>
 
+        {/* Alerta de orden pendiente */}
+        {hasPendingOrder && pendingOrder && (
+          <div className="mb-8">
+            <PendingOrderAlert
+              pendingOrder={pendingOrder}
+              onGoToCheckout={() => router.push('/checkout')}
+            />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3">
             <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 overflow-hidden">
@@ -253,16 +271,24 @@ const Cart = () => {
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={isUpdating[item.id]}
-                            className="bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30] p-1.5 rounded-lg transition-all duration-200 disabled:opacity-50"
+                            disabled={isUpdating[item.id] || hasPendingOrder}
+                            className={`p-1.5 rounded-lg transition-all duration-200 ${
+                              isUpdating[item.id] || hasPendingOrder
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
+                            }`}
                           >
                             {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
                           </button>
                           <span className="text-[#2e4b30] font-medium min-w-[2rem] text-center">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            disabled={isUpdating[item.id]}
-                            className="bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30] p-1.5 rounded-lg transition-all duration-200 disabled:opacity-50"
+                            disabled={isUpdating[item.id] || hasPendingOrder}
+                            className={`p-1.5 rounded-lg transition-all duration-200 ${
+                              isUpdating[item.id] || hasPendingOrder
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
+                                : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
+                            }`}
                           >
                             {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                           </button>
@@ -270,8 +296,12 @@ const Cart = () => {
 
                         <button
                           onClick={() => removeItem(item.id)}
-                          disabled={isRemoving[item.id]}
-                          className="text-red-500 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors duration-200"
+                          disabled={isRemoving[item.id] || hasPendingOrder}
+                          className={`p-2 rounded-full transition-colors duration-200 ${
+                            isRemoving[item.id] || hasPendingOrder
+                              ? 'text-gray-400 cursor-not-allowed bg-gray-100' 
+                              : 'text-red-500 hover:text-red-600 hover:bg-red-50'
+                          }`}
                         >
                           {isRemoving[item.id] ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
                         </button>
@@ -282,7 +312,15 @@ const Cart = () => {
               </div>
 
               <div className="p-6 bg-gray-50 border-t border-[#2e4b30]/10">
-                <button onClick={handleClearCart} className="text-red-500 hover:text-red-600 font-medium flex items-center">
+                <button 
+                  onClick={handleClearCart} 
+                  disabled={hasPendingOrder}
+                  className={`font-medium flex items-center ${
+                    hasPendingOrder 
+                      ? 'text-gray-400 cursor-not-allowed' 
+                      : 'text-red-500 hover:text-red-600'
+                  }`}
+                >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Vaciar carrito
                 </button>
@@ -313,9 +351,14 @@ const Cart = () => {
 
               <button
                 onClick={handleCheckout}
-                className="w-full bg-[#2e4b30] hover:bg-[#2e4b30]/90 text-[#f5efe1] py-3 px-6 rounded-lg font-medium transition-all duration-200 mb-4"
+                disabled={hasPendingOrder}
+                className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-200 mb-4 ${
+                  hasPendingOrder 
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                    : 'bg-[#2e4b30] hover:bg-[#2e4b30]/90 text-[#f5efe1]'
+                }`}
               >
-                Proceder al Pago
+                {hasPendingOrder ? 'Orden Pendiente en Proceso' : 'Proceder al Pago'}
               </button>
 
               <Link

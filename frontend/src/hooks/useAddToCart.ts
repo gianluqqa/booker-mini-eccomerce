@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { addToCart } from '@/services/cartService'
 import { IAddToCart, ICartItem } from '@/types/Cart'
 import { useCart } from '@/contexts/CartContext'
+import { useCartWithPendingOrderCheck } from './useCartWithPendingOrderCheck'
 
 
 interface UseAddToCartReturn {
@@ -22,8 +23,14 @@ export const useAddToCart = (): UseAddToCartReturn => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const { refreshCart } = useCart();
+  const { canAddToCart } = useCartWithPendingOrderCheck();
 
   const addBookToCart = async (data: IAddToCart): Promise<ICartItem | null> => {
+    // Verificar si hay orden pendiente antes de continuar
+    if (!canAddToCart()) {
+      return null;
+    }
+
     setLoading(true)
     setError(null)
 

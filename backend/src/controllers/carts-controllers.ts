@@ -75,12 +75,28 @@ export const getUserCartController = async (req: Request, res: Response) => {
       });
     }
 
+    const pendingOrder = (req as any).pendingOrder;
+    
     const cart = await getUserCartService(authUser.id);
 
-    return res.status(200).json({
+    const response: any = {
       success: true,
       data: cart,
-    });
+    };
+
+    // Si hay una orden pendiente, agregar la información a la respuesta
+    if (pendingOrder) {
+      response.pendingOrder = {
+        id: pendingOrder.id,
+        total: pendingOrder.total,
+        createdAt: pendingOrder.createdAt,
+        expiresAt: pendingOrder.expiresAt,
+        itemsCount: pendingOrder.items?.length || 0,
+        message: "Tienes una orden pendiente. Debes confirmarla o cancelarla para poder modificar el carrito."
+      };
+    }
+
+    return res.status(200).json(response);
   } catch (error: any) {
     const status = error.status || 500;
     const message = error.message || "Error interno del servidor";

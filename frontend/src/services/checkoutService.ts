@@ -47,10 +47,8 @@ export const createStockReservation = async (): Promise<IStockReservationRespons
  */
 export const startCheckout = async (): Promise<IOrder> => {
   try {
-    console.log('🚀 Iniciando checkout - Creando orden PENDING...')
     const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', {})
     const order = extractData<IOrder>(response)
-    console.log('✅ Orden PENDING creada:', order)
     return order
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al iniciar el checkout'
@@ -72,10 +70,8 @@ export const processPayment = async (paymentData: {
   cvc: string;
 }): Promise<IOrder> => {
   try {
-    console.log('💳 Procesando pago de orden PENDING...', paymentData)
     const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', paymentData)
     const order = extractData<IOrder>(response)
-    console.log('✅ Pago procesado, orden actualizada:', order)
     return order
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago'
@@ -91,7 +87,6 @@ export const processPayment = async (paymentData: {
  */
 export const checkPendingOrder = async (): Promise<IOrder | null> => {
   try {
-    console.log('🔍 Verificando orden PENDING existente...')
     
     // Usar un endpoint dedicado para solo verificar, no crear
     // Por ahora, modificamos la llamada para que no cree órdenes
@@ -99,11 +94,9 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
     
     if (response.data.success && response.data.data) {
       const order = response.data.data
-      console.log('✅ Orden PENDING encontrada:', order)
       return order
     }
     
-    console.log('📋 No hay orden PENDING existente')
     return null
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al verificar orden PENDING'
@@ -111,7 +104,6 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
     
     // Si el error es "El carrito está vacío", lo tratamos como un caso normal (no hay orden PENDING)
     if (errorMessage.includes('carrito está vacío') || errorMessage.includes('carrito vacio')) {
-      console.log('🛒 Carrito vacío - No hay orden PENDING posible')
       return null
     }
     
@@ -154,11 +146,8 @@ export const processCheckout = async (paymentData: {
   cvc: string;
 }): Promise<IOrder> => {
   try {
-    console.log('⚠️ Usando función legada processCheckout - Considerar usar startCheckout() + processPayment()')
-    console.log('Enviando datos de pago al backend:', paymentData)
     const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', paymentData)
     const order = extractData<IOrder>(response)
-    console.log('Respuesta del backend:', order)
     return order
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al procesar el checkout'

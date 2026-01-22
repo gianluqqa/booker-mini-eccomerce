@@ -2,16 +2,38 @@
 
 import { apiClient, extractData } from '@/config/api'
 import { ICartResponse, IAddToCart, ICartItem } from '@/types/Cart'
+import { IPendingOrder } from '@/types/PendingOrder'
+
+interface CartResponse extends ICartResponse {
+  pendingOrder?: IPendingOrder;
+}
+
+interface ApiResponse {
+  success: boolean;
+  data: ICartResponse;
+  pendingOrder?: IPendingOrder;
+}
 
 /**
  * Obtiene el carrito del usuario actual
  * @returns Datos del carrito del usuario
  * @throws Error si no se puede obtener el carrito
  */
-export const getUserCart = async (): Promise<ICartResponse> => {
+export const getUserCart = async (): Promise<CartResponse> => {
   try {
-    const response = await apiClient.get<{ success: boolean; data: ICartResponse }>('/carts')
-    return extractData<ICartResponse>(response)
+    const response = await apiClient.get<ApiResponse>('/carts')
+    
+    const responseData = response.data;
+    
+    // Extraer el carrito y mantener pendingOrder si existe
+    const cartData = responseData.success ? responseData.data : (responseData as unknown as ICartResponse);
+    
+    return {
+      items: cartData.items,
+      totalItems: cartData.totalItems,
+      totalPrice: cartData.totalPrice,
+      pendingOrder: responseData.pendingOrder
+    };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
     throw new Error(errorMessage)

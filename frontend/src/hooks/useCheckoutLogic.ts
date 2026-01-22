@@ -38,7 +38,6 @@ export const useCheckoutLogic = () => {
       try {
         // Si se proporciona un orderId, cargar esa orden específica
         if (orderId) {
-          console.log("🎯 Cargando orden específica:", orderId);
           const specificOrder = await getOrderById(orderId);
 
           if (specificOrder.status !== "PENDING") {
@@ -53,7 +52,6 @@ export const useCheckoutLogic = () => {
             const now = new Date().getTime();
 
             if (expiryTime <= now) {
-              console.log("⏰ La orden específica ha expirado");
               setOrderExpired(true);
               setError("Esta orden ha expirado. Por favor, inicia un nuevo checkout.");
               return;
@@ -76,7 +74,6 @@ export const useCheckoutLogic = () => {
               updatedAt: new Date(),
             }))
           );
-          console.log("✅ Orden específica cargada:", specificOrder);
           return;
         }
 
@@ -90,11 +87,9 @@ export const useCheckoutLogic = () => {
         }
 
         // Verificar si ya existe una orden PENDING
-        console.log("🔍 Verificando si existe orden PENDING...");
         const existingOrder = await checkPendingOrder();
 
         if (existingOrder) {
-          console.log("✅ Orden PENDING existente encontrada:", existingOrder);
           setOrder(existingOrder);
 
           // Verificar si la orden ha expirado
@@ -103,7 +98,6 @@ export const useCheckoutLogic = () => {
             const now = new Date().getTime();
 
             if (expiryTime <= now) {
-              console.log("⏰ La orden PENDING ha expirado");
               setOrderExpired(true);
               setError("Tu orden ha expirado. Por favor, inicia un nuevo checkout.");
             }
@@ -111,19 +105,15 @@ export const useCheckoutLogic = () => {
         } else {
           // Verificar si hay items en el carrito antes de crear nueva orden
           if (cartData.items.length === 0) {
-            console.log("🛒 Carrito vacío - No se puede crear nueva orden");
             router.push("/cart");
             return;
           }
 
           // Crear nueva orden PENDING solo si no hay error de expiración
           if (!orderExpired) {
-            console.log("🆕 Creando nueva orden PENDING...");
             const newOrder = await startCheckout();
             setOrder(newOrder);
-            console.log("✅ Orden PENDING creada:", newOrder);
           } else {
-            console.log("⏰ Orden expirada - Esperando acción del usuario para crear nueva orden");
           }
         }
       } catch (error: unknown) {
@@ -162,13 +152,11 @@ export const useCheckoutLogic = () => {
 
     try {
       const cleanData = cleanPaymentData(cardData);
-      console.log("💳 Procesando pago de orden PENDING...");
       const paidOrder = await processPayment(cleanData);
       setOrder(paidOrder);
       setLoading(false);
       setProcessing(false);
       clearReservation();
-      console.log("✅ Pago procesado exitosamente:", paidOrder);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al procesar el pago";
       setError(errorMessage);
@@ -186,6 +174,7 @@ export const useCheckoutLogic = () => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al cancelar el checkout";
       setError(errorMessage);
+      console.error('❌ Frontend - Error en handleCancelCheckout:', error);
     }
   };
 
@@ -209,7 +198,6 @@ export const useCheckoutLogic = () => {
       setOrder(newOrder);
 
       setLoading(false);
-      console.log("✅ Nuevo checkout iniciado:", newOrder);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al reiniciar el checkout";
       setError(errorMessage);

@@ -39,7 +39,6 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
         setShow(false);
       }
     } catch {
-      console.log('🔍 No hay orden PENDING activa o usuario no autenticado');
       setPendingOrder(null);
       setShow(false);
     } finally {
@@ -62,7 +61,6 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
   // Usar el hook de temporizador si hay orden pendiente
   const handleExpired = useCallback(() => {
     // Cuando expira, ocultar el componente y limpiar estado
-    console.log('⏰ Orden expirada - Ocultando timer global');
     setShow(false);
     setPendingOrder(null);
     // NOTA: Eliminada la verificación automática para evitar crear nuevas órdenes
@@ -85,7 +83,6 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
     setCancelling(true);
     try {
       await cancelCheckout();
-      console.log('✅ Orden cancelada desde timer global');
       setPendingOrder(null);
       setShow(false);
     } catch (error) {

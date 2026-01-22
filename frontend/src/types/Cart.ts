@@ -32,5 +32,14 @@ export interface ICartResponse {
   items: ICartItem[];
   totalItems: number;
   totalPrice: number;
+  pendingOrder?: {
+    id: string;
+    total: number;
+    createdAt: string | Date;
+    expiresAt?: string | Date;
+    itemsCount: number;
+    message: string;
+    actionRequired: string;
+  };
 }
 
