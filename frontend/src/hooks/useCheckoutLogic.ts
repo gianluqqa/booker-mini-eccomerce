@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useReservation } from "@/contexts/ReservationContext";
 import { startCheckout, processPayment, checkPendingOrder, cancelCheckout, getUserCart } from "@/services/checkoutService";
@@ -28,14 +28,25 @@ export const useCheckoutLogic = () => {
     cvc: "",
   });
 
+  // 🔒 useRef para bloqueo real (persiste entre re-renders)
+  const isInitializingRef = useRef<boolean>(false);
+
   // Efecto de inicialización
   useEffect(() => {
     const initializeCheckout = async () => {
+      // 🔒 Evitar múltiples inicializaciones simultáneas con useRef
+      if (isInitializingRef.current) {
+        console.log('🔒 [FRONTEND] initializeCheckout - Ya se está inicializando, evitando duplicación');
+        return;
+      }
+
+      isInitializingRef.current = true;
       setLoading(true);
       setError(null);
       setOrderExpired(false);
 
       try {
+        console.log('🚀 [FRONTEND] initializeCheckout - Iniciando inicialización');
         // Si se proporciona un orderId, cargar esa orden específica
         if (orderId) {
           const specificOrder = await getOrderById(orderId);
@@ -90,6 +101,7 @@ export const useCheckoutLogic = () => {
         const existingOrder = await checkPendingOrder();
 
         if (existingOrder) {
+          console.log('🔍 [FRONTEND] initializeCheckout - Orden PENDING existente encontrada:', existingOrder.id);
           setOrder(existingOrder);
 
           // Verificar si la orden ha expirado
@@ -98,8 +110,11 @@ export const useCheckoutLogic = () => {
             const now = new Date().getTime();
 
             if (expiryTime <= now) {
+              console.log('⏰ [FRONTEND] initializeCheckout - Orden PENDING ha expirado');
               setOrderExpired(true);
               setError("Tu orden ha expirado. Por favor, inicia un nuevo checkout.");
+            } else {
+              console.log('✅ [FRONTEND] initializeCheckout - Orden PENDING válida encontrada');
             }
           }
         } else {
@@ -111,17 +126,42 @@ export const useCheckoutLogic = () => {
 
           // Crear nueva orden PENDING solo si no hay error de expiración
           if (!orderExpired) {
-            const newOrder = await startCheckout();
-            setOrder(newOrder);
+            console.log('🆕 [FRONTEND] initializeCheckout - Creando nueva orden PENDING');
+            try {
+              const newOrder = await startCheckout();
+              setOrder(newOrder);
+              console.log('✅ [FRONTEND] initializeCheckout - Nueva orden creada:', newOrder.id);
+            } catch (orderError: unknown) {
+              // Si el error es por orden pendiente existente, es normal en Strict Mode
+              const errorMessage = orderError instanceof Error ? orderError.message : '';
+              if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
+                console.log('🔄 [FRONTEND] initializeCheckout - Orden pendiente detectada, verificando si es la misma...');
+                
+                // Verificar si ya existe una orden (puede ser la que acabamos de crear)
+                const existingOrder = await checkPendingOrder();
+                if (existingOrder) {
+                  console.log('✅ [FRONTEND] initializeCheckout - Usando orden existente:', existingOrder.id);
+                  setOrder(existingOrder);
+                } else {
+                  console.log('⚠️ [FRONTEND] initializeCheckout - No se encontró orden existente después del error');
+                }
+              } else {
+                // Para otros errores, lanzar la excepción
+                throw orderError;
+              }
+            }
           } else {
+            console.log('⚠️ [FRONTEND] initializeCheckout - Orden expirada, no se crea nueva');
           }
         }
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Error al inicializar el checkout";
         setError(errorMessage);
-        console.error("❌ Error en initializeCheckout:", error);
+        console.error("❌ [FRONTEND] Error en initializeCheckout:", error);
       } finally {
         setLoading(false);
+        isInitializingRef.current = false;
+        console.log('✅ [FRONTEND] initializeCheckout - Inicialización completada');
       }
     };
 
@@ -151,30 +191,34 @@ export const useCheckoutLogic = () => {
     setError(null);
 
     try {
+      console.log('💳 [FRONTEND] handleCheckout - Iniciando procesamiento de pago');
       const cleanData = cleanPaymentData(cardData);
       const paidOrder = await processPayment(cleanData);
       setOrder(paidOrder);
       setLoading(false);
       setProcessing(false);
       clearReservation();
+      console.log('✅ [FRONTEND] handleCheckout - Pago procesado exitosamente');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al procesar el pago";
       setError(errorMessage);
       setProcessing(false);
-      console.error("❌ Error en handleCheckout:", error);
+      console.error("❌ [FRONTEND] Error en handleCheckout:", error);
     }
   };
 
   const handleCancelCheckout = async () => {
     try {
+      console.log('🔄 [FRONTEND] handleCancelCheckout - Cancelando checkout');
       await cancelCheckout();
       clearReservation();
       setOrder(null);
       router.push("/cart");
+      console.log('✅ [FRONTEND] handleCancelCheckout - Checkout cancelado exitosamente');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al cancelar el checkout";
       setError(errorMessage);
-      console.error('❌ Frontend - Error en handleCancelCheckout:', error);
+      console.error('❌ [FRONTEND] Error en handleCancelCheckout:', error);
     }
   };
 
@@ -184,7 +228,15 @@ export const useCheckoutLogic = () => {
   };
 
   const handleRestartCheckout = async () => {
+    // 🔒 Evitar múltiples reinicios simultáneos
+    if (isInitializingRef.current) {
+      console.log('🔒 [FRONTEND] handleRestartCheckout - Ya se está inicializando, evitando duplicación');
+      return;
+    }
+
     try {
+      console.log('🔄 [FRONTEND] handleRestartCheckout - Reiniciando checkout');
+      isInitializingRef.current = true;
       setLoading(true);
       setError(null);
       setOrderExpired(false);
@@ -194,14 +246,38 @@ export const useCheckoutLogic = () => {
       setOrder(null);
 
       // Crear nueva orden PENDING
-      const newOrder = await startCheckout();
-      setOrder(newOrder);
+      try {
+        const newOrder = await startCheckout();
+        setOrder(newOrder);
+        console.log('✅ [FRONTEND] handleRestartCheckout - Nueva orden creada:', newOrder.id);
+      } catch (orderError: unknown) {
+        // Si el error es por orden pendiente existente, verificar y usar la existente
+        const errorMessage = orderError instanceof Error ? orderError.message : '';
+        if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
+          console.log('🔄 [FRONTEND] handleRestartCheckout - Orden pendiente detectada, verificando...');
+          
+          const existingOrder = await checkPendingOrder();
+          if (existingOrder) {
+            console.log('✅ [FRONTEND] handleRestartCheckout - Usando orden existente:', existingOrder.id);
+            setOrder(existingOrder);
+          } else {
+            console.log('⚠️ [FRONTEND] handleRestartCheckout - No se encontró orden existente');
+            throw orderError;
+          }
+        } else {
+          throw orderError;
+        }
+      }
 
       setLoading(false);
+      console.log('✅ [FRONTEND] handleRestartCheckout - Checkout reiniciado exitosamente');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al reiniciar el checkout";
       setError(errorMessage);
       setLoading(false);
+      console.error("❌ [FRONTEND] Error en handleRestartCheckout:", error);
+    } finally {
+      isInitializingRef.current = false;
     }
   };
 

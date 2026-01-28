@@ -17,8 +17,26 @@ export const createStockReservationForCheckoutService = async (userId: string): 
   const cartRepository = AppDataSource.getRepository(Cart);
   const bookRepository = AppDataSource.getRepository(Book);
   const userRepository = AppDataSource.getRepository(User);
+  const orderRepository = AppDataSource.getRepository(Order);
 
   try {
+    console.log('🚨 [DEBUG] createStockReservationForCheckoutService - Inicio para usuario:', userId);
+    
+    // 🔍 VERIFICAR SI YA EXISTE ORDEN PENDING
+    const existingPendingOrder = await orderRepository.findOne({
+      where: {
+        user: { id: userId },
+        status: OrderStatus.PENDING
+      }
+    });
+    
+    if (existingPendingOrder) {
+      console.log('🚨 [ERROR] Ya existe orden PENDIENTE ID:', existingPendingOrder.id, 'NO se debe crear reserva');
+      throw { 
+        status: 409, 
+        message: "Ya tienes una orden pendiente. No se puede crear otra reserva." 
+      };
+    }
     const cartItems = await cartRepository.find({
       where: { user: { id: userId } },
       relations: ["book"],
@@ -204,7 +222,8 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     const userRepository = queryRunner.manager.getRepository(User);
     const stockReservationRepository = queryRunner.manager.getRepository(StockReservation);
 
-    console.log('🔄 Procesando checkout - paymentData:', paymentData ? 'CON DATOS DE PAGO' : 'SIN DATOS DE PAGO');
+    console.log('� [DEBUG] processCheckoutService - Inicio para usuario:', userId);
+    console.log('🚨 [DEBUG] paymentData:', paymentData ? 'CON DATOS DE PAGO' : 'SIN DATOS DE PAGO');
 
     // Verificar usuario
     const user = await userRepository.findOne({ where: { id: userId } });
@@ -221,36 +240,22 @@ export const processCheckoutService = async (userId: string, paymentData?: {
       relations: ["items", "items.book"],
     });
 
+    console.log('🚨 [DEBUG] Búsqueda de orden PENDING existente:', existingPendingOrder ? {
+      id: existingPendingOrder.id,
+      status: existingPendingOrder.status,
+      total: existingPendingOrder.total
+    } : 'Ninguna encontrada');
+
     // CASO 1: YA EXISTE ORDEN PENDING - Procesar pago
     if (existingPendingOrder) {
-      console.log('⚠️ Ya existe orden PENDING ID:', existingPendingOrder.id);
+      console.log('⚠️ [DEBUG] Ya existe orden PENDING ID:', existingPendingOrder.id);
 
-      // Si no hay datos de pago, devolver la orden existente
+      // Si no hay datos de pago completos, ERROR - no se debe crear otra orden
       if (!paymentData || !paymentData.cardNumber || !paymentData.cardName || !paymentData.expiryDate || !paymentData.cvc) {
-        console.log('📋 Sin datos de pago - Devolviendo orden PENDING existente');
-        return {
-          id: existingPendingOrder.id,
-          total: existingPendingOrder.total,
-          status: existingPendingOrder.status,
-          createdAt: existingPendingOrder.createdAt,
-          expiresAt: existingPendingOrder.expiresAt,
-          items: existingPendingOrder.items.map((item) => {
-            const unitPrice = Number(item.book.price);
-            const totalPrice = Number(item.price);
-            return {
-              id: item.id,
-              book: {
-                id: item.book.id,
-                title: item.book.title,
-                author: item.book.author,
-                price: unitPrice,
-              },
-              quantity: item.quantity,
-              price: unitPrice,
-              unitPrice: unitPrice,
-              totalPrice: totalPrice,
-            };
-          }),
+        console.log('� [ERROR] Ya existe orden PENDING y no hay datos de pago - NO SE DEBE CREAR OTRA ORDEN');
+        throw { 
+          status: 409, 
+          message: "Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar." 
         };
       }
 
@@ -321,7 +326,7 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     }
 
     // CASO 2: NO EXISTE ORDEN PENDING - Crear nueva orden PENDING
-    console.log('🆕 No existe orden PENDING - Creando nueva orden...');
+    console.log('🆕 [DEBUG] No existe orden PENDING - Creando nueva orden...');
 
     // Obtener items del carrito
     const cartItems = await cartRepository.find({
@@ -437,7 +442,7 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     });
 
     const savedOrder = await orderRepository.save(order);
-    console.log(' Orden creada - ID:', savedOrder.id, 'Estado:', orderStatus);
+    console.log('🚨 [DEBUG] Orden creada - ID:', savedOrder.id, 'Estado:', orderStatus);
 
     // Asignar orden a los items y guardar
     for (const orderItem of orderItems) {

@@ -11,7 +11,10 @@ router.post("/reserve", authenticateJWT, validateNoPendingOrder, createStockRese
 //? Cancelar checkout y liberar reserva de stock (DELETE).
 router.delete("/cancel", authenticateJWT, cancelCheckoutController);
 
-//? Procesar checkout y crear orden (POST).
-router.post("/", authenticateJWT, processCheckoutController);
+//? Crear nueva orden PENDING (POST) - Solo si no existe orden PENDING
+router.post("/", authenticateJWT, validateNoPendingOrder, processCheckoutController);
+
+//? Procesar pago de orden PENDING existente (POST) - Permite si ya existe orden PENDING
+router.post("/pay", authenticateJWT, processCheckoutController);
 
 export default router;

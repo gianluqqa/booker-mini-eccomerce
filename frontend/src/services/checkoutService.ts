@@ -21,38 +21,58 @@ export const getUserCart = async (): Promise<ICartResponse> => {
 }
 
 /**
- * Crea reserva de stock para el checkout (10 minutos)
+ * Crea reserva de stock para el checkout (2 minutos)
  * @returns Datos de la reserva creada
  * @throws Error si no se puede crear la reserva
  */
 export const createStockReservation = async (): Promise<IStockReservationResponse> => {
   try {
+    console.log('🚨 [FRONTEND] createStockReservation - Creando reserva');
     const response = await apiClient.post<{ 
       success: boolean; 
       message: string; 
       data: IStockReservationResponse 
     }>('/checkout/reserve');
     
-    return extractData<IStockReservationResponse>(response);
+    const reservation = extractData<IStockReservationResponse>(response);
+    console.log('✅ [FRONTEND] createStockReservation - Reserva creada:', reservation.reservationId);
+    return reservation;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al crear la reserva de stock';
+    console.error('❌ [FRONTEND] Error en createStockReservation:', error);
+    
+    // Si el error es por orden pendiente existente
+    if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
+      console.log('🚨 [FRONTEND] Error de orden pendiente detectado en createStockReservation');
+      throw new Error('Ya tienes una orden pendiente. No se puede crear otra reserva.');
+    }
+    
     throw new Error(errorMessage);
   }
 }
 
 /**
  * Inicia el checkout - Crea orden PENDING inmediatamente
- * @returns Orden PENDING con expiración de 10 minutos
+ * @returns Orden PENDING con expiración de 2 minutos
  * @throws Error si no se puede iniciar el checkout
  */
 export const startCheckout = async (): Promise<IOrder> => {
   try {
+    console.log('🚨 [FRONTEND] startCheckout - Iniciando checkout');
     const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', {})
     const order = extractData<IOrder>(response)
+    console.log('✅ [FRONTEND] startCheckout - Orden creada:', order.id);
     return order
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al iniciar el checkout'
-    console.error('❌ Error en startCheckout:', error)
+    console.error('❌ [FRONTEND] Error en startCheckout:', error)
+    
+    // Si el error es por orden pendiente existente, extraer información
+    if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
+      console.log('🚨 [FRONTEND] Error de orden pendiente detectado');
+      throw new Error('Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar.');
+    }
+    
     throw new Error(errorMessage)
   }
 }
@@ -70,12 +90,21 @@ export const processPayment = async (paymentData: {
   cvc: string;
 }): Promise<IOrder> => {
   try {
-    const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', paymentData)
+    console.log('💳 [FRONTEND] processPayment - Procesando pago');
+    const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout/pay', paymentData)
     const order = extractData<IOrder>(response)
+    console.log('✅ [FRONTEND] processPayment - Pago procesado, orden:', order.id, 'estado:', order.status);
     return order
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al procesar el pago'
-    console.error('❌ Error en processPayment:', error)
+    console.error('❌ [FRONTEND] Error en processPayment:', error)
+    
+    // Si el error es por orden pendiente existente
+    if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
+      console.log('🚨 [FRONTEND] Error de orden pendiente detectado en processPayment');
+      throw new Error('Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar.');
+    }
+    
     throw new Error(errorMessage)
   }
 }
@@ -87,6 +116,7 @@ export const processPayment = async (paymentData: {
  */
 export const checkPendingOrder = async (): Promise<IOrder | null> => {
   try {
+    console.log('🔍 [FRONTEND] checkPendingOrder - Verificando orden PENDING');
     
     // Usar un endpoint dedicado para solo verificar, no crear
     // Por ahora, modificamos la llamada para que no cree órdenes
@@ -94,16 +124,19 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
     
     if (response.data.success && response.data.data) {
       const order = response.data.data
+      console.log('✅ [FRONTEND] checkPendingOrder - Orden PENDING encontrada:', order.id);
       return order
     }
     
+    console.log('🔍 [FRONTEND] checkPendingOrder - No hay orden PENDING');
     return null
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al verificar orden PENDING'
-    console.error('❌ Error en checkPendingOrder:', error)
+    console.error('❌ [FRONTEND] Error en checkPendingOrder:', error)
     
     // Si el error es "El carrito está vacío", lo tratamos como un caso normal (no hay orden PENDING)
     if (errorMessage.includes('carrito está vacío') || errorMessage.includes('carrito vacio')) {
+      console.log('🔍 [FRONTEND] checkPendingOrder - Carrito vacío, sin orden PENDING');
       return null
     }
     
@@ -119,15 +152,19 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
  */
 export const cancelCheckout = async (): Promise<{ message: string; reservationId: string }> => {
   try {
+    console.log('🔄 [FRONTEND] cancelCheckout - Cancelando checkout');
     const response = await apiClient.delete<{ 
       success: boolean; 
       message: string; 
       data: { message: string; reservationId: string }
     }>('/checkout/cancel');
     
-    return extractData<{ message: string; reservationId: string }>(response);
+    const result = extractData<{ message: string; reservationId: string }>(response);
+    console.log('✅ [FRONTEND] cancelCheckout - Checkout cancelado:', result.message);
+    return result;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cancelar el checkout';
+    console.error('❌ [FRONTEND] Error en cancelCheckout:', error);
     throw new Error(errorMessage);
   }
 }
@@ -146,12 +183,13 @@ export const processCheckout = async (paymentData: {
   cvc: string;
 }): Promise<IOrder> => {
   try {
+    console.log('🔄 [FRONTEND] processCheckout (deprecated) - Procesando checkout legado');
     const response = await apiClient.post<{ success: boolean; message: string; data: IOrder }>('/checkout', paymentData)
     const order = extractData<IOrder>(response)
     return order
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al procesar el checkout'
-    console.error('Error en processCheckout:', error)
+    console.error('❌ [FRONTEND] Error en processCheckout (deprecated):', error)
     throw new Error(errorMessage)
   }
 }
