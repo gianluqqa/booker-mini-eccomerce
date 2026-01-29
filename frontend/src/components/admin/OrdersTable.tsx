@@ -255,7 +255,7 @@ const OrdersTable: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    {(order.status?.toLowerCase() === 'paid') ? (
+                    {(order.status?.toLowerCase() === 'paid' || order.status?.toLowerCase() === 'pending') ? (
                       <button
                         onClick={() => order.id && handleCancelOrder(order.id)}
                         disabled={cancellingOrderId === order.id}
@@ -301,7 +301,7 @@ const OrdersTable: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-green-900">Pagadas</p>
               <p className="text-2xl font-bold text-green-600">
-                {orders.filter(o => o.status.toLowerCase() === 'paid').length}
+                {orders.filter(o => o.status?.toLowerCase() === 'paid').length}
               </p>
             </div>
           </div>
@@ -312,7 +312,7 @@ const OrdersTable: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-yellow-900">Pendientes</p>
               <p className="text-2xl font-bold text-yellow-600">
-                {orders.filter(o => o.status.toLowerCase() === 'pending').length}
+                {orders.filter(o => o.status?.toLowerCase() === 'pending').length}
               </p>
             </div>
           </div>
@@ -323,7 +323,7 @@ const OrdersTable: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-red-900">Canceladas</p>
               <p className="text-2xl font-bold text-red-600">
-                {orders.filter(o => o.status.toLowerCase() === 'cancelled').length}
+                {orders.filter(o => o.status?.toLowerCase() === 'cancelled').length}
               </p>
             </div>
           </div>

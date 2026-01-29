@@ -1,5 +1,6 @@
 import { AppDataSource } from "../config/data-source";
 import { Order } from "../entities/Order";
+import { Book } from "../entities/Book";
 import { OrderStatus } from "../enums/OrderStatus";
 import { OrderResponseDto } from "../dto/OrderDto";
 
@@ -214,9 +215,23 @@ export const cancelPaidOrderService = async (orderId: string): Promise<OrderResp
       throw { status: 404, message: "Orden no encontrada" };
     }
 
-    // Verificar que la orden esté en estado PAID
-    if (order.status !== OrderStatus.PAID) {
-      throw { status: 400, message: "Solo se pueden cancelar órdenes en estado PAID" };
+    // Verificar que la orden esté en estado PAID o PENDING
+    if (order.status !== OrderStatus.PAID && order.status !== OrderStatus.PENDING) {
+      throw { status: 400, message: "Solo se pueden cancelar órdenes en estado PAID o PENDING" };
+    }
+
+    // Si es una orden PENDING, devolver el stock
+    if (order.status === OrderStatus.PENDING) {
+      const bookRepository = AppDataSource.getRepository(Book);
+      
+      for (const item of order.items) {
+        const book = await bookRepository.findOne({ where: { id: item.book.id } });
+        if (book) {
+          book.stock += item.quantity;
+          await bookRepository.save(book);
+          console.log(`📈 [BACKEND] Stock devuelto: ${book.title} +${item.quantity} unidades`);
+        }
+      }
     }
 
     // Cambiar el estado a CANCELLED

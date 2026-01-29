@@ -139,7 +139,7 @@ export const cancelPaidOrder = async (orderId: string): Promise<IOrder> => {
     }
 
     if (errorMessage.includes("400") && errorMessage.includes("PAID")) {
-      throw new Error("Solo se pueden cancelar órdenes en estado PAID");
+      throw new Error("Solo se pueden cancelar órdenes en estado PAID o PENDING");
     }
 
     if (errorMessage.includes("404")) {
