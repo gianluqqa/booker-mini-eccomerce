@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { getOrderByIdService, getUserOrdersService, getUserPendingOrdersService } from "../services/orders-services";
+﻿import { Request, Response } from "express";
+import { getOrderByIdService, getUserOrdersService, getUserPendingOrdersService, getAllOrdersService, cancelPaidOrderService } from "../services/orders-services";
 
 //? Obtener una orden por ID (GET).
 export const getOrderByIdController = async (req: Request, res: Response) => {
@@ -102,6 +102,56 @@ export const getUserPendingOrdersController = async (req: Request, res: Response
     const message = error.message || "Error interno del servidor";
 
     console.error('❌ [BACKEND] Error en getUserPendingOrdersController:', error);
+
+    return res.status(status).json({
+      success: false,
+      message,
+    });
+  }
+};
+
+//? Obtener todas las órdenes de todos los usuarios (solo administradores).
+export const getAllOrdersController = async (req: Request, res: Response) => {
+  try {
+    const orders = await getAllOrdersService();
+
+    return res.json({
+      success: true,
+      data: orders,
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Error interno del servidor";
+
+    return res.status(status).json({
+      success: false,
+      message,
+    });
+  }
+};
+
+//? Cancelar una orden pagada (solo para administradores).
+export const cancelPaidOrderController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "ID de orden es requerido",
+      });
+    }
+
+    const order = await cancelPaidOrderService(id);
+
+    return res.json({
+      success: true,
+      message: "Orden cancelada exitosamente",
+      order,
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Error interno del servidor";
 
     return res.status(status).json({
       success: false,

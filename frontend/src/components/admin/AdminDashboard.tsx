@@ -9,6 +9,7 @@ import { getRoleDisplay } from '@/utils/helpers'
 import UsersTable from './UserTable'
 import CreateBook from './CreateBook'
 import BookList from './BookList'
+import OrdersTable from './OrdersTable'
 
 const AdminDashboard: React.FC = () => {
   const { user, isAuthenticated, loading } = useAuth()
@@ -194,6 +195,25 @@ const AdminDashboard: React.FC = () => {
 
           <CreateBook />
           <BookList />
+        </div>
+
+        {/* Gestión de órdenes */}
+        <div className="bg-[#fcfaf5] rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200/50 space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center flex-shrink-0">
+              <BarChart3 className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-[#2e4b30]">
+                Gestión de Órdenes
+              </h2>
+              <p className="text-xs text-gray-600">
+                Visualiza y monitorea todas las órdenes del sistema con detalles de clientes y estados.
+              </p>
+            </div>
+          </div>
+
+          <OrdersTable />
         </div>
       </div>
     </div>

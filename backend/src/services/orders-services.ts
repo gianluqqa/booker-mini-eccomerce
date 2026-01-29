@@ -151,3 +151,117 @@ export const getUserPendingOrdersService = async (
   }
 };
 
+//? Obtener todas las órdenes de todos los usuarios (solo administradores).
+export const getAllOrdersService = async (): Promise<OrderResponseDto[]> => {
+  try {
+    const orderRepository = AppDataSource.getRepository(Order);
+
+    // Obtener todas las órdenes de todos los usuarios
+    const orders = await orderRepository.find({
+      relations: ["user", "items", "items.book"],
+      order: { createdAt: "DESC" },
+    });
+
+    return orders.map((order) => ({
+      id: order.id,
+      total: order.total,
+      status: order.status,
+      createdAt: order.createdAt,
+      expiresAt: order.expiresAt,
+      user: {
+        id: order.user.id,
+        email: order.user.email,
+        name: order.user.name,
+        surname: order.user.surname,
+      },
+      items: order.items.map((item) => {
+        const unitPrice = Number(item.book.price); // precio unitario del libro
+        const totalPrice = Number(item.price); // precio total guardado
+        return {
+          id: item.id,
+          book: {
+            id: item.book.id,
+            title: item.book.title,
+            author: item.book.author,
+            price: unitPrice,
+          },
+          quantity: item.quantity,
+          price: unitPrice,
+          unitPrice: unitPrice,
+          totalPrice: totalPrice,
+        };
+      }),
+    }));
+  } catch (error: any) {
+    console.error("Error al obtener todas las órdenes:", error);
+    if (error.status && error.message) throw error;
+    throw { status: 500, message: "Error al obtener todas las órdenes" };
+  }
+};
+
+//? Cancelar una orden pagada (solo para administradores).
+export const cancelPaidOrderService = async (orderId: string): Promise<OrderResponseDto> => {
+  try {
+    const orderRepository = AppDataSource.getRepository(Order);
+    
+    // Buscar la orden con todas sus relaciones
+    const order = await orderRepository.findOne({
+      where: { id: orderId },
+      relations: ["user", "items", "items.book"],
+    });
+
+    if (!order) {
+      throw { status: 404, message: "Orden no encontrada" };
+    }
+
+    // Verificar que la orden esté en estado PAID
+    if (order.status !== OrderStatus.PAID) {
+      throw { status: 400, message: "Solo se pueden cancelar órdenes en estado PAID" };
+    }
+
+    // Cambiar el estado a CANCELLED
+    order.status = OrderStatus.CANCELLED;
+    
+    // Guardar los cambios
+    await orderRepository.save(order);
+
+    console.log(`🚫 [BACKEND] Orden ${orderId} cancelada por administrador. Estado: ${order.status}`);
+
+    // Devolver la orden actualizada
+    return {
+      id: order.id,
+      total: order.total,
+      status: order.status,
+      createdAt: order.createdAt,
+      expiresAt: order.expiresAt,
+      user: {
+        id: order.user.id,
+        email: order.user.email,
+        name: order.user.name,
+        surname: order.user.surname,
+      },
+      items: order.items.map((item) => {
+        const unitPrice = Number(item.book.price);
+        const totalPrice = Number(item.price);
+        return {
+          id: item.id,
+          book: {
+            id: item.book.id,
+            title: item.book.title,
+            author: item.book.author,
+            price: unitPrice,
+          },
+          quantity: item.quantity,
+          price: unitPrice,
+          unitPrice: unitPrice,
+          totalPrice: totalPrice,
+        };
+      }),
+    };
+  } catch (error: any) {
+    console.error("Error al cancelar la orden:", error);
+    if (error.status && error.message) throw error;
+    throw { status: 500, message: "Error al cancelar la orden" };
+  }
+};
+

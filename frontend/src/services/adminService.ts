@@ -4,6 +4,7 @@
 import { apiClient, extractData } from "@/config/api";
 import { IUser } from "@/types/User";
 import { IBook, ICreateBook, IUpdateBook } from "@/types/Book";
+import { IOrder } from "@/types/Order";
 
 /**
  * Obtiene todos los usuarios (solo para administradores)
@@ -80,6 +81,71 @@ export const deleteBookAdmin = async (id: string): Promise<void> => {
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudo eliminar el libro";
+    throw new Error(errorMessage);
+  }
+};
+
+/**
+ * Obtiene todas las órdenes de todos los usuarios (solo para administradores)
+ * Endpoint: GET /orders/admin/all
+ * Requiere: Autenticación JWT + rol admin
+ * @returns Lista de todas las órdenes con información de usuarios
+ * @throws Error si no se pueden obtener las órdenes o si no es admin
+ */
+export const getAllOrders = async (): Promise<IOrder[]> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: IOrder[] }>(
+      "/orders/admin/all"
+    );
+    return extractData<IOrder[]>(response);
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Error al cargar las órdenes";
+
+    if (
+      errorMessage.includes("403") ||
+      errorMessage.includes("administrador")
+    ) {
+      throw new Error("No tienes permisos para ver todas las órdenes");
+    }
+
+    throw new Error(errorMessage);
+  }
+};
+
+/**
+ * Cancela una orden pagada (solo para administradores)
+ * Endpoint: PATCH /orders/admin/:id/cancel
+ * Requiere: Autenticación JWT + rol admin
+ * @param orderId - ID de la orden a cancelar
+ * @returns Orden actualizada con estado CANCELLED
+ * @throws Error si no se puede cancelar la orden o si no es admin
+ */
+export const cancelPaidOrder = async (orderId: string): Promise<IOrder> => {
+  try {
+    const response = await apiClient.patch<{ success: boolean; message: string; order: IOrder }>(
+      `/orders/admin/${orderId}/cancel`
+    );
+    return extractData<IOrder>(response);
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "No se pudo cancelar la orden";
+
+    if (
+      errorMessage.includes("403") ||
+      errorMessage.includes("administrador")
+    ) {
+      throw new Error("No tienes permisos para cancelar órdenes");
+    }
+
+    if (errorMessage.includes("400") && errorMessage.includes("PAID")) {
+      throw new Error("Solo se pueden cancelar órdenes en estado PAID");
+    }
+
+    if (errorMessage.includes("404")) {
+      throw new Error("Orden no encontrada");
+    }
+
     throw new Error(errorMessage);
   }
 };

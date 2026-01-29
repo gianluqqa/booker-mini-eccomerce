@@ -20,5 +20,11 @@ export interface IOrder {
   status: string; // OrderStatus enum: "pending" | "paid" | "shipped" | "cancelled"
   createdAt: Date | string;
   expiresAt?: Date | string;
+  user?: { // Información del usuario (solo para administradores)
+    id: string;
+    email: string;
+    name: string;
+    surname: string;
+  };
   items: IOrderItem[];
 }

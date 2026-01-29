@@ -6,6 +6,12 @@ export interface OrderResponseDto {
   status: OrderStatus;
   createdAt: Date;
   expiresAt?: Date;
+  user?: { // Información del usuario (solo para administradores)
+    id: string;
+    email: string;
+    name: string;
+    surname: string;
+  };
   items: {
     id: string;
     book: {
