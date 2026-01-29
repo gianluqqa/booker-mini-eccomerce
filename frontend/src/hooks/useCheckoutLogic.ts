@@ -102,12 +102,22 @@ export const useCheckoutLogic = () => {
 
         if (existingOrder) {
           console.log('🔍 [FRONTEND] initializeCheckout - Orden PENDING existente encontrada:', existingOrder.id);
+          console.log('📅 [FRONTEND] initializeCheckout - expiresAt:', existingOrder.expiresAt);
+          console.log('📅 [FRONTEND] initializeCheckout - createdAt:', existingOrder.createdAt);
+          console.log('📅 [FRONTEND] initializeCheckout - status:', existingOrder.status);
           setOrder(existingOrder);
 
           // Verificar si la orden ha expirado
           if (existingOrder.expiresAt) {
             const expiryTime = new Date(existingOrder.expiresAt).getTime();
             const now = new Date().getTime();
+            const timeRemaining = expiryTime - now;
+            
+            console.log('⏰ [FRONTEND] initializeCheckout - Verificando expiración:');
+            console.log('   - Tiempo de expiración (ms):', expiryTime);
+            console.log('   - Tiempo actual (ms):', now);
+            console.log('   - Tiempo restante (ms):', timeRemaining);
+            console.log('   - Tiempo restante (min):', Math.floor(timeRemaining / 60000));
 
             if (expiryTime <= now) {
               console.log('⏰ [FRONTEND] initializeCheckout - Orden PENDING ha expirado');
@@ -115,7 +125,11 @@ export const useCheckoutLogic = () => {
               setError("Tu orden ha expirado. Por favor, inicia un nuevo checkout.");
             } else {
               console.log('✅ [FRONTEND] initializeCheckout - Orden PENDING válida encontrada');
+              setOrderExpired(false); // Asegurar que el estado sea correcto
             }
+          } else {
+            console.log('⚠️ [FRONTEND] initializeCheckout - Orden PENDING sin expiresAt');
+            setOrderExpired(false);
           }
         } else {
           // Verificar si hay items en el carrito antes de crear nueva orden

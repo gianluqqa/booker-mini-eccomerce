@@ -79,18 +79,29 @@ export const getUserPendingOrdersController = async (req: Request, res: Response
       });
     }
 
+    console.log('🔍 [BACKEND] getUserPendingOrdersController - Buscando órdenes PENDING para usuario:', authUser.id);
+
     const orders = await getUserPendingOrdersService(authUser.id);
 
     // Devolver la primera orden PENDING o null
     const pendingOrder = orders && orders.length > 0 ? orders[0] : null;
 
+    console.log('📋 [BACKEND] getUserPendingOrdersController - Órdenes encontradas:', orders?.length || 0);
+    console.log('📋 [BACKEND] getUserPendingOrdersController - Orden PENDING:', pendingOrder ? {
+      id: pendingOrder.id,
+      status: pendingOrder.status,
+      expiresAt: pendingOrder.expiresAt
+    } : 'Ninguna');
+
     return res.json({
       success: true,
-      orders: pendingOrder ? [pendingOrder] : [],
+      data: pendingOrder, 
     });
   } catch (error: any) {
     const status = error.status || 500;
     const message = error.message || "Error interno del servidor";
+
+    console.error('❌ [BACKEND] Error en getUserPendingOrdersController:', error);
 
     return res.status(status).json({
       success: false,
