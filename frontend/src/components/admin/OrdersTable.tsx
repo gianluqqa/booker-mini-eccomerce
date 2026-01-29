@@ -1,15 +1,16 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getAllOrders, cancelPaidOrder } from '@/services/adminService'
+import { getAllOrders, cancelPaidOrder, clearAllOrders } from '@/services/adminService'
 import { IOrder } from '@/types/Order'
-import { Package, CheckCircle, XCircle, AlertCircle, Ban, Clock } from 'lucide-react'
+import { Package, CheckCircle, XCircle, AlertCircle, Ban, Clock, Trash2 } from 'lucide-react'
 
 const OrdersTable: React.FC = () => {
   const [orders, setOrders] = useState<IOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
+  const [clearingOrders, setClearingOrders] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -52,6 +53,30 @@ const OrdersTable: React.FC = () => {
       alert(`Error: ${errorMessage}`)
     } finally {
       setCancellingOrderId(null)
+    }
+  }
+
+  const handleClearAllOrders = async () => {
+    if (!confirm('⚠️ ¿Estás seguro de que deseas eliminar TODAS las órdenes? Esta acción es irreversible y devolverá el stock de las órdenes pendientes.')) {
+      return
+    }
+
+    try {
+      setClearingOrders(true)
+      setError(null)
+      const result = await clearAllOrders()
+      
+      // Limpiar la lista local
+      setOrders([])
+      
+      // Mostrar mensaje de éxito con estadísticas
+      alert(`✅ Limpieza completada:\n• ${result.deletedOrders} órdenes eliminadas\n• ${result.restoredStock} unidades de stock restauradas`)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al limpiar las órdenes'
+      setError(errorMessage)
+      alert(`Error: ${errorMessage}`)
+    } finally {
+      setClearingOrders(false)
     }
   }
 
@@ -163,12 +188,31 @@ const OrdersTable: React.FC = () => {
             Visualización de todas las órdenes del sistema ({orders.length} total)
           </p>
         </div>
-        <button
-          onClick={fetchOrders}
-          className="px-4 py-2 bg-[#2e4b30] text-white rounded-lg hover:bg-[#1a2f1a] transition-colors"
-        >
-          Actualizar
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleClearAllOrders}
+            disabled={clearingOrders || orders.length === 0}
+            className="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {clearingOrders ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b border-red-600 mr-2"></div>
+                Limpiando...
+              </>
+            ) : (
+              <>
+                <Trash2 className="w-4 h-4 mr-2" />
+                Limpiar Todas
+              </>
+            )}
+          </button>
+          <button
+            onClick={fetchOrders}
+            className="px-4 py-2 bg-[#2e4b30] text-white rounded-lg hover:bg-[#1a2f1a] transition-colors"
+          >
+            Actualizar
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -241,7 +285,7 @@ const OrdersTable: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
-                    {order.expiresAt ? (
+                    {order.status?.toLowerCase() === 'pending' && order.expiresAt ? (
                       <span className="text-sm text-yellow-600">
                         {formatDate(order.expiresAt)}
                       </span>

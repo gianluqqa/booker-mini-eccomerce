@@ -1,5 +1,6 @@
 import { AppDataSource } from "../config/data-source";
 import { Order } from "../entities/Order";
+import { OrderItem } from "../entities/OrderItem";
 import { Book } from "../entities/Book";
 import { OrderStatus } from "../enums/OrderStatus";
 import { OrderResponseDto } from "../dto/OrderDto";
@@ -277,6 +278,74 @@ export const cancelPaidOrderService = async (orderId: string): Promise<OrderResp
     console.error("Error al cancelar la orden:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al cancelar la orden" };
+  }
+};
+
+//? Limpiar todas las órdenes de la base de datos (solo para administradores).
+export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; restoredStock: number }> => {
+  try {
+    const orderRepository = AppDataSource.getRepository(Order);
+    const bookRepository = AppDataSource.getRepository(Book);
+    
+    console.log(`🗑️ [BACKEND] Iniciando limpieza TOTAL de órdenes...`);
+
+    // Primero obtener todas las órdenes para procesar stock y contar
+    const orders = await orderRepository.find({
+      relations: ["items", "items.book"],
+    });
+
+    let restoredStock = 0;
+    let deletedOrders = orders.length;
+
+    console.log(`� [BACKEND] Se encontraron ${orders.length} órdenes para eliminar`);
+
+    // Procesar restauración de stock para órdenes PENDING
+    for (const order of orders) {
+      if (order.status === OrderStatus.PENDING && order.items) {
+        for (const item of order.items) {
+          if (item.book) {
+            const book = await bookRepository.findOne({ where: { id: item.book.id } });
+            if (book) {
+              book.stock += item.quantity;
+              await bookRepository.save(book);
+              restoredStock += item.quantity;
+              console.log(`📈 [BACKEND] Stock devuelto: ${book.title} +${item.quantity} unidades`);
+            }
+          }
+        }
+      }
+    }
+
+    // USAR QUERY BUILDER PARA ELIMINACIÓN COMPLETA
+    // Primero eliminar todos los OrderItems
+    const orderItemRepository = AppDataSource.getRepository(OrderItem);
+    const deletedItems = await orderItemRepository
+      .createQueryBuilder()
+      .delete()
+      .from(OrderItem)
+      .execute();
+
+    console.log(`🗑️ [BACKEND] Items de órdenes eliminados: ${deletedItems.affected}`);
+
+    // Luego eliminar todas las órdenes
+    const deletedOrdersResult = await orderRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Order)
+      .execute();
+
+    console.log(`🗑️ [BACKEND] Órdenes eliminadas: ${deletedOrdersResult.affected}`);
+
+    console.log(`✅ [BACKEND] Limpieza TOTAL completada. Órdenes eliminadas: ${deletedOrdersResult.affected}, Stock restaurado: ${restoredStock} unidades`);
+
+    return {
+      deletedOrders: deletedOrdersResult.affected || 0,
+      restoredStock,
+    };
+  } catch (error: any) {
+    console.error("Error al limpiar todas las órdenes:", error);
+    if (error.status && error.message) throw error;
+    throw { status: 500, message: "Error al limpiar todas las órdenes" };
   }
 };
 

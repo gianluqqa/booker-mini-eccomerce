@@ -149,3 +149,35 @@ export const cancelPaidOrder = async (orderId: string): Promise<IOrder> => {
     throw new Error(errorMessage);
   }
 };
+
+/**
+ * Limpia todas las órdenes de la base de datos (solo para administradores)
+ * Endpoint: DELETE /orders/admin/clear-all
+ * Requiere: Autenticación JWT + rol admin
+ * @returns Objeto con estadísticas de la operación
+ * @throws Error si no se pueden limpiar las órdenes o si no es admin
+ */
+export const clearAllOrders = async (): Promise<{ deletedOrders: number; restoredStock: number }> => {
+  try {
+    const response = await apiClient.delete<{ 
+      success: boolean; 
+      message: string; 
+      data: { deletedOrders: number; restoredStock: number } 
+    }>(
+      "/orders/admin/clear-all"
+    );
+    return extractData<{ deletedOrders: number; restoredStock: number }>(response);
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "No se pudieron limpiar las órdenes";
+
+    if (
+      errorMessage.includes("403") ||
+      errorMessage.includes("administrador")
+    ) {
+      throw new Error("No tienes permisos para limpiar órdenes");
+    }
+
+    throw new Error(errorMessage);
+  }
+};
