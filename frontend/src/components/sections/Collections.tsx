@@ -91,7 +91,7 @@ const Collections = () => {
 
   if (loading) {
     return (
-      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
+      <section id="collections" className="py-16 px-4 bg-[#f5efe1] text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -106,7 +106,7 @@ const Collections = () => {
 
   if (error) {
     return (
-      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
+      <section id="collections" className="py-16 px-4 bg-[#f5efe1] text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -121,7 +121,7 @@ const Collections = () => {
 
   if (books.length === 0) {
     return (
-      <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
+      <section id="collections" className="py-16 px-4 bg-[#f5efe1] text-xs sm:text-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -134,7 +134,7 @@ const Collections = () => {
   }
 
   return (
-    <section id="collections" className="py-16 px-4 bg-gradient-to-b from-white to-[#f5efe1] text-xs sm:text-sm">
+    <section id="collections" className="py-16 px-4 bg-[#f5efe1] text-xs sm:text-sm">
       <div className="max-w-7xl mx-auto">
         {/* Encabezado */}
         <div className="text-center mb-10">
@@ -156,7 +156,7 @@ const Collections = () => {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                 selectedGenre === ""
                   ? "bg-[#2e4b30] text-[#f5efe1]"
-                  : "bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1]"
+                  : "bg-white text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1]"
               }`}
             >
               <BookOpen className="w-4 h-4" />
@@ -169,7 +169,7 @@ const Collections = () => {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                   selectedGenre === genre
                     ? "bg-[#2e4b30] text-[#f5efe1]"
-                    : "bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1]"
+                    : "bg-white text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1]"
                 }`}
               >
                 {getGenreIcon(genre)}
@@ -182,7 +182,7 @@ const Collections = () => {
         {/* Muestra de Colecciones */}
         {selectedGenre === "" ? (
           // Mostrar carrusel para todos los libros
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#f5efe1]">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#2e4b30]/10">
             {/* Encabezado del Carrusel */}
             <div className="text-center mb-8">
               <h3 className="text-3xl font-bold text-[#1a3a1c] mb-4 flex items-center justify-center gap-3">
@@ -250,7 +250,7 @@ const Collections = () => {
           </div>
         ) : (
           // Mostrar la colección del género seleccionado
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#f5efe1]">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#2e4b30]/10">
             {/* Botón de Regreso */}
             <button
               onClick={() => setSelectedGenre("")}

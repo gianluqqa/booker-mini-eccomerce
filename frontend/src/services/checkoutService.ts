@@ -21,7 +21,7 @@ export const getUserCart = async (): Promise<ICartResponse> => {
 }
 
 /**
- * Crea reserva de stock para el checkout (2 minutos)
+ * Crea reserva de stock para el checkout (5 minutos)
  * @returns Datos de la reserva creada
  * @throws Error si no se puede crear la reserva
  */
@@ -53,7 +53,7 @@ export const createStockReservation = async (): Promise<IStockReservationRespons
 
 /**
  * Inicia el checkout - Crea orden PENDING inmediatamente
- * @returns Orden PENDING con expiración de 2 minutos
+ * @returns Orden PENDING con expiración de 5 minutos
  * @throws Error si no se puede iniciar el checkout
  */
 export const startCheckout = async (): Promise<IOrder> => {

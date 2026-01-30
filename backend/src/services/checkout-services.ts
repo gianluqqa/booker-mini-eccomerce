@@ -9,7 +9,7 @@ import { OrderStatus } from "../enums/OrderStatus";
 import { OrderResponseDto } from "../dto/OrderDto";
 import { setupOrderExpiration, cancelOrderExpiration } from "./order-expiration-service";
 
-const RESERVATION_MINUTES = 2;
+const RESERVATION_MINUTES = 5;
 
 //? Crear reserva de stock para checkout
 export const createStockReservationForCheckoutService = async (userId: string): Promise<any> => {
@@ -97,7 +97,7 @@ export const createStockReservationForCheckoutService = async (userId: string): 
       totalAmount: totalAmount,
       expiresAt: expiresAt,
       totalMinutes: RESERVATION_MINUTES,
-      message: "Reserva creada. Tienes 2 minutos para completar la compra."
+      message: "Reserva creada. Tienes 5 minutos para completar la compra."
     };
   } catch (error: any) {
     if (error.status && error.message) throw error;
@@ -396,7 +396,7 @@ export const processCheckoutService = async (userId: string, paymentData?: {
         throw { status: 400, message: "El pago fue rechazado" };
       }
     } else {
-      // Si no hay datos de pago, crear expiración de 2 minutos y reservar stock
+      // Si no hay datos de pago, crear expiración de 5 minutos y reservar stock
       expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + RESERVATION_MINUTES);
       console.log('⏰ Orden PENDING creada con expiración:', expiresAt);
