@@ -83,7 +83,7 @@ export const getUserPendingOrdersController = async (req: Request, res: Response
 
     const orders = await getUserPendingOrdersService(authUser.id);
 
-    // Devolver la primera orden PENDING o null
+    // Devolver la primera orden PENDING como array para mantener consistencia con frontend
     const pendingOrder = orders && orders.length > 0 ? orders[0] : null;
 
     console.log('📋 [BACKEND] getUserPendingOrdersController - Órdenes encontradas:', orders?.length || 0);
@@ -95,7 +95,7 @@ export const getUserPendingOrdersController = async (req: Request, res: Response
 
     return res.json({
       success: true,
-      data: pendingOrder, 
+      orders: pendingOrder ? [pendingOrder] : [], 
     });
   } catch (error: any) {
     const status = error.status || 500;

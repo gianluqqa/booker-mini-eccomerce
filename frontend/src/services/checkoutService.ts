@@ -119,13 +119,12 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
     console.log('🔍 [FRONTEND] checkPendingOrder - Verificando orden PENDING');
     
     // Usar un endpoint dedicado para solo verificar, no crear
-    // Por ahora, modificamos la llamada para que no cree órdenes
-    const response = await apiClient.get<{ success: boolean; message: string; data: IOrder | null }>('/orders/pending')
+    const response = await apiClient.get<{ success: boolean; orders: IOrder[] }>('/orders/pending')
     
     console.log('📡 [FRONTEND] checkPendingOrder - Respuesta del servidor:', response.data);
     
-    if (response.data.success && response.data.data) {
-      const order = response.data.data
+    if (response.data.success && response.data.orders && response.data.orders.length > 0) {
+      const order = response.data.orders[0] // Tomar la primera orden PENDING
       console.log('✅ [FRONTEND] checkPendingOrder - Orden PENDING encontrada:', order.id);
       console.log('📅 [FRONTEND] checkPendingOrder - expiresAt:', order.expiresAt);
       console.log('📅 [FRONTEND] checkPendingOrder - status:', order.status);

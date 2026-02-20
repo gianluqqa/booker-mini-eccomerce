@@ -51,7 +51,7 @@ export const useCheckoutLogic = () => {
         if (orderId) {
           const specificOrder = await getOrderById(orderId);
 
-          if (specificOrder.status !== "PENDING") {
+          if (specificOrder.status !== "pending") {
             setError("Esta orden ya no está pendiente. Redirigiendo...");
             setTimeout(() => router.push("/profile"), 2000);
             return;
