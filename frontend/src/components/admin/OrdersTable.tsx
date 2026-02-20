@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { getAllOrders, cancelPaidOrder, clearAllOrders } from '@/services/adminService'
+import { getAllOrders, cancelPaidOrder, clearAllOrders, clearCancelledOrders } from '@/services/adminService'
 import { IOrder } from '@/types/Order'
 import { Package, CheckCircle, XCircle, AlertCircle, Ban, Clock, Trash2 } from 'lucide-react'
 
@@ -11,6 +11,7 @@ const OrdersTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
   const [clearingOrders, setClearingOrders] = useState(false)
+  const [clearingCancelledOrders, setClearingCancelledOrders] = useState(false)
 
   useEffect(() => {
     fetchOrders()
@@ -77,6 +78,30 @@ const OrdersTable: React.FC = () => {
       alert(`Error: ${errorMessage}`)
     } finally {
       setClearingOrders(false)
+    }
+  }
+
+  const handleClearCancelledOrders = async () => {
+    if (!confirm('⚠️ ¿Estás seguro de que deseas eliminar todas las órdenes CANCELADAS? Esta acción es irreversible.')) {
+      return
+    }
+
+    try {
+      setClearingCancelledOrders(true)
+      setError(null)
+      const result = await clearCancelledOrders()
+      
+      // Actualizar la lista local eliminando las canceladas
+      setOrders(prevOrders => prevOrders.filter(order => order.status?.toLowerCase() !== 'cancelled'))
+      
+      // Mostrar mensaje de éxito
+      alert(`✅ Limpieza completada:\n• ${result.deletedOrders} órdenes canceladas eliminadas`)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al limpiar órdenes canceladas'
+      setError(errorMessage)
+      alert(`Error: ${errorMessage}`)
+    } finally {
+      setClearingCancelledOrders(false)
     }
   }
 
@@ -161,7 +186,7 @@ const OrdersTable: React.FC = () => {
         </div>
         <button
           onClick={fetchOrders}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+          className="mt-2 px-4 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700 transition-colors"
         >
           Reintentar
         </button>
@@ -191,8 +216,8 @@ const OrdersTable: React.FC = () => {
         <div className="flex gap-2">
           <button
             onClick={handleClearAllOrders}
-            disabled={clearingOrders || orders.length === 0}
-            className="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            disabled={clearingOrders || clearingCancelledOrders || orders.length === 0}
+            className="inline-flex items-center px-4 py-2 border border-red-300 text-sm font-medium rounded-sm text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {clearingOrders ? (
               <>
@@ -207,8 +232,26 @@ const OrdersTable: React.FC = () => {
             )}
           </button>
           <button
+            onClick={handleClearCancelledOrders}
+            disabled={clearingOrders || clearingCancelledOrders || orders.filter(o => o.status?.toLowerCase() === 'cancelled').length === 0}
+            className="inline-flex items-center px-4 py-2 border border-orange-300 text-sm font-medium rounded-sm text-orange-700 bg-orange-50 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {clearingCancelledOrders ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b border-orange-600 mr-2"></div>
+                Eliminando...
+              </>
+            ) : (
+              <>
+                <Ban className="w-4 h-4 mr-2" />
+                Eliminar Canceladas
+              </>
+            )}
+          </button>
+          <button
             onClick={fetchOrders}
-            className="px-4 py-2 bg-[#2e4b30] text-white rounded-lg hover:bg-[#1a2f1a] transition-colors"
+            disabled={clearingOrders || clearingCancelledOrders}
+            className="px-4 py-2 bg-[#2e4b30] text-white rounded-sm hover:bg-[#1a2f1a] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Actualizar
           </button>
@@ -303,7 +346,7 @@ const OrdersTable: React.FC = () => {
                       <button
                         onClick={() => order.id && handleCancelOrder(order.id)}
                         disabled={cancellingOrderId === order.id}
-                        className="inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="inline-flex items-center px-3 py-1.5 border border-red-300 text-xs font-medium rounded-sm text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         {cancellingOrderId === order.id ? (
                           <>

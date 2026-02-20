@@ -1,6 +1,6 @@
 // src/routes/order-routes.ts
 import { Router } from "express";
-import { getOrderByIdController, getUserOrdersController, getUserPendingOrdersController, getAllOrdersController, cancelPaidOrderController, clearAllOrdersController } from "../controllers/orders-controllers";
+import { getOrderByIdController, getUserOrdersController, getUserPendingOrdersController, getAllOrdersController, cancelPaidOrderController, clearAllOrdersController, clearCancelledOrdersController } from "../controllers/orders-controllers";
 import { authenticateJWT, requireAdmin } from "../middlewares/auth";
 
 const orderRoutes = Router();
@@ -22,5 +22,8 @@ orderRoutes.patch("/admin/:id/cancel", authenticateJWT, requireAdmin, cancelPaid
 
 //? Limpiar todas las órdenes de la base de datos (solo administradores)
 orderRoutes.delete("/admin/clear-all", authenticateJWT, requireAdmin, clearAllOrdersController);
+
+//? Limpiar todas las órdenes canceladas de la base de datos (solo administradores)
+orderRoutes.delete("/admin/clear-cancelled", authenticateJWT, requireAdmin, clearCancelledOrdersController);
 
 export default orderRoutes;

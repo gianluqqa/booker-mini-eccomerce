@@ -316,7 +316,7 @@ const CreateBook: React.FC = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-[#2e4b30] text-[#f5efe1] px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-[#1a3a1c] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="bg-[#2e4b30] text-[#f5efe1] px-4 py-1.5 rounded-sm text-xs font-medium hover:bg-[#1a3a1c] transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <span className="flex items-center gap-2">

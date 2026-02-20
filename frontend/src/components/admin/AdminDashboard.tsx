@@ -136,7 +136,7 @@ const AdminDashboard: React.FC = () => {
           <div className="grid gap-4 md:grid-cols-2">
             <button
               type="button"
-              className="flex items-center justify-between w-full bg-white hover:bg-gray-50 text-[#2e4b30] px-4 py-3 rounded-xl transition-colors duration-200 border border-gray-200"
+              className="flex items-center justify-between w-full bg-white hover:bg-gray-50 text-[#2e4b30] px-4 py-3 rounded-sm transition-colors duration-200 border border-gray-200"
             >
               <div className="flex items-center gap-3">
                 <Users className="w-5 h-5" />
@@ -154,7 +154,7 @@ const AdminDashboard: React.FC = () => {
 
             <button
               type="button"
-              className="flex items-center justify-between w-full bg-white hover:bg-gray-50 text-[#2e4b30] px-4 py-3 rounded-xl transition-colors duration-200 border border-gray-200"
+              className="flex items-center justify-between w-full bg-white hover:bg-gray-50 text-[#2e4b30] px-4 py-3 rounded-sm transition-colors duration-200 border border-gray-200"
             >
               <div className="flex items-center gap-3">
                 <BookOpen className="w-5 h-5" />

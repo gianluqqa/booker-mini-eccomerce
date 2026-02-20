@@ -1,5 +1,5 @@
 ﻿import { Request, Response } from "express";
-import { getOrderByIdService, getUserOrdersService, getUserPendingOrdersService, getAllOrdersService, cancelPaidOrderService, clearAllOrdersService } from "../services/orders-services";
+import { getOrderByIdService, getUserOrdersService, getUserPendingOrdersService, getAllOrdersService, cancelPaidOrderService, clearAllOrdersService, clearCancelledOrdersService } from "../services/orders-services";
 
 //? Obtener una orden por ID (GET).
 export const getOrderByIdController = async (req: Request, res: Response) => {
@@ -168,6 +168,27 @@ export const clearAllOrdersController = async (req: Request, res: Response) => {
     return res.json({
       success: true,
       message: "Todas las órdenes han sido eliminadas exitosamente",
+      data: result,
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Error interno del servidor";
+
+    return res.status(status).json({
+      success: false,
+      message,
+    });
+  }
+};
+
+//? Limpiar todas las órdenes canceladas de la base de datos (solo para administradores).
+export const clearCancelledOrdersController = async (req: Request, res: Response) => {
+  try {
+    const result = await clearCancelledOrdersService();
+
+    return res.json({
+      success: true,
+      message: "Todas las órdenes canceladas han sido eliminadas exitosamente",
       data: result,
     });
   } catch (error: any) {

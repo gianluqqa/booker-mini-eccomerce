@@ -297,7 +297,7 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
     let restoredStock = 0;
     let deletedOrders = orders.length;
 
-    console.log(`� [BACKEND] Se encontraron ${orders.length} órdenes para eliminar`);
+    console.log(`📊 [BACKEND] Se encontraron ${orders.length} órdenes para eliminar`);
 
     // Procesar restauración de stock para órdenes PENDING
     for (const order of orders) {
@@ -346,6 +346,73 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
     console.error("Error al limpiar todas las órdenes:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al limpiar todas las órdenes" };
+  }
+};
+
+//? Limpiar todas las órdenes canceladas de la base de datos (solo para administradores).
+export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: number }> => {
+  try {
+    const orderRepository = AppDataSource.getRepository(Order);
+    
+    console.log(`🗑️ [BACKEND] Iniciando limpieza de órdenes CANCELADAS...`);
+
+    // Primero contar cuántas órdenes canceladas existen
+    const cancelledOrdersCount = await orderRepository.count({
+      where: { status: OrderStatus.CANCELLED }
+    });
+
+    console.log(`📊 [BACKEND] Se encontraron ${cancelledOrdersCount} órdenes CANCELADAS para eliminar`);
+
+    if (cancelledOrdersCount === 0) {
+      console.log(`ℹ️ [BACKEND] No hay órdenes canceladas para eliminar`);
+      return { deletedOrders: 0 };
+    }
+
+    // USAR QUERY BUILDER PARA ELIMINAR EFICIENTE
+    // Primero eliminar los OrderItems de órdenes canceladas
+    const orderItemRepository = AppDataSource.getRepository(OrderItem);
+    
+    // Obtener los IDs de las órdenes canceladas para eliminar sus items
+    const cancelledOrders = await orderRepository.find({
+      where: { status: OrderStatus.CANCELLED },
+      select: ["id"]
+    });
+
+    const cancelledOrderIds = cancelledOrders.map(order => order.id);
+
+    if (cancelledOrderIds.length > 0) {
+      // Eliminar los items de las órdenes canceladas
+      const deletedItems = await orderItemRepository
+        .createQueryBuilder()
+        .delete()
+        .from(OrderItem)
+        .where("orderId IN (:...orderIds)", { orderIds: cancelledOrderIds })
+        .execute();
+
+      console.log(`🗑️ [BACKEND] Items de órdenes canceladas eliminados: ${deletedItems.affected}`);
+
+      // Luego eliminar las órdenes canceladas
+      const deletedOrdersResult = await orderRepository
+        .createQueryBuilder()
+        .delete()
+        .from(Order)
+        .where("status = :status", { status: OrderStatus.CANCELLED })
+        .execute();
+
+      console.log(`🗑️ [BACKEND] Órdenes canceladas eliminadas: ${deletedOrdersResult.affected}`);
+
+      console.log(`✅ [BACKEND] Limpieza de órdenes CANCELADAS completada. Órdenes eliminadas: ${deletedOrdersResult.affected}`);
+
+      return {
+        deletedOrders: deletedOrdersResult.affected || 0,
+      };
+    }
+
+    return { deletedOrders: 0 };
+  } catch (error: any) {
+    console.error("Error al limpiar órdenes canceladas:", error);
+    if (error.status && error.message) throw error;
+    throw { status: 500, message: "Error al limpiar órdenes canceladas" };
   }
 };
 

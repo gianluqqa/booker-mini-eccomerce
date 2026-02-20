@@ -4,9 +4,10 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { getAllUsers } from "@/services/adminService";
+import { deleteUser, deleteAllUsersExceptAdmin } from "@/services/userService";
 import { IUser } from "@/types/User";
 import Image from "next/image";
-import { Users, Loader2, AlertCircle, Mail, Calendar, Shield, User as UserIcon } from "lucide-react";
+import { Users, Loader2, AlertCircle, Mail, Calendar, Shield, User as UserIcon, Trash2, AlertTriangle } from "lucide-react";
 import { getRoleDisplay, getRoleColor, formatDate } from "@/utils/helpers";
 
 const UsersTable = () => {
@@ -15,6 +16,9 @@ const UsersTable = () => {
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
+  const [deleteAllLoading, setDeleteAllLoading] = useState(false);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
 
   useEffect(() => {
     // Verificar autenticación y rol de admin
@@ -44,6 +48,44 @@ const UsersTable = () => {
     fetchUsers();
   }, [isAuthenticated, authLoading, user, router]);
 
+  // Función para eliminar un usuario específico
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!window.confirm(`¿Estás seguro de que quieres eliminar al usuario "${userName}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    try {
+      setDeleteLoading(userId);
+      await deleteUser(userId);
+      setUsers(users.filter(u => u.id !== userId));
+      setError(null);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Error al eliminar el usuario";
+      setError(errorMessage);
+      console.error("Error deleting user:", err);
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
+
+  // Función para eliminar todos los usuarios excepto admin
+  const handleDeleteAllUsers = async () => {
+    try {
+      setDeleteAllLoading(true);
+      const result = await deleteAllUsersExceptAdmin();
+      setUsers(users.filter(u => u.role === 'admin'));
+      setError(null);
+      setShowDeleteAllConfirm(false);
+      alert(`${result.message} (${result.deletedCount} usuarios eliminados)`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Error al eliminar los usuarios";
+      setError(errorMessage);
+      console.error("Error deleting all users:", err);
+    } finally {
+      setDeleteAllLoading(false);
+    }
+  };
+
   // No renderizar si no es admin
   if (!isAuthenticated || user?.role !== "admin") {
     return null;
@@ -72,7 +114,7 @@ const UsersTable = () => {
         <p className="text-gray-700 mb-3 text-sm">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="bg-[#2e4b30] text-[#f5efe1] px-5 py-1.5 rounded-lg text-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
+          className="bg-[#2e4b30] text-[#f5efe1] px-5 py-1.5 rounded-sm text-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
         >
           Reintentar
         </button>
@@ -95,7 +137,59 @@ const UsersTable = () => {
             </p>
           </div>
         </div>
+        
+        {/* Botón para eliminar todos los usuarios excepto admin */}
+        {users.filter(u => u.role !== 'admin').length > 0 && (
+          <button
+            onClick={() => setShowDeleteAllConfirm(true)}
+            disabled={deleteAllLoading}
+            className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-sm text-sm font-medium hover:bg-red-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {deleteAllLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+            Eliminar Todos los Clientes
+          </button>
+        )}
       </div>
+
+      {/* Modal de confirmación para eliminar todos */}
+      {showDeleteAllConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md mx-4">
+            <div className="flex items-center gap-3 text-red-600 mb-4">
+              <AlertTriangle className="w-6 h-6" />
+              <h3 className="text-lg font-semibold">Confirmar Eliminación Masiva</h3>
+            </div>
+            <p className="text-gray-700 mb-6">
+              ¿Estás seguro de que quieres eliminar a todos los usuarios clientes? 
+              Se eliminarán {users.filter(u => u.role !== 'admin').length} usuarios. 
+              Esta acción no se puede deshacer.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowDeleteAllConfirm(false)}
+                disabled={deleteAllLoading}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteAllUsers}
+                disabled={deleteAllLoading}
+                className="bg-red-500 text-white px-4 py-2 rounded-sm hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deleteAllLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : null}
+                Eliminar Todos
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tabla de usuarios */}
       {users.length === 0 ? (
@@ -113,6 +207,7 @@ const UsersTable = () => {
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#2e4b30]">Rol</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#2e4b30]">Registrado</th>
                 <th className="text-left py-3 px-4 text-sm font-semibold text-[#2e4b30]">Ubicación</th>
+                <th className="text-left py-3 px-4 text-sm font-semibold text-[#2e4b30]">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -177,6 +272,24 @@ const UsersTable = () => {
                       </span>
                     ) : (
                       <span className="text-sm text-gray-400 italic">No especificada</span>
+                    )}
+                  </td>
+
+                  {/* Columna Acciones */}
+                  <td className="py-4 px-4">
+                    {userItem.role !== 'admin' && (
+                      <button
+                        onClick={() => handleDeleteUser(userItem.id, `${userItem.name} ${userItem.surname}`)}
+                        disabled={deleteLoading === userItem.id}
+                        className="flex items-center gap-1 text-red-600 hover:text-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Eliminar usuario"
+                      >
+                        {deleteLoading === userItem.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
                     )}
                   </td>
                 </tr>

@@ -201,3 +201,55 @@ export const updateUserService = async (id: string, user: UpdateUserDTO) => {
     throw { status: 500, message: "No se pudo actualizar el usuario" };
   }
 };
+
+//? Eliminar un usuario específico por ID (DELETE).
+export const deleteUserService = async (id: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  
+  try {
+    const user = await userRepo.findOne({ where: { id } });
+    if (!user) {
+      throw { status: 404, message: "Usuario no encontrado" };
+    }
+
+    // No permitir eliminar al usuario admin
+    if (user.role === UserRole.ADMIN) {
+      throw { status: 403, message: "No se puede eliminar al usuario administrador" };
+    }
+
+    await userRepo.remove(user);
+    
+    return { message: "Usuario eliminado exitosamente", userId: id };
+  } catch (error: any) {
+    console.error("Error deleting user:", error);
+    if (error.status && error.message) throw error;
+    throw { status: 500, message: "No se pudo eliminar el usuario" };
+  }
+};
+
+//? Eliminar todos los usuarios excepto el admin (DELETE).
+export const deleteAllUsersExceptAdminService = async () => {
+  const userRepo = AppDataSource.getRepository(User);
+  
+  try {
+    // Encontrar todos los usuarios que no sean admin
+    const usersToDelete = await userRepo.find({
+      where: { role: UserRole.CUSTOMER }
+    });
+
+    if (usersToDelete.length === 0) {
+      return { message: "No hay usuarios clientes para eliminar", deletedCount: 0 };
+    }
+
+    // Eliminar todos los usuarios encontrados
+    await userRepo.remove(usersToDelete);
+    
+    return { 
+      message: "Se eliminaron todos los usuarios clientes exitosamente", 
+      deletedCount: usersToDelete.length 
+    };
+  } catch (error: any) {
+    console.error("Error deleting all users except admin:", error);
+    throw { status: 500, message: "No se pudieron eliminar los usuarios" };
+  }
+};

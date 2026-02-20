@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService, getCurrentUserService, firebaseLoginService } from "../services/users-services";
+import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService, getCurrentUserService, firebaseLoginService, deleteUserService, deleteAllUsersExceptAdminService } from "../services/users-services";
 import { FirebaseLoginDTO, LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
 import { validateUpdateUser } from "../middlewares/validateUser";
 import { UserRole } from "../enums/UserRole";

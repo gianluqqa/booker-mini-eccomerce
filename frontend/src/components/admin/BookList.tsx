@@ -178,7 +178,7 @@ const BookList: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => handleEdit(book)}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] transition-colors"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-sm text-xs font-medium bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] transition-colors"
                       >
                         <Pencil className="w-3 h-3" />
                         Editar
@@ -187,7 +187,7 @@ const BookList: React.FC = () => {
                         type="button"
                         onClick={() => handleDelete(book)}
                         disabled={deletingId === book.id}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-700 hover:bg-red-600 hover:text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-sm text-xs font-medium bg-red-50 text-red-700 hover:bg-red-600 hover:text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         {deletingId === book.id ? (
                           <Loader2 className="w-3 h-3 animate-spin" />

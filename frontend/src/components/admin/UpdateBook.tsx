@@ -81,7 +81,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
             <p className="text-xs text-gray-600">Modifica los campos y guarda los cambios.</p>
           </div>
         </div>
-        <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-1">
+        <button type="button" onClick={onClose} className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-sm p-1">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -224,14 +224,14 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
+            className="px-4 py-2 rounded-sm text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="px-4 py-2 rounded-lg text-xs font-medium bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-sm text-xs font-medium bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <span className="flex items-center gap-2">
