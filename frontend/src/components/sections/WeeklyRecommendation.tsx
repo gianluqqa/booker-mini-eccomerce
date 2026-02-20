@@ -82,7 +82,7 @@ const WeeklyRecommendation = () => {
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Sparkles className="w-6 h-6 text-[#f5efe1]" />
-            <h2 className="text-3xl font-bold text-white">
+            <h2 className="text-3xl font-bold text-[#f5efe1]">
               Recomendación de la Semana
             </h2>
             <Star className="w-6 h-6 text-[#f5efe1]" />
@@ -103,7 +103,7 @@ const WeeklyRecommendation = () => {
 
             {/* Título y autor */}
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              <h3 className="text-2xl md:text-3xl font-bold text-[#f5efe1] mb-2">
                 {recommendation.title}
               </h3>
               <p className="text-lg text-[#f5efe1] opacity-80">
@@ -113,7 +113,7 @@ const WeeklyRecommendation = () => {
 
             {/* Precio y stock */}
             <div className="flex items-center justify-between">
-              <div className="text-3xl font-bold text-white">
+              <div className="text-3xl font-bold text-[#f5efe1]">
                 ${typeof recommendation.price === 'number' 
                   ? recommendation.price.toFixed(2) 
                   : parseFloat(String(recommendation.price)).toFixed(2)
@@ -163,7 +163,7 @@ const WeeklyRecommendation = () => {
                 disabled={recommendation.stock === 0 || cartLoading}
                 className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                   recommendation.stock > 0 && !cartLoading
-                    ? "bg-[#f5efe1] text-[#2e4b30] hover:bg-white hover:shadow-lg"
+                    ? "bg-[#f5efe1] text-[#2e4b30] hover:bg-[#e8dcc8] hover:shadow-lg"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
@@ -202,7 +202,7 @@ const WeeklyRecommendation = () => {
               {/* Contenedor de la imagen */}
               <div 
                 onClick={handleViewDetails}
-                className="relative bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-[#f5efe1]/20"
+                className="relative bg-[#f5efe1] rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-[#f5efe1]/20"
               >
                 <div className="aspect-[3/4] w-80">
                   {recommendation.image && !imageError ? (
@@ -223,14 +223,6 @@ const WeeklyRecommendation = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-12 text-center">
-          <p className="text-[#f5efe1] opacity-70 text-sm flex items-center justify-center gap-2">
-            <BookOpen className="w-4 h-4" />
-            Actualizado semanalmente de nuestra colección de {books.length} libros
-          </p>
         </div>
       </div>
     </section>

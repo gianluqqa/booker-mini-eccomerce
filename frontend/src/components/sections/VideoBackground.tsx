@@ -13,7 +13,7 @@ const VideoBackground = () => {
   }, [])
 
   return (
-    <section className="relative h-screen w-full overflow-hidden pt-20">
+    <section className="relative h-screen w-full overflow-hidden pt-16">
       {/* Video de fondo */}
       <div className="absolute inset-0 z-0">
         <video
@@ -30,7 +30,7 @@ const VideoBackground = () => {
       </div>
 
       {/* Contenido del Hero */}
-      <div className="relative z-10 flex h-full items-center justify-center">
+      <div className="relative z-10 flex h-full items-start justify-center pt-12">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <div className="space-y-8">
             {/* Badge de bienvenida */}
@@ -59,7 +59,7 @@ const VideoBackground = () => {
                 Explorar Catálogo
               </button>
               
-              <button className="bg-[#f5efe1] text-[#2e4b30] px-8 py-3 rounded-lg hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium">
+              <button className="bg-booker-beige text-booker-green px-8 py-3 rounded-lg border border-booker-green hover:bg-booker-green hover:text-booker-beige hover:shadow-lg transition-all duration-200 font-medium">
                 Ver Novedades
               </button>
             </div>

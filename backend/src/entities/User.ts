@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { Order } from "./Order";
 import { Cart } from "./Cart";
+import { Review } from "./Review";
 import { UserRole } from "../enums/UserRole";
 import { UserGender } from "../enums/UserGender";
 
@@ -63,6 +64,9 @@ export class User {
 
   @OneToMany(() => Cart, (cart) => cart.user)
   carts!: Cart[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews!: Review[];
 
   @CreateDateColumn()
   createdAt!: Date;

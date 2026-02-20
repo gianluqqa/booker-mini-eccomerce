@@ -155,7 +155,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
           {/* Botón de Detalles*/}
           <button
             onClick={handleViewDetails}
-            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 bg-[#f5efe1] text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm cursor-pointer"
+            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-200 bg-[#f5efe1] text-[#2e4b30] border border-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm cursor-pointer"
           >
             <Eye className="w-4 h-4" />
             Detalles

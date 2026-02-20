@@ -7,6 +7,7 @@ import { OrderItem } from "../entities/OrderItem";
 import { Cart } from "../entities/Cart";
 import { Genre } from "../entities/Genre";
 import { StockReservation } from "../entities/StockReservation";
+import { Review } from "../entities/Review";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -22,5 +23,5 @@ export const AppDataSource = new DataSource({
   //dropSchema: true,
   logging: false,
   uuidExtension: "uuid-ossp",
-  entities: [User, Book, Order, OrderItem, Cart, Genre, StockReservation],
+  entities: [User, Book, Order, OrderItem, Cart, Genre, StockReservation, Review],
 });

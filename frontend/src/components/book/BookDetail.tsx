@@ -7,11 +7,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useParams } from "next/navigation";
 import { getBookById } from "@/services/booksService";
 import { IBook } from "@/types/Book";
+import { ReviewList } from "@/components/review/ReviewList";
 
 const BookDetail = () => {
   const router = useRouter();
   const params = useParams();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [book, setBook] = useState<IBook | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -214,6 +215,19 @@ const BookDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Sección de Reseñas */}
+        {book.id && (
+          <div className="mt-8">
+            <ReviewList 
+              bookId={book.id} 
+              currentUserId={user?.id}
+              onReviewUpdated={() => {
+                // Opcional: actualizar algún estado si es necesario
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
