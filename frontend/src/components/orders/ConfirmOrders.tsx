@@ -72,7 +72,7 @@ const ConfirmOrders: React.FC<ConfirmOrdersProps> = ({ orders }) => {
                         <p className="font-semibold text-[#2e4b30]">${item.totalPrice.toFixed(2)}</p>
                       ) : (
                         <p className="font-semibold text-[#2e4b30]">
-                          ${(item.unitPrice * item.quantity).toFixed(2)}
+                          ${((item.unitPrice || 0) * item.quantity).toFixed(2)}
                         </p>
                       )}
                     </div>

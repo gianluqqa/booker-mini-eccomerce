@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { IPendingOrder } from '@/types/PendingOrder'
 import { getUserCart } from '@/services/cartService'
+import { useAuth } from '@/contexts/AuthContext'
 
 /**
  * Hook para verificar si el usuario tiene órdenes pendientes
@@ -10,8 +11,17 @@ export const usePendingOrderCheck = () => {
   const [pendingOrder, setPendingOrder] = useState<IPendingOrder | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { isAuthenticated } = useAuth()
 
-  const checkPendingOrder = async () => {
+  const checkPendingOrder = useCallback(async () => {
+    // Solo verificar si el usuario está autenticado
+    if (!isAuthenticated) {
+      setPendingOrder(null)
+      setError(null)
+      setIsLoading(false)
+      return
+    }
+
     try {
       setIsLoading(true)
       setError(null)
@@ -27,6 +37,14 @@ export const usePendingOrderCheck = () => {
     } catch (err: unknown) {
       // Si el error es por orden pendiente (409), extraer la información
       const error = err as Error & { status?: number; message?: string }
+      
+      // Manejar específicamente errores de autenticación
+      if (error.status === 401 || error.message?.includes('Unauthorized')) {
+        setPendingOrder(null)
+        setError(null)
+        return
+      }
+      
       if (error.message?.includes('orden pendiente') || error.status === 409) {
         try {
           const errorData = JSON.parse(error.message || '{}')
@@ -43,17 +61,17 @@ export const usePendingOrderCheck = () => {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [isAuthenticated])
 
   const clearPendingOrder = () => {
     setPendingOrder(null)
     setError(null)
   }
 
-  // Verificar al montar el hook
+  // Verificar al montar el hook y cuando cambie la autenticación
   useEffect(() => {
     checkPendingOrder()
-  }, [])
+  }, [checkPendingOrder])
 
   return {
     pendingOrder,
