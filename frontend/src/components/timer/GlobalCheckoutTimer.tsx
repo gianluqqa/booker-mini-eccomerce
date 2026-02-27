@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { IOrder } from '@/types/Order';
-import { checkPendingOrder, cancelCheckout } from '@/services/checkoutService';
+import { cancelCheckout } from '@/services/checkoutService';
 import { useReservationTimer } from '@/hooks/useReservationTimer';
-import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 interface GlobalCheckoutTimerProps {
   className?: string;
@@ -13,75 +12,38 @@ interface GlobalCheckoutTimerProps {
 
 export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ className = "" }) => {
   const router = useRouter();
-  const { user } = useAuth();
-  const [pendingOrder, setPendingOrder] = useState<IOrder | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { pendingOrder, hasPendingOrder, loading, refreshCart } = useCart();
   const [cancelling, setCancelling] = useState(false);
   const [show, setShow] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 80 }); // Se ajustará al montar
+  const [position, setPosition] = useState({ x: 0, y: 80 });
 
-  // Ajustar posición inicial a la esquina superior derecha al montar
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const windowWidth = window.innerWidth;
-      const componentWidth = 384; // max-w-sm = 24rem = 384px
-      const initialX = windowWidth - componentWidth - 16; // 16px = 1rem de margen
+      const componentWidth = 384; 
+      const initialX = windowWidth - componentWidth - 16;
       setPosition({ x: initialX, y: 80 });
     }
   }, []);
+
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
   const elementStartPos = useRef({ x: 0, y: 0 });
 
-  // Verificar si hay una orden PENDING activa (solo si hay usuario autenticado)
-  const checkForPendingOrder = useCallback(async () => {
-    // No verificar si no hay usuario autenticado
-    if (!user) {
-      setPendingOrder(null);
-      setShow(false);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const order = await checkPendingOrder();
-      if (order && order.status === 'pending') {
-        setPendingOrder(order);
-        setShow(true);
-      } else {
-        setPendingOrder(null);
-        setShow(false);
-      }
-    } catch {
-      setPendingOrder(null);
-      setShow(false);
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
-
-  // Verificar al montar el componente y cuando cambia el usuario
   useEffect(() => {
-    checkForPendingOrder();
-    
-    // Verificar periódicamente cada 5 segundos para detectar nuevas órdenes PENDING
-    const interval = setInterval(() => {
-      checkForPendingOrder();
-    }, 5000);
-    
-    return () => {
-      clearInterval(interval);
-    };
-  }, [user, checkForPendingOrder]); // Dependencia del usuario y la función memorizada
+    if (hasPendingOrder && pendingOrder) {
+      setShow(true);
+    } else {
+      setShow(false);
+    }
+  }, [hasPendingOrder, pendingOrder]);
 
   // Usar el hook de temporizador si hay orden pendiente
   const handleExpired = useCallback(() => {
-    // Cuando expira, ocultar el componente y limpiar estado
     setShow(false);
-    setPendingOrder(null);
-    // NOTA: Eliminada la verificación automática para evitar crear nuevas órdenes
-  }, []);
+    refreshCart();
+  }, [refreshCart]);
 
   const { isExpired, formattedTime, isWarning, isDanger } = useReservationTimer(
     pendingOrder?.expiresAt ? (typeof pendingOrder.expiresAt === 'string' ? pendingOrder.expiresAt : pendingOrder.expiresAt.toISOString()) : null,
@@ -100,7 +62,7 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
     setCancelling(true);
     try {
       await cancelCheckout();
-      setPendingOrder(null);
+      await refreshCart();
       setShow(false);
     } catch (error) {
       console.error('❌ Error al cancelar orden desde timer global:', error);
@@ -173,10 +135,10 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
     return null;
   }
 
-  // No mostrar en páginas de cart y checkout
+  // No mostrar en páginas de cart, checkout y profile
   if (typeof window !== 'undefined') {
     const currentPath = window.location.pathname;
-    if (currentPath === '/cart' || currentPath === '/checkout') {
+    if (currentPath === '/cart' || currentPath === '/checkout' || currentPath === '/profile') {
       return null;
     }
   }

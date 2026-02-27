@@ -10,17 +10,17 @@ import UpdateUserForm, { UpdateUserFormData } from '@/components/forms/UpdateUse
 import PendingOrders from '@/components/orders/PendingOrders'
 import ConfirmOrders from '@/components/orders/ConfirmOrders'
 import { getUserProfile, updateUserProfile } from '@/services/userService'
-import { getUserCart } from '@/services/cartService'
 import { getUserOrders, getUserPendingOrders } from '@/services/orderService'
 import { getRoleDisplay, getRoleColor, formatDate } from '@/utils/helpers'
+import { useCart } from '@/contexts/CartContext'
 import { IOrder } from '@/types/Order'
 
 const Profile = () => {
   const { isAuthenticated, loading: authLoading } = useAuth()
-
   const router = useRouter()
   const [userData, setUserData] = useState<IUser | null>(null)
-  const [cartItems, setCartItems] = useState<ICartItem[]>([])
+  const { cart } = useCart()
+  const cartItems = cart?.items || []
   const [orders, setOrders] = useState<IOrder[]>([])
   const [pendingOrders, setPendingOrders] = useState<IOrder[]>([])
   const [loading, setLoading] = useState(true)
@@ -49,15 +49,6 @@ const Profile = () => {
         // Obtener perfil del usuario actual
         const userData = await getUserProfile()
         setUserData(userData)
-
-        // Obtener carrito del usuario
-        try {
-          const cartData = await getUserCart()
-          setCartItems(cartData.items)
-        } catch {
-          // Si no hay carrito o hay error, simplemente no mostrar items
-          setCartItems([])
-        }
 
         // Obtener órdenes confirmadas del usuario
         try {

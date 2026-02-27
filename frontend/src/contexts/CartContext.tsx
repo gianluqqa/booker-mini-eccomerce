@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { ICartResponse } from "@/types/Cart";
 import { getUserCart } from "@/services/cartService";
 import { useAuth } from "./AuthContext";
+import { IPendingOrder } from "@/types/PendingOrder";
 
 interface CartContextType {
   cart: ICartResponse | null;
@@ -11,6 +12,8 @@ interface CartContextType {
   error: string | null;
   refreshCart: () => Promise<void>;
   itemCount: number;
+  pendingOrder: IPendingOrder | null; 
+  hasPendingOrder: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -77,6 +80,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         error,
         refreshCart,
         itemCount,
+        pendingOrder: cart?.pendingOrder || null,
+        hasPendingOrder: !!cart?.pendingOrder,
       }}
     >
       {children}

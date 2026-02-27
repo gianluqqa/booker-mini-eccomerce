@@ -1,84 +1,22 @@
-import { useState, useEffect, useCallback } from 'react'
-import { IPendingOrder } from '@/types/PendingOrder'
-import { getUserCart } from '@/services/cartService'
-import { useAuth } from '@/contexts/AuthContext'
+import { useCart } from '@/contexts/CartContext'
 
 /**
- * Hook para verificar si el usuario tiene órdenes pendientes
- * Retorna el estado de la orden pendiente y funciones para manejarlo
+ * Hook para obtener si el usuario tiene órdenes pendientes
+ * Ahora se basa en el estado central de CartContext para evitar múltiples llamadas API.
  */
 export const usePendingOrderCheck = () => {
-  const [pendingOrder, setPendingOrder] = useState<IPendingOrder | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const { isAuthenticated } = useAuth()
-
-  const checkPendingOrder = useCallback(async () => {
-    // Solo verificar si el usuario está autenticado
-    if (!isAuthenticated) {
-      setPendingOrder(null)
-      setError(null)
-      setIsLoading(false)
-      return
-    }
-
-    try {
-      setIsLoading(true)
-      setError(null)
-      
-      const response = await getUserCart()
-      
-      // La respuesta ahora incluye pendingOrder si existe
-      if (response.pendingOrder) {
-        setPendingOrder(response.pendingOrder)
-      } else {
-        setPendingOrder(null)
-      }
-    } catch (err: unknown) {
-      // Si el error es por orden pendiente (409), extraer la información
-      const error = err as Error & { status?: number; message?: string }
-      
-      // Manejar específicamente errores de autenticación
-      if (error.status === 401 || error.message?.includes('Unauthorized')) {
-        setPendingOrder(null)
-        setError(null)
-        return
-      }
-      
-      if (error.message?.includes('orden pendiente') || error.status === 409) {
-        try {
-          const errorData = JSON.parse(error.message || '{}')
-          if (errorData.data) {
-            setPendingOrder(errorData.data)
-            return
-          }
-        } catch {
-          // Si no puede parsear, continuar con error normal
-        }
-      }
-      
-      setError(error.message || 'Error al verificar órdenes pendientes')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [isAuthenticated])
+  const { pendingOrder, loading: isLoading, error, refreshCart } = useCart()
 
   const clearPendingOrder = () => {
-    setPendingOrder(null)
-    setError(null)
+    // Esto es solo local, idealmente refetch para sincronizar con backend.
   }
-
-  // Verificar al montar el hook y cuando cambie la autenticación
-  useEffect(() => {
-    checkPendingOrder()
-  }, [checkPendingOrder])
 
   return {
     pendingOrder,
     hasPendingOrder: !!pendingOrder,
     isLoading,
     error,
-    refetch: checkPendingOrder,
+    refetch: refreshCart,
     clearPendingOrder
   }
 }
