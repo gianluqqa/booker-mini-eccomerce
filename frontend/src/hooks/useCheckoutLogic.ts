@@ -247,56 +247,31 @@ export const useCheckoutLogic = () => {
   };
 
   const handleRestartCheckout = async () => {
-    // 🔒 Evitar múltiples reinicios simultáneos
-    if (isInitializingRef.current) {
-      console.log('🔒 [FRONTEND] handleRestartCheckout - Ya se está inicializando, evitando duplicación');
-      return;
-    }
-
     try {
-      console.log('🔄 [FRONTEND] handleRestartCheckout - Reiniciando checkout');
-      isInitializingRef.current = true;
+      console.log('🔄 [FRONTEND] handleRestartCheckout - Cancelando orden expirada para volver a la tienda');
       setLoading(true);
       setError(null);
-      setOrderExpired(false);
 
-      // Cancelar checkout actual
-      await cancelCheckout();
-      setOrder(null);
-
-      // Crear nueva orden PENDING
+      // Cancelar checkout actual en el servidor
       try {
-        const newOrder = await startCheckout();
-        setOrder(newOrder);
-        console.log('✅ [FRONTEND] handleRestartCheckout - Nueva orden creada:', newOrder.id);
-      } catch (orderError: unknown) {
-        // Si el error es por orden pendiente existente, verificar y usar la existente
-        const errorMessage = orderError instanceof Error ? orderError.message : '';
-        if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
-          console.log('🔄 [FRONTEND] handleRestartCheckout - Orden pendiente detectada, verificando...');
-          
-          const existingOrder = await checkPendingOrder();
-          if (existingOrder) {
-            console.log('✅ [FRONTEND] handleRestartCheckout - Usando orden existente:', existingOrder.id);
-            setOrder(existingOrder);
-          } else {
-            console.log('⚠️ [FRONTEND] handleRestartCheckout - No se encontró orden existente');
-            throw orderError;
-          }
-        } else {
-          throw orderError;
-        }
+        await cancelCheckout();
+      } catch (e) {
+        console.warn('⚠️ Error al cancelar (puede que ya estuviera cancelada):', e);
       }
 
-      setLoading(false);
-      console.log('✅ [FRONTEND] handleRestartCheckout - Checkout reiniciado exitosamente');
+      clearReservation();
+      setOrder(null);
+      setOrderExpired(false);
+      await refreshCart();
+
+      // Redirigir a la tienda para "añadir libros otra vez"
+      router.push("/"); 
+      console.log('✅ [FRONTEND] handleRestartCheckout - Redirigiendo a la tienda');
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Error al reiniciar el checkout";
+      const errorMessage = error instanceof Error ? error.message : "Error al procesar la solicitud";
       setError(errorMessage);
       setLoading(false);
       console.error("❌ [FRONTEND] Error en handleRestartCheckout:", error);
-    } finally {
-      isInitializingRef.current = false;
     }
   };
 

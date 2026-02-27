@@ -17,30 +17,30 @@ interface CheckoutSummaryProps {
   onRestartCheckout: () => void;
 }
 
-export const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({ 
-  subtotal, 
-  tax, 
-  total, 
-  processing, 
-  orderExpired, 
-  order, 
-  onCheckout, 
-  onCancelCheckout, 
-  onOrderExpired, 
-  onRestartCheckout 
+export const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
+  subtotal,
+  tax,
+  total,
+  processing,
+  orderExpired,
+  order,
+  onCheckout,
+  onCancelCheckout,
+  onOrderExpired,
+  onRestartCheckout
 }) => {
   return (
-    <div className="bg-white rounded-sm shadow-sm p-6">
-      <ReservationTimer order={order} onExpired={onOrderExpired} />
+    <div className="bg-white p-6">
+      <ReservationTimer order={order} onExpired={onOrderExpired} onExtend={onRestartCheckout} />
 
       <CheckoutTotals subtotal={subtotal} tax={tax} total={total} />
 
-      <CheckoutActions 
-        processing={processing} 
-        orderExpired={orderExpired} 
-        onCheckout={onCheckout} 
-        onCancelCheckout={onCancelCheckout} 
-        onRestartCheckout={onRestartCheckout} 
+      <CheckoutActions
+        processing={processing}
+        orderExpired={orderExpired}
+        onCheckout={onCheckout}
+        onCancelCheckout={onCancelCheckout}
+        onRestartCheckout={onRestartCheckout}
       />
     </div>
   );

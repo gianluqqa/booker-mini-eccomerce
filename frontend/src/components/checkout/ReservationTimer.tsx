@@ -26,18 +26,33 @@ export const ReservationTimer: React.FC<ReservationTimerProps> = ({ order, reser
 
   if (!finalExpiresAt || isExpired) {
     return (
-      <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
-        <div className="flex items-center space-x-3">
-          <AlertTriangle className="w-5 h-5 text-red-600" />
-          <div className="flex-1">
-            <p className="text-red-800 font-medium">Orden expirada</p>
-            <p className="text-red-600 text-sm">Tu orden ha expirado. Por favor, inicia un nuevo checkout.</p>
+      <div className={`relative overflow-hidden bg-white border-t-4 border-t-red-500 transition-all duration-500 ${className}`}>
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-sm bg-red-50">
+                <AlertTriangle className="h-6 w-6 text-red-500" />
+              </div>
+
+              <div className="space-y-0.5">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-red-600">
+                  Orden Expirada
+                </h3>
+                <p className="text-sm text-[#2e4b30]/60 font-medium">
+                  El tiempo de reserva ha finalizado.
+                </p>
+              </div>
+            </div>
+
+            {finalOnExtend && (
+              <button
+                onClick={finalOnExtend}
+                className="bg-[#2e4b30] text-[#f5efe1] px-6 py-2.5 rounded-sm hover:bg-[#1a3a1c] transition-all text-[11px] font-bold uppercase tracking-wider active:scale-95"
+              >
+                Volver a la Tienda
+              </button>
+            )}
           </div>
-          {finalOnExtend && (
-            <button onClick={finalOnExtend} className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors text-sm">
-              Reiniciar checkout
-            </button>
-          )}
         </div>
       </div>
     );
