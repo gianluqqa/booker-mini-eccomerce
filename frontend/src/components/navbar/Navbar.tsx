@@ -268,7 +268,7 @@ const Navbar = () => {
                 className="relative p-2 text-[#2e4b30] hover:opacity-80 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <ShoppingCart className="h-5 w-5 sm:h-6 sm:w-6" />
+                <ShoppingCart className="w-5 h-5 sm:w-6 h-6" strokeWidth={2.5} />
                 {cartCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 bg-red-600 text-white text-[9px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-sm">
                     {cartCount > 9 ? "9+" : cartCount}
@@ -285,7 +285,7 @@ const Navbar = () => {
                   className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-2 rounded-sm transition-all duration-200 flex items-center space-x-1"
                   title="Mi Perfil"
                 >
-                  <User className="w-5 h-5" strokeWidth={2} />
+                  <User className="w-5 h-5 sm:w-6 h-6" strokeWidth={2.5} />
                 </Link>
                 <button
                   onClick={() => {

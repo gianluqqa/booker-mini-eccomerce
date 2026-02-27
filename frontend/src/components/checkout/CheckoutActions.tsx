@@ -57,12 +57,6 @@ export const CheckoutActions: React.FC<CheckoutActionsProps> = ({
         Cancelar Checkout
       </button>
 
-      <button
-        onClick={() => window.history.back()}
-        className="w-full bg-[#2e4b30]/10 text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-sm hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium"
-      >
-        Volver al Carrito
-      </button>
     </div>
   );
 };

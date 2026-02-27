@@ -28,7 +28,7 @@ const WeeklyRecommendation = () => {
   const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setSuccessMessage(null);
 
     if (!isAuthenticated) {
@@ -76,153 +76,141 @@ const WeeklyRecommendation = () => {
   }
 
   return (
-    <section id="weekly-recommendation" className="py-16 px-4 bg-[#2e4b30]">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="w-6 h-6 text-[#f5efe1]" />
-            <h2 className="text-3xl font-bold text-[#f5efe1]">
-              Recomendación de la Semana
-            </h2>
-            <Star className="w-6 h-6 text-[#f5efe1]" />
-          </div>
-          <p className="text-sm text-[#f5efe1] opacity-80 max-w-2xl mx-auto">
-            Descubre nuestra selección especial, elegida con cuidado por nuestro equipo de curadores
-          </p>
-        </div>
+    <section id="weekly-recommendation" className="py-24 px-4 bg-[#2e4b30] relative overflow-hidden">
+      {/* Elementos Decorativos de Fondo */}
+      <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 border-2 border-[#f5efe1] rotate-12"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 border border-[#f5efe1] -rotate-6"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-[#f5efe1]/20"></div>
+      </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Columna izquierda: Información */}
-          <div className="space-y-6">
-            {/* Badge de selección */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#f5efe1] text-[#2e4b30] rounded-sm text-sm font-semibold">
-              <Award className="w-4 h-4" />
-              Selección Booker
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid lg:grid-cols-12 gap-16 items-center">
+
+          {/* LADO IZQUIERDO: TEXTO Y ACCIONES (Col 7) */}
+          <div className="lg:col-span-7 space-y-10 order-2 lg:order-1">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 text-[#f5efe1]/60 uppercase tracking-[0.4em] text-[10px] font-black">
+                <div className="h-[1px] w-12 bg-[#f5efe1]/30"></div>
+                <span>Curaduría Exclusiva</span>
+              </div>
+
+              <h2 className="text-5xl md:text-7xl font-black text-[#f5efe1] uppercase tracking-tighter leading-[0.85]">
+                Libro de la <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f5efe1] to-[#f5efe1]/40">Semana</span>
+              </h2>
             </div>
 
-            {/* Título y autor */}
-            <div>
-              <h3 className="text-2xl md:text-3xl font-bold text-[#f5efe1] mb-2">
+            <div className="relative pl-8 border-l-2 border-[#f5efe1]/20">
+              <h3 className="text-3xl md:text-4xl font-bold text-[#f5efe1] mb-2 tracking-tight">
                 {recommendation.title}
               </h3>
-              <p className="text-lg text-[#f5efe1] opacity-80">
-                por {recommendation.author}
+              <p className="text-xl text-[#f5efe1]/70 font-medium italic">
+                — {recommendation.author}
               </p>
             </div>
 
-            {/* Precio y stock */}
-            <div className="flex items-center justify-between">
-              <div className="text-3xl font-bold text-[#f5efe1]">
-                ${typeof recommendation.price === 'number' 
-                  ? recommendation.price.toFixed(2) 
-                  : parseFloat(String(recommendation.price)).toFixed(2)
-                }
-              </div>
-              <div className={`px-3 py-1 rounded-sm text-xs font-medium ${
-                recommendation.stock > 0
-                  ? "bg-[#f5efe1] text-[#2e4b30]"
-                  : "bg-red-100 text-red-600"
-              }`}>
-                {recommendation.stock > 0 ? `${recommendation.stock} disponibles` : "Sin stock"}
-              </div>
-            </div>
-
-            {/* Mensaje de éxito */}
-            {successMessage && (
-              <div className="px-4 py-3 bg-green-100 text-green-700 rounded-sm text-sm font-medium">
-                {successMessage}
-              </div>
-            )}
-
-            {/* Descripción */}
-            <div className="bg-[#1a3a1c] rounded-sm p-6">
-              <p className="text-[#f5efe1] leading-relaxed">
-                Una obra que captura la esencia de la literatura contemporánea con 
-                prosas poéticas y personajes inolvidables. Perfecta para quienes buscan 
-                historias que resuenan profundamente en el alma.
+            <div className="bg-[#1a3a1c] p-8 border border-[#f5efe1]/10 shadow-2xl relative">
+              <Sparkles className="absolute -top-4 -right-4 w-10 h-10 text-[#f5efe1]/20" />
+              <p className="text-[#f5efe1]/90 leading-relaxed text-lg font-medium italic">
+                "{recommendation.description || 'Una obra que captura la esencia de la literatura contemporánea con prosas poéticas y personajes inolvidables. Perfecta para quienes buscan historias que resuenan profundamente en el alma.'}"
               </p>
             </div>
 
-            {/* Características */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3">
-                <Clock className="w-5 h-5 text-[#f5efe1]" />
-                <span className="text-sm text-[#f5efe1]">Lectura de fin de semana</span>
+            <div className="flex flex-wrap items-center gap-8 pt-4">
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-black tracking-widest text-[#f5efe1]/40 mb-1">Inversión</span>
+                <span className="text-4xl font-black text-[#f5efe1] tracking-tighter">
+                  ${typeof recommendation.price === 'number'
+                    ? recommendation.price.toFixed(2)
+                    : parseFloat(String(recommendation.price)).toFixed(2)
+                  }
+                </span>
               </div>
-              <div className="flex items-center gap-3">
-                <Gift className="w-5 h-5 text-[#f5efe1]" />
-                <span className="text-sm text-[#f5efe1]">Ideal para regalar</span>
+
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col items-center px-4 py-2 border border-[#f5efe1]/20">
+                  <Clock className="w-5 h-5 text-[#f5efe1] mb-1" />
+                  <span className="text-[10px] font-bold text-[#f5efe1] uppercase">420 Pag.</span>
+                </div>
+                <div className="flex flex-col items-center px-4 py-2 border border-[#f5efe1]/20">
+                  <Award className="w-5 h-5 text-[#f5efe1] mb-1" />
+                  <span className="text-[10px] font-bold text-[#f5efe1] uppercase">Best Seller</span>
+                </div>
               </div>
             </div>
 
-            {/* Botones de acción */}
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
               <button
                 onClick={handleAddToCart}
                 disabled={recommendation.stock === 0 || cartLoading}
-                className={`flex-1 py-3 px-6 rounded-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
-                  recommendation.stock > 0 && !cartLoading
-                    ? "bg-[#f5efe1] text-[#2e4b30] hover:bg-[#e8dcc8] hover:shadow-lg"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                className={`group relative overflow-hidden px-10 py-5 font-black uppercase text-[11px] tracking-[0.3em] transition-all ${recommendation.stock > 0 && !cartLoading
+                    ? "bg-[#f5efe1] text-[#2e4b30] hover:bg-white"
+                    : "bg-gray-500 text-gray-300 cursor-not-allowed"
+                  }`}
               >
-                {cartLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Añadiendo...
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-4 h-4" />
-                    {recommendation.stock > 0 ? "Añadir al carrito" : "No disponible"}
-                  </>
-                )}
+                <span className="relative z-10 flex items-center justify-center gap-3">
+                  {cartLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShoppingCart className="w-4 h-4" />}
+                  {recommendation.stock > 0 ? "Añadir a Colección" : "Agotado"}
+                </span>
               </button>
-              
+
               <button
                 onClick={handleViewDetails}
-                className="flex-1 py-3 px-6 rounded-sm font-medium transition-all duration-300 bg-[#1a3a1c] text-[#f5efe1] hover:bg-black hover:shadow-lg flex items-center justify-center gap-2 border border-[#f5efe1]/20"
+                className="px-10 py-5 font-black uppercase text-[11px] tracking-[0.3em] bg-transparent border-2 border-[#f5efe1]/20 text-[#f5efe1] hover:bg-[#f5efe1] hover:text-[#2e4b30] transition-all flex items-center justify-center gap-3"
               >
-                Ver detalles
+                Explorar Obra
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
+
+            {successMessage && (
+              <p className="text-[#f5efe1] text-xs font-bold uppercase tracking-widest animate-pulse">
+                ✓ {successMessage}
+              </p>
+            )}
           </div>
 
-          {/* Columna derecha: Imagen del libro */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="relative group">
-              {/* Badge flotante */}
-              <div className="absolute -top-3 -right-3 z-10 bg-[#f5efe1] text-[#2e4b30] px-3 py-1 rounded-sm text-xs font-bold flex items-center gap-1">
-                <Star className="w-3 h-3 fill-current" />
-                Top Pick
-              </div>
+          {/* LADO DERECHO: IMAGEN DINÁMICA (Col 5) */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end order-1 lg:order-2">
+            <div className="relative group cursor-pointer" onClick={handleViewDetails}>
+              {/* Sombras y marcos decorativos */}
+              <div className="absolute top-10 left-10 w-full h-full border-2 border-[#f5efe1]/20 -z-10 group-hover:top-6 group-hover:left-6 transition-all duration-500"></div>
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 border-b-2 border-r-2 border-[#f5efe1]/40 -z-10"></div>
 
-              {/* Contenedor de la imagen */}
-              <div 
-                onClick={handleViewDetails}
-                className="relative bg-[#f5efe1] rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
-              >
-                <div className="aspect-[3/4] w-80">
-                  {recommendation.image && !imageError ? (
-                    <Image
-                      src={recommendation.image}
-                      alt={recommendation.title}
-                      width={320}
-                      height={427}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={() => setImageError(true)}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#f5efe1] to-[#e8dcc8] flex items-center justify-center">
-                      <BookOpen className="w-16 h-16 text-[#2e4b30]/30" />
-                    </div>
-                  )}
+              {/* Contenedor Principal de Imagen */}
+              <div className="w-72 md:w-96 aspect-[3/4.5] bg-[#1a3a1c] shadow-[30px_30px_60px_rgba(0,0,0,0.4)] relative overflow-hidden border-2 border-[#f5efe1]/10">
+                {recommendation.image && !imageError ? (
+                  <Image
+                    src={recommendation.image}
+                    alt={recommendation.title}
+                    width={400}
+                    height={600}
+                    className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
+                    <BookOpen className="w-20 h-20 text-[#f5efe1]/10" />
+                    <span className="text-[#f5efe1]/30 font-black uppercase tracking-widest text-[10px]">Sin Imagen</span>
+                  </div>
+                )}
+
+                {/* Badge Flotante Estilizado */}
+                <div className="absolute top-0 right-0 p-8">
+                  <div className="bg-[#f5efe1] text-[#2e4b30] w-14 h-14 flex items-center justify-center shadow-2xl rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                    <Star className="w-6 h-6 fill-current" />
+                  </div>
+                </div>
+
+                {/* Info Overlay al Hover */}
+                <div className="absolute inset-x-0 bottom-0 p-8 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-gradient-to-t from-black/80 to-transparent">
+                  <p className="text-[#f5efe1] text-[10px] font-black uppercase tracking-[0.5em]">Edición Limitada</p>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>

@@ -22,3 +22,8 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   font-size: 0.75rem; /* base pequeña equivalente a text-xs; Tailwind ajustará tamaños relativos */
 }
+
+/* Forzar remoción de redondeos en toda la aplicación */
+* {
+  border-radius: 0 !important;
+}

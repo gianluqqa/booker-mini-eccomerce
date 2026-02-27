@@ -34,21 +34,21 @@ interface CheckoutMainViewProps {
   }>>;
 }
 
-export const CheckoutMainView: React.FC<CheckoutMainViewProps> = ({ 
-  cartItems, 
-  order, 
-  error, 
-  processing, 
-  orderExpired, 
-  cardData, 
-  subtotal, 
-  tax, 
-  total, 
-  handleCheckout, 
-  handleCancelCheckout, 
-  handleOrderExpired, 
-  handleRestartCheckout, 
-  setCardData 
+export const CheckoutMainView: React.FC<CheckoutMainViewProps> = ({
+  cartItems,
+  order,
+  error,
+  processing,
+  orderExpired,
+  cardData,
+  subtotal,
+  tax,
+  total,
+  handleCheckout,
+  handleCancelCheckout,
+  handleOrderExpired,
+  handleRestartCheckout,
+  setCardData
 }) => {
   return (
     <div className="min-h-screen bg-[#f5efe1] pt-20">
@@ -57,24 +57,24 @@ export const CheckoutMainView: React.FC<CheckoutMainViewProps> = ({
 
         {error && <CheckoutErrorState error={error} />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2">
             <CartPreview cartItems={cartItems} />
             <PaymentForm cardData={cardData} setCardData={setCardData} />
           </div>
 
-          <div>
-            <CheckoutSummary 
-              subtotal={subtotal} 
-              tax={tax} 
-              total={total} 
-              processing={processing} 
-              orderExpired={orderExpired} 
-              order={order} 
-              onCheckout={handleCheckout} 
-              onCancelCheckout={handleCancelCheckout} 
-              onOrderExpired={handleOrderExpired} 
-              onRestartCheckout={handleRestartCheckout} 
+          <div className="lg:sticky lg:top-24">
+            <CheckoutSummary
+              subtotal={subtotal}
+              tax={tax}
+              total={total}
+              processing={processing}
+              orderExpired={orderExpired}
+              order={order}
+              onCheckout={handleCheckout}
+              onCancelCheckout={handleCancelCheckout}
+              onOrderExpired={handleOrderExpired}
+              onRestartCheckout={handleRestartCheckout}
             />
           </div>
         </div>

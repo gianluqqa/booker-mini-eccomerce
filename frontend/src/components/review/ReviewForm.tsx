@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { CreateReviewDto, UpdateReviewDto, Review } from "../../types/Review";
-import { Star } from "lucide-react";
+import { Star, X, Check, Loader2 } from "lucide-react";
+import { REVIEW_CONFIG, isValidReviewLength } from "@/config/reviewConfig";
 
 interface ReviewFormProps {
   bookId: string;
@@ -25,23 +26,15 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!comment.trim()) {
-      alert("Por favor escribe un comentario");
-      return;
-    }
-
+    if (!isValidReviewLength(comment)) return;
     setIsSubmitting(true);
-    
     try {
       const data = isEditing
         ? { rating, title: title.trim() || undefined, comment }
         : { rating, title: title.trim() || undefined, comment, bookId };
-      
       await onSubmit(data);
     } catch (error) {
       console.error("Error al guardar reseña:", error);
-      alert("Error al guardar la reseña. Por favor intenta nuevamente.");
     } finally {
       setIsSubmitting(false);
     }
@@ -57,14 +50,14 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
           onClick={() => setRating(starValue)}
           onMouseEnter={() => setHoveredStar(starValue)}
           onMouseLeave={() => setHoveredStar(0)}
-          className="p-1 transition-transform hover:scale-110"
+          className="p-1 transition-transform hover:scale-125"
         >
           <Star
-            className={`w-6 h-6 ${
-              starValue <= (hoveredStar || rating)
-                ? "fill-yellow-400 text-yellow-400"
-                : "fill-gray-200 text-gray-300"
-            }`}
+            className={`w-6 h-6 transition-all ${starValue <= (hoveredStar || rating)
+              ? "fill-[#2e4b30] text-[#2e4b30]"
+              : "fill-transparent text-[#2e4b30]/20"
+              }`}
+            strokeWidth={2.5}
           />
         </button>
       );
@@ -72,76 +65,92 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        {isEditing ? "Editar Reseña" : "Escribir una Reseña"}
-      </h3>
-      
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Calificación */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Calificación *
-          </label>
-          <div className="flex items-center gap-2">
-            {renderStars()}
-            <span className="text-sm text-gray-600 ml-2">
-              {rating} de 5 estrellas
-            </span>
+    <div className="bg-[#1a3a1c] p-[2px] rounded-none shadow-2xl">
+      <div className="bg-[#f5efe1] p-8 border border-white/5 space-y-8">
+        <div className="flex justify-between items-center border-b border-[#2e4b30]/10 pb-4">
+          <h3 className="text-xl font-black text-[#1a3a1c] uppercase tracking-tighter">
+            {isEditing ? "Corregir Reseña" : "Voz del Lector"}
+          </h3>
+          <button onClick={onCancel} className="text-[#2e4b30]/40 hover:text-[#2e4b30] transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Calificación */}
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-[#2e4b30] uppercase tracking-[0.3em] block">
+                Valoración Cosmética
+              </label>
+              <div className="flex items-center gap-2 bg-white/40 p-3 border border-[#2e4b30]/10 rounded-none w-fit">
+                {renderStars()}
+                <span className="text-[10px] font-black text-[#2e4b30] ml-4 bg-[#2e4b30] text-white px-2 py-1">
+                  {rating}/5
+                </span>
+              </div>
+            </div>
+
+            {/* Título */}
+            <div className="space-y-4">
+              <label className="text-[10px] font-black text-[#2e4b30] uppercase tracking-[0.3em] block">
+                Resumen Corto
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="El corazón de tu crítica..."
+                className="w-full bg-white/60 border-2 border-[#2e4b30]/10 p-3 focus:border-[#2e4b30] focus:outline-none text-sm font-bold text-[#2e4b30] placeholder-[#2e30]/30 transition-all rounded-none"
+                maxLength={255}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Título (opcional) */}
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-            Título (opcional)
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Breve resumen de tu opinión"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
-            maxLength={255}
-          />
-        </div>
+          {/* Comentario */}
+          <div className="space-y-4">
+            <label className="text-[10px] font-black text-[#2e4b30] uppercase tracking-[0.3em] block">
+              Tu Pensamiento
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="¿Qué universos descubriste en estas páginas?"
+              rows={5}
+              className="w-full bg-white/60 border-2 border-[#2e4b30]/10 p-4 focus:border-[#2e4b30] focus:outline-none text-sm font-bold text-[#2e4b30] resize-none placeholder-[#2e30]/30 transition-all rounded-none"
+              required
+              maxLength={REVIEW_CONFIG.MAX_CHARACTERS}
+            />
+            <div className="flex justify-end">
+              <span className={`text-[10px] font-black uppercase tracking-widest ${comment.length > REVIEW_CONFIG.MAX_CHARACTERS - 100 ? "text-red-500" : "text-[#2e4b30]/40"}`}>
+                {comment.length} / {REVIEW_CONFIG.MAX_CHARACTERS} Caracteres
+              </span>
+            </div>
+          </div>
 
-        {/* Comentario */}
-        <div>
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
-            Comentario *
-          </label>
-          <textarea
-            id="comment"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Comparte tu experiencia con este libro..."
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none text-gray-900 placeholder-gray-500"
-            required
-          />
-        </div>
-
-        {/* Botones */}
-        <div className="flex gap-3 justify-end">
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={isSubmitting}
-            className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? "Guardando..." : isEditing ? "Actualizar" : "Publicar"}
-          </button>
-        </div>
-      </form>
+          {/* Acciones */}
+          <div className="flex gap-4 pt-4">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 bg-[#2e4b30] text-[#f5efe1] py-4 font-black uppercase text-[10px] tracking-[0.4em] flex items-center justify-center gap-3 hover:bg-[#1a3a1c] transition-all disabled:opacity-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] active:scale-[0.98]"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <><Check className="w-4 h-4" /> {isEditing ? "Actualizar Obra" : "Publicar mi Voz"}</>
+              )}
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-8 py-4 border-2 border-[#2e4b30]/10 text-[#2e4b30] font-black uppercase text-[10px] tracking-[0.4em] hover:bg-[#2e4b30]/5 transition-all"
+            >
+              Cerrar
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

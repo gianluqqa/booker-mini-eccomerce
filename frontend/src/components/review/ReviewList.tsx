@@ -3,18 +3,21 @@ import { Review, ReviewListDto, CreateReviewDto, UpdateReviewDto } from "../../t
 import { getReviewsByBook } from "../../services/reviewService";
 import { ReviewCard } from "./ReviewCard";
 import { ReviewForm } from "./ReviewForm";
-import { Star, MessageSquare, BarChart3 } from "lucide-react";
+import { Star, MessageSquare, BarChart3, Loader2, Plus } from "lucide-react";
+import Link from "next/link";
 
 interface ReviewListProps {
   bookId: string;
   currentUserId?: string;
   onReviewUpdated?: () => void;
+  mode?: "stats" | "feed" | "full";
 }
 
 export const ReviewList: React.FC<ReviewListProps> = ({
   bookId,
   currentUserId,
   onReviewUpdated,
+  mode = "full"
 }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,7 +37,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
   const fetchReviews = useCallback(async () => {
     try {
       setLoading(true);
-      const data: ReviewListDto = await getReviewsByBook(bookId, 1, 50); // Obtener más reseñas para estadísticas
+      const data: ReviewListDto = await getReviewsByBook(bookId, 1, 50);
       setReviews(data.reviews);
       setStats({
         total: data.total,
@@ -55,224 +58,166 @@ export const ReviewList: React.FC<ReviewListProps> = ({
   }, [bookId, fetchReviews]);
 
   const handleCreateReview = async (reviewData: CreateReviewDto | UpdateReviewDto) => {
-    try {
-      const { createReview } = await import("../../services/reviewService");
-      await createReview(reviewData as CreateReviewDto);
-      setShowForm(false);
-      fetchReviews();
-      onReviewUpdated?.();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Error al crear la reseña";
-      
-      // Si el error es porque ya existe una reseña, mostrar opción de editar
-      if (errorMessage.includes("Ya has reseñado")) {
-        // Buscar la reseña existente del usuario
-        const userReview = reviews.find(review => review.userId === currentUserId);
-        if (userReview) {
-          setEditingReview(userReview);
-          return;
-        }
-      }
-      
-      throw error;
-    }
+    const { createReview } = await import("../../services/reviewService");
+    await createReview(reviewData as CreateReviewDto);
+    setShowForm(false);
+    fetchReviews();
+    onReviewUpdated?.();
   };
 
   const handleUpdateReview = async (reviewData: UpdateReviewDto) => {
     if (!editingReview) return;
-    
-    try {
-      const { updateReview } = await import("../../services/reviewService");
-      await updateReview(editingReview.id, reviewData);
-      setEditingReview(null);
-      fetchReviews();
-      onReviewUpdated?.();
-    } catch (error) {
-      throw error;
-    }
+    const { updateReview } = await import("../../services/reviewService");
+    await updateReview(editingReview.id, reviewData);
+    setEditingReview(null);
+    fetchReviews();
+    onReviewUpdated?.();
   };
 
   const handleDeleteReview = async (reviewId: string) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar esta reseña?")) return;
-    
-    try {
-      const { deleteReview } = await import("../../services/reviewService");
-      await deleteReview(reviewId);
-      fetchReviews();
-      onReviewUpdated?.();
-    } catch (error) {
-      console.error("Error deleting review:", error);
-      alert("Error al eliminar la reseña");
-    }
+    if (!confirm("¿Eliminar este pensamiento para siempre?")) return;
+    const { deleteReview } = await import("../../services/reviewService");
+    await deleteReview(reviewId);
+    fetchReviews();
+    onReviewUpdated?.();
   };
 
-  const renderStars = (rating: number, size: "small" | "large" = "small") => {
-    const starSize = size === "large" ? "w-6 h-6" : "w-4 h-4";
+  const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, index) => (
       <Star
         key={index}
-        className={`${starSize} ${
-          index < rating
-            ? "fill-yellow-400 text-yellow-400"
-            : "fill-gray-200 text-gray-200"
-        }`}
+        className={`w-4 h-4 ${index < rating
+          ? "fill-[#2e4b30] text-[#2e4b30]"
+          : "fill-transparent text-[#2e4b30]/10"
+          }`}
+        strokeWidth={2.5}
       />
     ));
   };
 
-  const renderRatingDistribution = () => {
-    const total = stats.total;
-    if (total === 0) return null;
-
-    return (
-      <div className="space-y-2">
-        {[5, 4, 3, 2, 1].map((rating) => {
-          const count = stats.ratingDistribution[rating as keyof typeof stats.ratingDistribution];
-          const percentage = total > 0 ? (count / total) * 100 : 0;
-          
-          return (
-            <div key={rating} className="flex items-center gap-2">
-              <div className="flex items-center gap-1 w-12">
-                <span className="text-sm font-medium">{rating}</span>
-                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-              </div>
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${percentage}%` }}
-                />
-              </div>
-              <span className="text-sm text-gray-600 w-8 text-right">
-                {count}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
   if (loading) {
     return (
-      <div className="flex justify-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-red-600">{error}</p>
-        <button
-          onClick={fetchReviews}
-          className="mt-2 text-blue-600 hover:underline"
-        >
-          Reintentar
-        </button>
+      <div className="flex flex-col items-center justify-center py-20 bg-white/5 shadow-inner">
+        <Loader2 className="w-8 h-8 text-[#2e4b30] animate-spin mb-4" />
+        <p className="text-[10px] font-black uppercase text-[#2e4b30] tracking-widest">Sincronizando pensamientos...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Estadísticas */}
-      <div className="bg-gray-50 rounded-lg p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Calificación promedio */}
-          <div className="text-center">
-            <div className="flex justify-center items-center gap-2 mb-2">
-              <span className="text-3xl font-bold text-gray-900">
-                {stats.averageRating.toFixed(1)}
-              </span>
-              <div className="flex">
-                {renderStars(Math.round(stats.averageRating), "large")}
+    <div className={`space-y-12 ${mode === "stats" ? "h-full flex flex-col" : ""}`}>
+      {/* Resumen de Estadísticas con un look minimalista y geométrico */}
+      {(mode === "full" || mode === "stats") && (
+        <div className={`bg-white/40 border border-[#2e4b30]/10 p-8 rounded-none shadow-sm ${mode === "stats" ? "flex-grow flex flex-col justify-center" : ""}`}>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+
+            <div className="md:col-span-4 text-center md:text-left space-y-2">
+              <p className="text-[10px] font-black text-[#2e4b30]/50 uppercase tracking-[0.4em]">IMPACTO MEDIO</p>
+              <div className="flex items-baseline justify-center md:justify-start gap-2">
+                <span className="text-6xl font-black text-[#1a3a1c] tracking-tighter italic-none">
+                  {stats.averageRating.toFixed(1)}
+                </span>
+                <div className="flex flex-col items-start gap-1">
+                  <div className="flex">{renderStars(Math.round(stats.averageRating))}</div>
+                  <p className="text-[9px] font-black text-[#2e4b30] uppercase opacity-40">
+                    {stats.total} {stats.total === 1 ? "Lectura" : "Lecturas"}
+                  </p>
+                </div>
               </div>
             </div>
-            <p className="text-gray-600">
-              {stats.total} {stats.total === 1 ? "reseña" : "reseñas"}
-            </p>
-          </div>
 
-          {/* Distribución de calificaciones */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="w-4 h-4 text-gray-600" />
-              <span className="font-medium text-gray-700">Distribución</span>
+            <div className="md:col-span-8 flex flex-col gap-3">
+              {[5, 4, 3, 2, 1].map((rating) => {
+                const count = stats.ratingDistribution[rating as keyof typeof stats.ratingDistribution];
+                const percentage = stats.total > 0 ? (count / stats.total) * 100 : 0;
+                return (
+                  <div key={rating} className="flex items-center gap-4">
+                    <span className="text-[9px] font-black text-[#2e4b30] w-2">{rating}</span>
+                    <div className="flex-1 h-1.5 bg-[#2e4b30]/5 rounded-none overflow-hidden">
+                      <div
+                        className="bg-[#2e4b30] h-full transition-all duration-1000"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-[9px] font-black text-[#2e4b30]/30 w-4 text-right">
+                      {count}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
-            {renderRatingDistribution()}
           </div>
         </div>
-      </div>
-
-      {/* Formulario de crear/editar reseña */}
-      {currentUserId && (showForm || editingReview) && (
-        <ReviewForm
-          bookId={bookId}
-          initialReview={editingReview || undefined}
-          onSubmit={editingReview ? handleUpdateReview : handleCreateReview}
-          onCancel={() => {
-            setShowForm(false);
-            setEditingReview(null);
-          }}
-          isEditing={!!editingReview}
-        />
       )}
 
-      {/* Botón para agregar/editar reseña */}
-      {currentUserId && !showForm && !editingReview && (
-        <div className="flex flex-col items-center gap-2">
-          {(() => {
-            const userReview = reviews.find(review => review.userId === currentUserId);
-            if (userReview) {
-              return (
-                <button
-                  onClick={() => setEditingReview(userReview)}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Editar mi reseña
-                </button>
-              );
-            } else {
-              return (
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Escribir una reseña
-                </button>
-              );
-            }
-          })()}
-        </div>
-      )}
+      {(mode === "full" || mode === "feed") && (
+        <>
+          {/* Acciones de Reseña */}
+          <div className="flex justify-center">
+            {!showForm && !editingReview && (
+              currentUserId ? (
+                (() => {
+                  const userReview = reviews.find(review => review.userId === currentUserId);
+                  if (userReview) return null; // No mostrar botón si ya tiene reseña (ya existe el icono de editar)
 
-      {/* Lista de reseñas */}
-      <div className="space-y-4">
-        {reviews.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p>Este libro aún no tiene reseñas.</p>
-            {currentUserId && !showForm && (
-              <p className="text-sm mt-2">
-                ¡Sé el primero en compartir tu opinión sobre este libro!
-              </p>
+                  return (
+                    <button
+                      onClick={() => setShowForm(true)}
+                      className="group relative px-10 py-4 bg-[#2e4b30] text-[#f5efe1] overflow-hidden rounded-none"
+                    >
+                      <div className="absolute inset-0 bg-[#1a3a1c] translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      <span className="relative flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em]">
+                        <Plus className="w-4 h-4" />
+                        Añadir Pensamiento
+                      </span>
+                    </button>
+                  );
+                })()
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-[10px] font-black text-[#2e4b30]/60 uppercase tracking-widest border border-[#2e4b30]/20 px-6 py-3 hover:bg-[#2e4b30] hover:text-[#f5efe1] transition-all duration-300 cursor-pointer rounded-none"
+                >
+                  Inicia sesión para compartir tu voz
+                </Link>
+              )
             )}
           </div>
-        ) : (
-          reviews.map((review) => (
-            <ReviewCard
-              key={review.id}
-              review={review}
-              currentUserId={currentUserId}
-              onEdit={currentUserId ? setEditingReview : undefined}
-              onDelete={currentUserId ? handleDeleteReview : undefined}
+
+          {/* Formulario */}
+          {currentUserId && (showForm || editingReview) && (
+            <ReviewForm
+              bookId={bookId}
+              initialReview={editingReview || undefined}
+              onSubmit={editingReview ? handleUpdateReview : handleCreateReview}
+              onCancel={() => { setShowForm(false); setEditingReview(null); }}
+              isEditing={!!editingReview}
             />
-          ))
-        )}
-      </div>
+          )}
+
+          {/* Feed de Reseñas */}
+          <div className="space-y-6">
+            {reviews.length === 0 ? (
+              <div className="text-center py-20 border-2 border-dashed border-[#2e4b30]/10 rounded-none">
+                <MessageSquare className="w-10 h-10 mx-auto mb-6 text-[#2e4b30]/10" />
+                <p className="text-[10px] font-black text-[#2e4b30]/40 uppercase tracking-widest italic-none">El silencio es absoluto por ahora.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {reviews.map((review) => (
+                  <ReviewCard
+                    key={review.id}
+                    review={review}
+                    currentUserId={currentUserId}
+                    onEdit={setEditingReview}
+                    onDelete={handleDeleteReview}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

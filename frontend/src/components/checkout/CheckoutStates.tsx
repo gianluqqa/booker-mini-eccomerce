@@ -32,12 +32,6 @@ export const EmptyCartState: React.FC<EmptyCartProps> = ({ onBackToCart }) => {
           <ShoppingBag className="w-24 h-24 text-[#2e4b30]/30 mx-auto mb-6" />
           <h2 className="text-2xl font-bold text-[#2e4b30] mb-4">Tu carrito está vacío</h2>
           <p className="text-[#2e4b30]/70 mb-8">No hay productos para procesar el checkout</p>
-          <button
-            onClick={onBackToCart}
-            className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium inline-block"
-          >
-            Volver al Carrito
-          </button>
         </div>
       </div>
     </div>

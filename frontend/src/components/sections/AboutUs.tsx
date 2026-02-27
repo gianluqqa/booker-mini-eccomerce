@@ -1,90 +1,104 @@
 import React from "react";
-import { BookOpen, Zap, CheckCircle } from "lucide-react";
+import { BookOpen, Zap, CheckCircle, Shield, Globe, Layers } from "lucide-react";
 
 const About = () => {
   return (
-    <section id="about" className="bg-[#2e4b30] min-h-screen flex items-center py-20 px-4 sm:px-6 lg:px-8 relative text-xs sm:text-sm">
-      <div className="max-w-6xl mx-auto w-full">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="inline-block px-3 py-1.5 bg-[#f5efe1] bg-opacity-10 rounded-sm mb-4">
-              <span className="text-[#2e4b30] text-[11px] font-medium tracking-wide">
-                SOBRE NOSOTROS
-              </span>
+    <section id="about" className="bg-[#2e4b30] py-32 px-4 relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-[#f5efe1]/5 -skew-x-12 translate-x-1/2 pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 border-t border-r border-[#f5efe1]/10 pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid lg:grid-cols-12 gap-16 items-start">
+
+          {/* LADO IZQUIERDO: EL MANIFIESTO (Col 7) */}
+          <div className="lg:col-span-7 space-y-12">
+            <div className="space-y-6">
+              <div className="flex items-center gap-4 text-[#f5efe1]/40 uppercase tracking-[0.5em] text-[10px] font-black">
+                <div className="h-[1px] w-12 bg-[#2e4b30]/30 lg:bg-[#f5efe1]/20"></div>
+                <span>Nuestra Identidad</span>
+              </div>
+
+              <h2 className="text-6xl md:text-8xl font-black text-[#f5efe1] uppercase tracking-tighter leading-[0.8] mb-8">
+                ¿Qué es <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f5efe1] to-[#f5efe1]/30">Booker?</span>
+              </h2>
+
+              <div className="max-w-xl">
+                <p className="text-[#f5efe1] text-xl md:text-2xl font-medium leading-tight mb-8 italic border-l-4 border-[#f5efe1] pl-6 py-2">
+                  No somos solo una tienda; somos el puente entre las grandes mentes y los buscadores de conocimiento.
+                </p>
+                <p className="text-[#f5efe1]/70 text-sm md:text-base leading-relaxed font-light">
+                  En Booker, entendemos que cada libro es un objeto de culto. Desde 2020, nos hemos dedicado a la curaduría de piezas literarias únicas, transformando la lectura en una experiencia sensorial y estética. Creemos en la permanencia del objeto físico en un mundo efímero.
+                </p>
+              </div>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#f5efe1] mb-4 leading-tight">
-              Bienvenido a Booker
-            </h2>
+            {/* Métrica de Impacto */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-8">
+              <div className="relative group">
+                <span className="absolute -top-8 -left-4 text-6xl font-black text-[#f5efe1]/5 group-hover:text-[#f5efe1]/10 transition-colors">01</span>
+                <p className="text-4xl font-black text-[#f5efe1] tracking-tighter mb-1">5k+</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#f5efe1]/40">Almas Conectadas</p>
+              </div>
+              <div className="relative group">
+                <span className="absolute -top-8 -left-4 text-6xl font-black text-[#f5efe1]/5 group-hover:text-[#f5efe1]/10 transition-colors">02</span>
+                <p className="text-4xl font-black text-[#f5efe1] tracking-tighter mb-1">20+</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#f5efe1]/40">Joyas Curadas</p>
+              </div>
+              <div className="relative group hidden md:block">
+                <span className="absolute -top-8 -left-4 text-6xl font-black text-[#f5efe1]/5 group-hover:text-[#f5efe1]/10 transition-colors">03</span>
+                <p className="text-4xl font-black text-[#f5efe1] tracking-tighter mb-1">100%</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#f5efe1]/40">Compromiso Estético</p>
+              </div>
+            </div>
+          </div>
 
-            <p className="text-[#f5efe1] text-sm sm:text-base mb-4 leading-relaxed opacity-90">
-              Tu destino premium para descubrir libros extraordinarios desde
-              2020.
-            </p>
-
-            <p className="text-[#f5efe1] text-xs sm:text-sm mb-6 leading-relaxed opacity-80">
-              Conectamos lectores con colecciones cuidadosamente seleccionadas que abarcan
-              todos los géneros. Desde clásicos atemporales hasta bestsellers modernos, nuestra
-              misión es hacer que la literatura de calidad sea accesible para todos.
-            </p>
-
-            <div className="flex flex-wrap gap-4">
-              <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-sm flex-1 min-w-[140px]">
-                <div className="text-2xl font-bold text-[#2e4b30] mb-1">
-                  20+
+          {/* LADO DERECHO: PILARES (Col 5) */}
+          <div className="lg:col-span-5 grid gap-4">
+            <div className="group bg-[#1a3a1c] p-8 border border-[#f5efe1]/10 hover:border-[#f5efe1]/30 transition-all duration-500 hover:-translate-y-1 shadow-2xl">
+              <div className="flex items-start gap-6">
+                <div className="p-4 bg-[#f5efe1] text-[#2e4b30]">
+                  <Globe className="w-6 h-6" />
                 </div>
-                <div className="text-[#2e4b30] text-xs opacity-80">
-                  Libros Disponibles
+                <div className="space-y-2">
+                  <h3 className="text-lg font-black text-[#f5efe1] uppercase tracking-tighter">Alcance Global</h3>
+                  <p className="text-sm text-[#f5efe1]/60 leading-snug">
+                    Llevamos la cultura sin fronteras, conectando autores de todo el mundo con lectores en cada rincón.
+                  </p>
                 </div>
               </div>
-              <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-sm flex-1 min-w-[140px]">
-                <div className="text-2xl font-bold text-[#2e4b30] mb-1">
-                  24/7
+            </div>
+
+            <div className="group bg-[#1a3a1c] p-8 border border-[#f5efe1]/10 hover:border-[#f5efe1]/30 transition-all duration-500 hover:-translate-y-1 shadow-2xl lg:translate-x-8">
+              <div className="flex items-start gap-6">
+                <div className="p-4 bg-[#f5efe1] text-[#2e4b30]">
+                  <Layers className="w-6 h-6" />
                 </div>
-                <div className="text-[#2e4b30] text-xs opacity-80">
-                  Soporte al Cliente
+                <div className="space-y-2">
+                  <h3 className="text-lg font-black text-[#f5efe1] uppercase tracking-tighter">Curaduría de Capas</h3>
+                  <p className="text-sm text-[#f5efe1]/60 leading-snug">
+                    Cada título pasa por un proceso de selección riguroso que evalúa contenido, diseño y relevancia.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="group bg-[#1a3a1c] p-8 border border-[#f5efe1]/10 hover:border-[#f5efe1]/30 transition-all duration-500 hover:-translate-y-1 shadow-2xl">
+              <div className="flex items-start gap-6">
+                <div className="p-4 bg-[#f5efe1] text-[#2e4b30]">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-black text-[#f5efe1] uppercase tracking-tighter">Legado Protegido</h3>
+                  <p className="text-sm text-[#f5efe1]/60 leading-snug">
+                    Garantizamos que cada obra llegue a tus manos en perfecto estado, respetando la integridad del libro.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm p-6 rounded-sm hover:bg-opacity-10 transition-all duration-300">
-              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-sm flex items-center justify-center mb-4">
-                <BookOpen className="w-6 h-6 text-[#2e4b30]" />
-              </div>
-              <h3 className="text-base font-semibold text-[#2e4b30] mb-1.5">
-                Amplia Selección
-              </h3>
-              <p className="text-[#2e4b30] opacity-80 text-xs leading-relaxed">
-                Descubre miles de títulos en todos los géneros y categorías
-              </p>
-            </div>
-
-            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm p-6 rounded-sm hover:bg-opacity-10 transition-all duration-300">
-              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-sm flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-[#2e4b30]" />
-              </div>
-              <h3 className="text-base font-semibold text-[#2e4b30] mb-1.5">
-                Entrega Rápida
-              </h3>
-              <p className="text-[#2e4b30] opacity-80 text-xs leading-relaxed">
-                Envío rápido y seguro para llevar los libros directamente a tu puerta
-              </p>
-            </div>
-
-            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm p-6 rounded-sm hover:bg-opacity-10 transition-all duration-300">
-              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-sm flex items-center justify-center mb-4">
-                <CheckCircle className="w-6 h-6 text-[#2e4b30]" />
-              </div>
-              <h3 className="text-base font-semibold text-[#2e4b30] mb-1.5">
-                Calidad Garantizada
-              </h3>
-              <p className="text-[#2e4b30] opacity-80 text-xs leading-relaxed">
-                Cada libro cuidadosamente seleccionado y verificado para tu satisfacción
-              </p>
-            </div>
-          </div>
         </div>
       </div>
     </section>
