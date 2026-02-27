@@ -43,48 +43,37 @@ export const ReservationTimer: React.FC<ReservationTimerProps> = ({ order, reser
     );
   }
 
-  const getTimerColor = () => {
-    if (isDanger) return "text-red-600 border-red-200 bg-red-50";
-    if (isWarning) return "text-yellow-600 border-yellow-200 bg-yellow-50";
-    return "text-blue-600 border-blue-200 bg-blue-50";
-  };
-
-  const getClockColor = () => {
-    if (isDanger) return "text-red-600";
-    if (isWarning) return "text-yellow-600";
-    return "text-blue-600";
-  };
-
   return (
-    <div className={`border rounded-lg p-4 ${getTimerColor()} ${className}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Clock className={`w-5 h-5 ${getClockColor()}`} />
-          <div>
-            <p className="font-medium">{isDanger ? "¡Tiempo por agotarse!" : isWarning ? "Tiempo limitado" : "Tiempo de orden"}</p>
-            <p className="text-sm opacity-90">Tienes {formattedTime} para completar tu compra</p>
+    <div className={`relative overflow-hidden bg-white transition-all duration-500 ${className}`}>
+      {/* El borde superior es ahora la barra de progreso dinámica */}
+      <div
+        className={`absolute top-0 left-0 h-1 transition-all duration-1000 ease-linear ${isDanger ? 'bg-red-400' : isWarning ? 'bg-amber-400' : 'bg-blue-400'}`}
+        style={{ width: `${((minutes * 60 + seconds) / 300) * 100}%` }}
+      />
+
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-sm transition-colors ${isDanger ? 'bg-red-50' : isWarning ? 'bg-amber-50' : 'bg-blue-50'}`}>
+              <Clock className={`h-6 w-6 ${isDanger ? 'text-red-500' : isWarning ? 'text-amber-500' : 'text-blue-500'}`} />
+            </div>
+
+            <div className="space-y-0.5">
+              <h3 className={`text-xs font-bold uppercase tracking-widest ${isDanger ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-blue-600'}`}>
+                {isDanger ? "Acción Requerida" : isWarning ? "Tiempo Limitado" : "Tiempo de Orden"}
+              </h3>
+              <p className="text-sm text-[#2e4b30]/60 font-medium">
+                Tu reserva de stock está activa.
+              </p>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <span className={`text-2xl font-bold ${getClockColor()}`}>{formattedTime}</span>
-          {onExtendReservation && (
-            <button onClick={onExtendReservation} className="ml-2 text-sm underline hover:no-underline">
-              Extender
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Barra de progreso visual */}
-      <div className="mt-3">
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className={`h-2 rounded-full transition-all duration-1000 ${isDanger ? "bg-red-600" : isWarning ? "bg-yellow-600" : "bg-blue-600"}`}
-            style={{
-              width: `${((minutes * 60 + seconds) / 300) * 100}%`,
-            }}
-          />
+          <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center px-2 py-1 sm:p-0 rounded-sm bg-gray-50/50 sm:bg-transparent">
+            <div className="sm:hidden text-[10px] font-bold text-[#2e4b30]/40 uppercase tracking-tighter mr-4">Expira en:</div>
+            <div className={`text-3xl sm:text-4xl font-black tracking-tighter tabular-nums ${isDanger ? 'text-red-600' : isWarning ? 'text-amber-600' : 'text-blue-600'}`}>
+              {formattedTime}
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ interface CartContextType {
   error: string | null;
   refreshCart: () => Promise<void>;
   itemCount: number;
-  pendingOrder: IPendingOrder | null; 
+  pendingOrder: IPendingOrder | null;
   hasPendingOrder: boolean;
 }
 
@@ -80,7 +80,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         error,
         refreshCart,
         itemCount,
-        pendingOrder: cart?.pendingOrder || null,
+        pendingOrder: cart?.pendingOrder
+          ? { ...cart.pendingOrder, total: cart.pendingOrder.total || cart.totalPrice || 0 }
+          : null,
         hasPendingOrder: !!cart?.pendingOrder,
       }}
     >

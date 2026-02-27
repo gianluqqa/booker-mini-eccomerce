@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useReservation } from "@/contexts/ReservationContext";
+import { useCart } from "@/contexts/CartContext";
 import { startCheckout, processPayment, checkPendingOrder, cancelCheckout, getUserCart } from "@/services/checkoutService";
 import { getOrderById } from "@/services/orderService";
 import { IOrder } from "@/types/Order";
@@ -12,6 +13,7 @@ export const useCheckoutLogic = () => {
   const router = useRouter();
   const params = useParams();
   const { clearReservation } = useReservation();
+  const { refreshCart } = useCart();
   const orderId = params.orderId as string | undefined;
 
   // Estados
@@ -144,6 +146,7 @@ export const useCheckoutLogic = () => {
             try {
               const newOrder = await startCheckout();
               setOrder(newOrder);
+              await refreshCart(); // 🔔 Notificar al contexto global
               console.log('✅ [FRONTEND] initializeCheckout - Nueva orden creada:', newOrder.id);
             } catch (orderError: unknown) {
               // Si el error es por orden pendiente existente, es normal en Strict Mode
@@ -212,6 +215,7 @@ export const useCheckoutLogic = () => {
       setLoading(false);
       setProcessing(false);
       clearReservation();
+      await refreshCart(); // 🔔 Notificar que ya no hay pendiente
       console.log('✅ [FRONTEND] handleCheckout - Pago procesado exitosamente');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Error al procesar el pago";
@@ -226,6 +230,7 @@ export const useCheckoutLogic = () => {
       console.log('🔄 [FRONTEND] handleCancelCheckout - Cancelando checkout');
       await cancelCheckout();
       clearReservation();
+      await refreshCart(); // 🔔 Notificar cancelación
       setOrder(null);
       router.push("/cart");
       console.log('✅ [FRONTEND] handleCancelCheckout - Checkout cancelado exitosamente');

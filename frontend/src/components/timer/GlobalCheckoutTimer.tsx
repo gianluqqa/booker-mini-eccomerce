@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { cancelCheckout } from '@/services/checkoutService';
 import { useReservationTimer } from '@/hooks/useReservationTimer';
 import { useCart } from '@/contexts/CartContext';
+import { usePathname } from 'next/navigation';
 
 interface GlobalCheckoutTimerProps {
   className?: string;
@@ -12,15 +13,21 @@ interface GlobalCheckoutTimerProps {
 
 export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ className = "" }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const { pendingOrder, hasPendingOrder, loading, refreshCart } = useCart();
   const [cancelling, setCancelling] = useState(false);
-  const [show, setShow] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 80 });
+
+  // Reiniciar el estado de 'oculto' si cambia la orden o aparece una nueva
+  useEffect(() => {
+    setDismissed(false);
+  }, [pendingOrder?.id]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const windowWidth = window.innerWidth;
-      const componentWidth = 384; 
+      const componentWidth = 384;
       const initialX = windowWidth - componentWidth - 16;
       setPosition({ x: initialX, y: 80 });
     }
@@ -31,23 +38,9 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
   const dragStartPos = useRef({ x: 0, y: 0 });
   const elementStartPos = useRef({ x: 0, y: 0 });
 
-  useEffect(() => {
-    if (hasPendingOrder && pendingOrder) {
-      setShow(true);
-    } else {
-      setShow(false);
-    }
-  }, [hasPendingOrder, pendingOrder]);
-
-  // Usar el hook de temporizador si hay orden pendiente
-  const handleExpired = useCallback(() => {
-    setShow(false);
-    refreshCart();
-  }, [refreshCart]);
-
   const { isExpired, formattedTime, isWarning, isDanger } = useReservationTimer(
     pendingOrder?.expiresAt ? (typeof pendingOrder.expiresAt === 'string' ? pendingOrder.expiresAt : pendingOrder.expiresAt.toISOString()) : null,
-    handleExpired
+    refreshCart
   );
 
   // Navegar al checkout
@@ -58,22 +51,17 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
   // Cancelar orden
   const handleCancel = async () => {
     if (!pendingOrder) return;
-    
+
     setCancelling(true);
     try {
       await cancelCheckout();
       await refreshCart();
-      setShow(false);
+      setDismissed(false);
     } catch (error) {
       console.error('❌ Error al cancelar orden desde timer global:', error);
     } finally {
       setCancelling(false);
     }
-  };
-
-  // Ocultar manualmente
-  const handleDismiss = () => {
-    setShow(false);
   };
 
   // Funciones de arrastre
@@ -103,7 +91,7 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
     // Aplicar límites para que no salga de la pantalla
     // Límite horizontal: no salir por la izquierda ni derecha
     newX = Math.max(0, Math.min(newX, windowWidth - componentWidth));
-    
+
     // Límite vertical: no superar navbar (80px) ni salir por abajo
     newY = Math.max(80, Math.min(newY, windowHeight - componentHeight));
 
@@ -130,47 +118,43 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
     }
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // No mostrar si está cargando, no hay orden, o está expirado
-  if (loading || !show || !pendingOrder || isExpired) {
+  // No mostrar si está cargando, no hay orden válida, expiró o se ocultó manualmente
+  if (loading || !pendingOrder || isExpired || dismissed) {
     return null;
   }
 
   // No mostrar en páginas de cart, checkout y profile
-  if (typeof window !== 'undefined') {
-    const currentPath = window.location.pathname;
-    if (currentPath === '/cart' || currentPath === '/checkout' || currentPath === '/profile') {
-      return null;
-    }
+  if (pathname === '/cart' || pathname === '/checkout' || pathname === '/profile') {
+    return null;
   }
 
   return (
-    <div 
+    <div
       ref={dragRef}
       className={`fixed z-50 max-w-sm ${className}`}
-      style={{ 
-        left: position.x, 
+      style={{
+        left: position.x,
         top: position.y,
         cursor: isDragging ? 'grabbing' : 'grab',
         userSelect: isDragging ? 'none' : 'auto'
       }}
       onMouseDown={handleMouseDown}
     >
-      <div className="bg-[#f5efe1] border border-[#2e4b30] rounded-lg shadow-lg select-none">
+      <div className="bg-[#f5efe1] border border-[#2e4b30] rounded-sm shadow-sm select-none">
         <div className="p-4">
           {/* Header - Ya no es el único arrastrable */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full ${
-                isDanger ? 'bg-red-600' : isWarning ? 'bg-amber-600' : 'bg-[#2e4b30]'
-              }`} />
+              <div className={`w-2 h-2 rounded-full ${isDanger ? 'bg-red-600' : isWarning ? 'bg-amber-600' : 'bg-[#2e4b30]'
+                }`} />
               <span className="font-semibold text-[#2e4b30] text-sm">
                 Checkout Activo
               </span>
             </div>
             <button
               onClick={(e) => {
-                e.stopPropagation(); // Evitar que dispare el arrastre
-                handleDismiss();
+                e.stopPropagation();
+                setDismissed(true);
               }}
               className="text-[#2e4b30] hover:text-[#2e4b30]/80 transition-colors"
               title="Ocultar temporalmente"
@@ -183,9 +167,8 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
 
           {/* Timer */}
           <div className="mb-3 text-center">
-            <div className={`text-2xl font-bold ${
-              isDanger ? 'text-red-700' : isWarning ? 'text-amber-700' : 'text-[#2e4b30]'
-            }`}>
+            <div className={`text-2xl font-bold ${isDanger ? 'text-red-700' : isWarning ? 'text-amber-700' : 'text-[#2e4b30]'
+              }`}>
               {formattedTime}
             </div>
             <div className="text-xs text-[#2e4b30] mt-1">
@@ -239,11 +222,10 @@ export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ classN
                 e.stopPropagation(); // Evitar que dispare el arrastre
                 goToCheckout();
               }}
-              className={`flex-1 px-3 py-2 rounded font-medium text-sm text-white transition-colors ${
-                isDanger ? 'bg-red-600 hover:bg-red-700' :
+              className={`flex-1 px-3 py-2 rounded font-medium text-sm text-white transition-colors ${isDanger ? 'bg-red-600 hover:bg-red-700' :
                 isWarning ? 'bg-amber-600 hover:bg-amber-700' :
-                'bg-[#2e4b30] hover:bg-[#2e4b30]/90'
-              }`}
+                  'bg-[#2e4b30] hover:bg-[#2e4b30]/90'
+                }`}
             >
               Ir al Checkout
             </button>

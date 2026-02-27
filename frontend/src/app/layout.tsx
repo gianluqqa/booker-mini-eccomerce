@@ -7,6 +7,7 @@ import AuthProvider from "@/app/providers/AuthProvider";
 import { CartProvider } from "@/contexts/CartContext";
 import { ReservationProvider } from "@/contexts/ReservationContext";
 import { GlobalCheckoutTimer } from "@/components/timer/GlobalCheckoutTimer";
+import { GlobalReservationTimer } from "@/components/checkout/GlobalReservationTimer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,6 +41,7 @@ export default function RootLayout({
               {children}
               <Footer />
               <GlobalCheckoutTimer />
+              <GlobalReservationTimer />
             </ReservationProvider>
           </CartProvider>
         </AuthProvider>
