@@ -60,7 +60,7 @@ const Books = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-block px-3 py-1.5 bg-[#2e4b30] bg-opacity-10 rounded-full mb-4">
+          <div className="inline-block px-3 py-1.5 bg-[#2e4b30] bg-opacity-10 rounded-sm mb-4">
             <span className="text-[#f5efe1] text-[11px] font-medium tracking-wide">
               NUESTROS LIBROS
             </span>

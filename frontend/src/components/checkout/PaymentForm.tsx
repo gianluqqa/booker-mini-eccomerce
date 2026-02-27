@@ -16,7 +16,7 @@ interface PaymentFormProps {
 
 export const PaymentForm: React.FC<PaymentFormProps> = ({ cardData, setCardData }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6">
+    <div className="bg-white rounded-sm shadow-sm p-6">
       <div className="flex items-center mb-4">
         <CreditCard className="w-6 h-6 text-[#2e4b30] mr-2" />
         <h2 className="text-xl font-bold text-[#2e4b30]">Información de Pago</h2>
@@ -54,7 +54,7 @@ const PaymentCardNumberInput: React.FC<{
         id="cardNumber"
         placeholder="1234 5678 9012 3456"
         maxLength={19} // 16 dígitos + 3 espacios
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
         value={value}
         onChange={onChange}
       />
@@ -76,7 +76,7 @@ const PaymentCardNameInput: React.FC<{
         type="text"
         id="cardName"
         placeholder="JUAN PEREZ"
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
@@ -99,7 +99,7 @@ const PaymentExpiryDateInput: React.FC<{
         id="expiryDate"
         placeholder="12/25"
         maxLength={5} // MM/YY
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
         value={value}
         onChange={onChange}
       />
@@ -122,7 +122,7 @@ const PaymentCvcInput: React.FC<{
         id="cvc"
         placeholder="123"
         maxLength={4}
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-lg focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
@@ -133,7 +133,7 @@ const PaymentCvcInput: React.FC<{
 // Componente para nota de seguridad
 const PaymentSecurityNote: React.FC = () => {
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+    <div className="bg-blue-50 border border-blue-200 rounded-sm p-4 mb-4">
       <p className="text-sm text-blue-800">
         <strong>Nota:</strong> Esta es una simulación. Los datos de pago no se envían a ningún servidor.
       </p>

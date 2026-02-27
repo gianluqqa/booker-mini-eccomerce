@@ -21,7 +21,7 @@ export const CheckoutActions: React.FC<CheckoutActionsProps> = ({
         <button 
           onClick={onCheckout} 
           disabled={processing} 
-          className="w-full bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {processing ? (
             <>
@@ -36,7 +36,7 @@ export const CheckoutActions: React.FC<CheckoutActionsProps> = ({
         <button 
           onClick={onRestartCheckout} 
           disabled={processing} 
-          className="w-full bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full bg-blue-500 text-white px-6 py-3 rounded-sm hover:bg-blue-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {processing ? (
             <>
@@ -52,14 +52,14 @@ export const CheckoutActions: React.FC<CheckoutActionsProps> = ({
       <button 
         onClick={onCancelCheckout} 
         disabled={processing} 
-        className="w-full bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-red-500 text-white px-6 py-3 rounded-sm hover:bg-red-600 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Cancelar Checkout
       </button>
 
       <button 
         onClick={() => window.history.back()} 
-        className="w-full bg-[#2e4b30]/10 text-[#2e4b30] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium"
+        className="w-full bg-[#2e4b30]/10 text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-sm hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium"
       >
         Volver al Carrito
       </button>

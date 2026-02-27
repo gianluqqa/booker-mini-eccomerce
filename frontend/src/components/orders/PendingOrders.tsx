@@ -19,7 +19,7 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
 
   if (!orders || orders.length === 0) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+      <div className="bg-white rounded-sm p-6 shadow-sm mb-8">
         <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
           <Package className="w-5 h-5" />
           Pedidos Pendientes
@@ -30,7 +30,7 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+    <div className="bg-white rounded-sm p-6 shadow-sm mb-8">
       <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
         <Package className="w-5 h-5" />
         Pedidos Pendientes
@@ -40,7 +40,7 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
           <div
             key={order.id}
             onClick={() => handleOrderClick(order.id)}
-            className="border-2 border-yellow-200 bg-yellow-50 rounded-lg p-4 hover:shadow-md hover:border-yellow-300 transition-all cursor-pointer group"
+            className="bg-yellow-50 rounded-sm p-4 hover:shadow-md transition-all cursor-pointer group"
           >
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
               <div>
@@ -53,7 +53,7 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
                 {order.createdAt && <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>}
               </div>
               <div className="flex flex-col sm:items-end gap-1">
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <span className="px-3 py-1 rounded-sm text-xs font-medium bg-yellow-100 text-yellow-800">
                   Pendiente
                 </span>
                 {order.total && (
@@ -65,7 +65,7 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
                 </div>
               </div>
             </div>
-            <div className="border-t border-yellow-200 pt-3">
+            <div className="bg-white bg-opacity-40 p-3 rounded-sm">
               <div className="space-y-2">
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between text-sm">
@@ -89,8 +89,8 @@ const PendingOrders: React.FC<PendingOrdersProps> = ({ orders }) => {
                 ))}
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-yellow-200">
-              <p className="text-xs text-yellow-700 bg-yellow-100 rounded-lg p-2 flex items-center gap-2">
+            <div className="mt-3">
+              <p className="text-xs text-yellow-700 bg-yellow-100 rounded-sm p-2 flex items-center gap-2">
                 <Clock className="w-3 h-3" />
                 {order.expiresAt ? (
                   <>Esta orden expira el {formatDate(order.expiresAt)}. Haz clic para completar el pago.</>

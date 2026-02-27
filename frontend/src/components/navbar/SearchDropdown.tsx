@@ -38,7 +38,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
   }
 
   return (
-    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-xl border border-[#2e4b30]/20 z-50 max-h-96 overflow-y-auto">
+    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-sm shadow-xl z-50 max-h-96 overflow-y-auto">
       {loading ? (
         // Mostrar indicador de carga mientras busca
         <div className="flex items-center justify-center py-8">
@@ -63,7 +63,7 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                 className="flex items-center gap-3 px-4 py-3 hover:bg-[#f5efe1] transition-colors duration-200 border-b border-[#2e4b30]/10 last:border-b-0 cursor-pointer block"
               >
               {/* Imagen del libro */}
-              <div className="flex-shrink-0 w-12 h-16 bg-[#f5efe1] rounded overflow-hidden">
+              <div className="flex-shrink-0 w-12 h-16 bg-[#f5efe1] rounded-sm overflow-hidden">
                 {book.image ? (
                   <Image
                     src={book.image}

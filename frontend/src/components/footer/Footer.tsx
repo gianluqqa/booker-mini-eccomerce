@@ -11,7 +11,7 @@ const Footer = () => {
               {/* Sección de la Marca */}
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-[#F5EFE1] p-1.5 rounded-lg">
+                  <div className="bg-[#F5EFE1] p-1.5 rounded-sm">
                     <Image src="/booker-new-logo.png" alt="Booker Logo" width={20} height={20} className="w-5 h-5" />
                   </div>
                   <span className="text-xl font-bold text-[#F5EFE1]">Booker</span>
@@ -20,16 +20,16 @@ const Footer = () => {
                   Tu destino definitivo para descubrir y coleccionar libros. Desde clásicos atemporales hasta bestsellers modernos.
                 </p>
                 <div className="flex space-x-3 pt-2">
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-lg transition-all duration-200">
+                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
                     <Facebook className="w-5 h-5 text-[#F5EFE1]" />
                   </a>
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-lg transition-all duration-200">
+                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
                     <Instagram className="w-5 h-5 text-[#F5EFE1]" />
                   </a>
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-lg transition-all duration-200">
+                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
                     <Twitter className="w-5 h-5 text-[#F5EFE1]" />
                   </a>
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-lg transition-all duration-200">
+                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
                     <Youtube className="w-5 h-5 text-[#F5EFE1]" />
                   </a>
                 </div>
@@ -130,9 +130,9 @@ const Footer = () => {
                   <input
                     type="email"
                     placeholder="Ingresa tu email"
-                    className="flex-1 bg-[#F5EFE1]/10 text-[#F5EFE1] placeholder-[#F5EFE1]/50 rounded-lg py-3 px-4 border border-[#F5EFE1]/20 focus:outline-none focus:border-[#F5EFE1] focus:ring-2 focus:ring-[#F5EFE1]/20 transition-all duration-200"
+                    className="flex-1 bg-[#F5EFE1]/10 text-[#F5EFE1] placeholder-[#F5EFE1]/50 rounded-sm py-3 px-4 border border-[#F5EFE1]/20 focus:outline-none focus:border-[#F5EFE1] focus:ring-2 focus:ring-[#F5EFE1]/20 transition-all duration-200"
                   />
-                  <button className="bg-[#F5EFE1] text-[#2E4B30] px-6 py-3 rounded-lg hover:bg-white transition-all duration-200 font-medium">
+                  <button className="bg-[#F5EFE1] text-[#2E4B30] px-6 py-3 rounded-sm hover:bg-white transition-all duration-200 font-medium">
                     Suscribirse
                   </button>
                 </div>

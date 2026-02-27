@@ -48,6 +48,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // Escuchar evento de logout automático (ej: por token expirado)
+  useEffect(() => {
+    const handleAutoLogout = () => {
+      logout();
+    };
+
+    window.addEventListener('auth-logout', handleAutoLogout);
+    return () => {
+      window.removeEventListener('auth-logout', handleAutoLogout);
+    };
+  }, []);
+
   const login = async (credentials: ILoginUser) => {
     try {
       const response = await apiClient.post<IUser & { accessToken: string }>('/users/login', credentials);

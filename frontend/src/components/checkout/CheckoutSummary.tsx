@@ -30,7 +30,7 @@ export const CheckoutSummary: React.FC<CheckoutSummaryProps> = ({
   onRestartCheckout 
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6">
+    <div className="bg-white rounded-sm shadow-sm p-6">
       <ReservationTimer order={order} onExpired={onOrderExpired} />
 
       <CheckoutTotals subtotal={subtotal} tax={tax} total={total} />

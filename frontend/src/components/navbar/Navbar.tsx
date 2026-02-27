@@ -127,7 +127,7 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        isScrolled || isMenuOpen ? "bg-[#f5efe1] bg-opacity-95 backdrop-blur-md shadow-lg" : "bg-transparent"
+        isScrolled || isMenuOpen ? "bg-booker-beige/80 backdrop-blur-md shadow-md" : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -137,7 +137,7 @@ const Navbar = () => {
             {!isHomePage && (
               <button
                 onClick={() => router.back()}
-                className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80 mr-3"
+                className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-sm transition-all duration-200 hover:opacity-80 mr-3"
               >
                 <ArrowLeft className="w-5 h-5" strokeWidth={2} />
               </button>
@@ -189,11 +189,7 @@ const Navbar = () => {
                     value={searchQuery}
                     onChange={handleSearchChange}
                     onFocus={handleSearchFocus}
-                    className={`w-full rounded-lg py-1.5 px-4 pr-8 border focus:outline-none focus:ring-1 transition-all duration-200 text-sm ${
-                      isScrolled
-                        ? "bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 border-[#2e4b30]/20 focus:border-[#2e4b30] focus:ring-[#2e4b30]/20"
-                        : "bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 border-[#2e4b30]/20 focus:border-[#2e4b30] focus:ring-[#2e4b30]/20"
-                    }`}
+                    className="w-full rounded-sm py-1.5 px-4 pr-8 focus:outline-none focus:ring-2 focus:ring-booker-green/50 transition-all duration-200 text-sm bg-booker-beige text-[#2e4b30] placeholder-[#2e4b30]/50 border border-booker-green/30 focus:border-booker-green"
                   />
                   <button
                     type="submit"
@@ -222,12 +218,12 @@ const Navbar = () => {
             {isAuthenticated && pathname !== "/cart" && pathname !== "/checkout" && (
               <Link
                 href="/cart"
-                className="relative p-2 text-gray-700 hover:text-gray-900 transition-colors"
+                className="relative p-2 text-booker-green hover:opacity-80 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <ShoppingCart className="h-6 w-6" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#2e4b30] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-booker-green text-white text-xs font-bold rounded-sm h-5 w-5 flex items-center justify-center">
                     {cartCount > 9 ? "9+" : cartCount}
                   </span>
                 )}
@@ -239,7 +235,7 @@ const Navbar = () => {
               <>
                 <Link
                   href={user?.role === "admin" ? "/admin" : "/profile"}
-                  className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80"
+                  className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-sm transition-all duration-200 hover:opacity-80"
                 >
                   <User className="w-5 h-5" strokeWidth={2} />
                 </Link>
@@ -248,7 +244,7 @@ const Navbar = () => {
                     logout();
                     router.push("/");
                   }}
-                  className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium shadow-md text-sm"
+                  className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] px-3 py-1.5 rounded-sm transition-all duration-200 font-medium shadow-md text-sm"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Cerrar Sesión</span>
@@ -257,7 +253,7 @@ const Navbar = () => {
             ) : (
               <Link
                 href="/login"
-                className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium shadow-md text-sm"
+                className="hidden md:flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] px-3 py-1.5 rounded-sm transition-all duration-200 font-medium shadow-md text-sm"
               >
                 <span>Iniciar Sesión</span>
               </Link>
@@ -266,7 +262,7 @@ const Navbar = () => {
             {/* Botón de Menú Móvil */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-lg transition-all duration-200 hover:opacity-80"
+              className="md:hidden text-[#2e4b30] hover:bg-[#2e4b30]/10 p-1.5 rounded-sm transition-all duration-200 hover:opacity-80"
             >
               {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -284,7 +280,7 @@ const Navbar = () => {
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={handleSearchFocus}
-                  className="w-full bg-white text-[#2e4b30] placeholder-[#2e4b30]/50 rounded-lg py-1.5 px-4 pr-8 border border-[#2e4b30]/20 focus:outline-none focus:border-[#2e4b30] focus:ring-1 focus:ring-[#2e4b30]/20 transition-all duration-200 text-sm"
+                  className="w-full bg-booker-beige text-[#2e4b30] placeholder-[#2e4b30]/50 rounded-sm py-1.5 px-4 pr-8 focus:outline-none border border-booker-green/30 focus:border-booker-green focus:ring-2 focus:ring-booker-green/50 transition-all duration-200 text-sm"
                 />
                 <button
                   type="submit"
@@ -309,31 +305,31 @@ const Navbar = () => {
 
         {/* Menú Móvil */}
         {isMenuOpen && (
-          <div className="md:hidden pb-3 border-t border-[#2e4b30]/20 pt-3 transition-colors duration-200">
+          <div className="md:hidden pb-3 border-t border-[#2e4b30]/10 pt-3 transition-colors duration-200">
             <div className="flex flex-col space-y-2">
               {isHomePage && (
                 <>
                   <button
                     onClick={() => scrollToSection("books")}
-                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-sm text-base hover:opacity-80 text-left"
                   >
                     Libros
                   </button>
                   <button
                     onClick={() => scrollToSection("bestsellers")}
-                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-sm text-base hover:opacity-80 text-left"
                   >
                     Más Vendidos
                   </button>
                   <button
                     onClick={() => scrollToSection("collections")}
-                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-sm text-base hover:opacity-80 text-left"
                   >
                     Colecciones
                   </button>
                   <button
                     onClick={() => scrollToSection("about")}
-                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-lg text-base hover:opacity-80 text-left"
+                    className="text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-200 font-medium py-2 px-3 rounded-sm text-base hover:opacity-80 text-left"
                   >
                     Sobre Nosotros
                   </button>
@@ -346,7 +342,7 @@ const Navbar = () => {
                     router.push("/");
                     setIsMenuOpen(false);
                   }}
-                  className="flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium w-fit shadow-md text-sm"
+                  className="flex items-center space-x-1.5 bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] px-3 py-1.5 rounded-sm transition-all duration-200 font-medium w-fit shadow-md text-sm"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Cerrar Sesión</span>
@@ -355,7 +351,7 @@ const Navbar = () => {
                 <Link
                   href="/login"
                   onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center justify-center bg-[#2e4b30] text-[#f5efe1] hover:bg-[#2e4b30]/90 px-3 py-1.5 rounded-lg transition-all duration-200 font-medium w-fit shadow-md text-sm"
+                  className="flex items-center justify-center bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] px-3 py-1.5 rounded-sm transition-all duration-200 font-medium w-fit shadow-md text-sm"
                 >
                   <span>Iniciar Sesión</span>
                 </Link>

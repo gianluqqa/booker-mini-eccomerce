@@ -7,7 +7,7 @@ const About = () => {
       <div className="max-w-6xl mx-auto w-full">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <div className="inline-block px-3 py-1.5 bg-[#f5efe1] bg-opacity-10 rounded-full mb-4">
+            <div className="inline-block px-3 py-1.5 bg-[#f5efe1] bg-opacity-10 rounded-sm mb-4">
               <span className="text-[#2e4b30] text-[11px] font-medium tracking-wide">
                 SOBRE NOSOTROS
               </span>
@@ -29,7 +29,7 @@ const About = () => {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-lg flex-1 min-w-[140px]">
+              <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-sm flex-1 min-w-[140px]">
                 <div className="text-2xl font-bold text-[#2e4b30] mb-1">
                   20+
                 </div>
@@ -37,7 +37,7 @@ const About = () => {
                   Libros Disponibles
                 </div>
               </div>
-              <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-lg flex-1 min-w-[140px]">
+              <div className="bg-[#f5efe1] bg-opacity-10 backdrop-blur-sm px-6 py-4 rounded-sm flex-1 min-w-[140px]">
                 <div className="text-2xl font-bold text-[#2e4b30] mb-1">
                   24/7
                 </div>
@@ -49,8 +49,8 @@ const About = () => {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 p-6 rounded-xl hover:bg-opacity-10 transition-all duration-300">
-              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm p-6 rounded-sm hover:bg-opacity-10 transition-all duration-300">
+              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-sm flex items-center justify-center mb-4">
                 <BookOpen className="w-6 h-6 text-[#2e4b30]" />
               </div>
               <h3 className="text-base font-semibold text-[#2e4b30] mb-1.5">
@@ -61,8 +61,8 @@ const About = () => {
               </p>
             </div>
 
-            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 p-6 rounded-xl hover:bg-opacity-10 transition-all duration-300">
-              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm p-6 rounded-sm hover:bg-opacity-10 transition-all duration-300">
+              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-sm flex items-center justify-center mb-4">
                 <Zap className="w-6 h-6 text-[#2e4b30]" />
               </div>
               <h3 className="text-base font-semibold text-[#2e4b30] mb-1.5">
@@ -73,8 +73,8 @@ const About = () => {
               </p>
             </div>
 
-            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 p-6 rounded-xl hover:bg-opacity-10 transition-all duration-300">
-              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-lg flex items-center justify-center mb-4">
+            <div className="bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm p-6 rounded-sm hover:bg-opacity-10 transition-all duration-300">
+              <div className="w-12 h-12 bg-[#f5efe1] bg-opacity-20 rounded-sm flex items-center justify-center mb-4">
                 <CheckCircle className="w-6 h-6 text-[#2e4b30]" />
               </div>
               <h3 className="text-base font-semibold text-[#2e4b30] mb-1.5">

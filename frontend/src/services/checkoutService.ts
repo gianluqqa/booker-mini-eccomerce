@@ -15,8 +15,7 @@ export const getUserCart = async (): Promise<ICartResponse> => {
     const response = await apiClient.get<{ success: boolean; data: ICartResponse }>('/carts')
     return extractData<ICartResponse>(response)
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
-    throw new Error(errorMessage)
+    throw error // Re-lanzar para preservación del status
   }
 }
 
@@ -47,7 +46,7 @@ export const createStockReservation = async (): Promise<IStockReservationRespons
       throw new Error('Ya tienes una orden pendiente. No se puede crear otra reserva.');
     }
     
-    throw new Error(errorMessage);
+    throw error;
   }
 }
 
@@ -73,7 +72,7 @@ export const startCheckout = async (): Promise<IOrder> => {
       throw new Error('Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar.');
     }
     
-    throw new Error(errorMessage)
+    throw error
   }
 }
 
@@ -105,7 +104,7 @@ export const processPayment = async (paymentData: {
       throw new Error('Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar.');
     }
     
-    throw new Error(errorMessage)
+    throw error
   }
 }
 
@@ -143,8 +142,8 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
       return null
     }
     
-    // Para otros errores, lanzamos la excepción
-    throw new Error(errorMessage)
+    // Para otros errores, lanzamos la excepción original
+    throw error
   }
 }
 
@@ -168,7 +167,7 @@ export const cancelCheckout = async (): Promise<{ message: string; reservationId
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cancelar el checkout';
     console.error('❌ [FRONTEND] Error en cancelCheckout:', error);
-    throw new Error(errorMessage);
+    throw error;
   }
 }
 
@@ -193,6 +192,6 @@ export const processCheckout = async (paymentData: {
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al procesar el checkout'
     console.error('❌ [FRONTEND] Error en processCheckout (deprecated):', error)
-    throw new Error(errorMessage)
+    throw error
   }
 }

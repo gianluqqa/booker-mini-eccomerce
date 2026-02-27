@@ -48,11 +48,11 @@ export const GlobalReservationTimer: React.FC = () => {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-2 fade-in duration-300">
-      <div className={`border rounded-lg shadow-lg p-4 ${getTimerColor()}`}>
+      <div className={`border rounded-sm shadow-lg p-4 ${getTimerColor()}`}>
         {/* Botón para cerrar */}
         <button
           onClick={clearReservation}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-black/10 transition-colors"
+          className="absolute top-2 right-2 p-1 rounded-sm hover:bg-black/10 transition-colors"
           title="Ocultar temporizador"
         >
           <X className="w-4 h-4 opacity-60" />
@@ -72,9 +72,9 @@ export const GlobalReservationTimer: React.FC = () => {
 
         {/* Barra de progreso visual */}
         <div className="mt-3">
-          <div className="w-full bg-gray-200 rounded-full h-1.5">
+          <div className="w-full bg-gray-200 rounded-sm h-1.5">
             <div
-              className={`h-1.5 rounded-full transition-all duration-1000 ${getProgressColor()}`}
+              className={`h-1.5 rounded-sm transition-all duration-1000 ${getProgressColor()}`}
               style={{
                 width: `${((minutes * 60 + seconds) / 300) * 100}%`,
               }}
@@ -86,13 +86,13 @@ export const GlobalReservationTimer: React.FC = () => {
         <div className="mt-3 flex gap-2">
           <button
             onClick={() => router.push("/checkout")}
-            className="flex-1 bg-[#2e4b30] text-white px-3 py-1.5 rounded-md hover:bg-[#2e4b30]/90 transition-colors text-xs font-medium"
+            className="flex-1 bg-[#2e4b30] text-white px-3 py-1.5 rounded-sm hover:bg-[#1a3a1c] transition-colors text-xs font-medium"
           >
             Ir al checkout
           </button>
           <button
             onClick={clearReservation}
-            className="px-3 py-1.5 rounded-md border border-current hover:bg-black/10 transition-colors text-xs font-medium"
+            className="px-3 py-1.5 rounded-sm border border-current hover:bg-black/10 transition-colors text-xs font-medium"
           >
             Cerrar
           </button>

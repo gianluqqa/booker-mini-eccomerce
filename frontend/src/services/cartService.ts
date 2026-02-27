@@ -35,8 +35,7 @@ export const getUserCart = async (): Promise<CartResponse> => {
       pendingOrder: responseData.pendingOrder
     };
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al cargar el carrito'
-    throw new Error(errorMessage)
+    throw error // Re-lanzar para que el interceptor o el contexto manejen el status
   }
 }
 
@@ -51,8 +50,7 @@ export const addToCart = async (addToCartData: IAddToCart): Promise<ICartItem> =
     const response = await apiClient.post<{ success: boolean; message: string; data: ICartItem }>('/carts/add', addToCartData)
     return extractData<ICartItem>(response)
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al añadir el libro al carrito'
-    throw new Error(errorMessage)
+    throw error
   }
 }
 
@@ -66,8 +64,7 @@ export const removeFromCart = async (cartId: string): Promise<void> => {
   try {
     await apiClient.delete(`/carts/${cartId}`);
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al eliminar el ítem del carrito';
-    throw new Error(errorMessage);
+    throw error;
   }
 };
 
@@ -80,8 +77,7 @@ export const clearCart = async (): Promise<void> => {
   try {
     await apiClient.delete('/carts');
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al vaciar el carrito';
-    throw new Error(errorMessage);
+    throw error;
   }
 };
 
@@ -90,7 +86,6 @@ export const updateCartItemQuantity = async (itemId: string, quantity: number): 
     const response = await apiClient.put<{ success: boolean; data: ICartItem }>(`/carts/${itemId}`, { quantity });
     return extractData<ICartItem>(response);
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Error al actualizar la cantidad';
-    throw new Error(errorMessage);
+    throw error;
   }
 };

@@ -96,7 +96,7 @@ const WeeklyRecommendation = () => {
           {/* Columna izquierda: Información */}
           <div className="space-y-6">
             {/* Badge de selección */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#f5efe1] text-[#2e4b30] rounded-full text-sm font-semibold">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#f5efe1] text-[#2e4b30] rounded-sm text-sm font-semibold">
               <Award className="w-4 h-4" />
               Selección Booker
             </div>
@@ -119,7 +119,7 @@ const WeeklyRecommendation = () => {
                   : parseFloat(String(recommendation.price)).toFixed(2)
                 }
               </div>
-              <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+              <div className={`px-3 py-1 rounded-sm text-xs font-medium ${
                 recommendation.stock > 0
                   ? "bg-[#f5efe1] text-[#2e4b30]"
                   : "bg-red-100 text-red-600"
@@ -130,13 +130,13 @@ const WeeklyRecommendation = () => {
 
             {/* Mensaje de éxito */}
             {successMessage && (
-              <div className="px-4 py-3 bg-green-100 text-green-700 border border-green-300 rounded-lg text-sm font-medium">
+              <div className="px-4 py-3 bg-green-100 text-green-700 rounded-sm text-sm font-medium">
                 {successMessage}
               </div>
             )}
 
             {/* Descripción */}
-            <div className="bg-[#1a3a1c] rounded-xl p-6 border border-[#f5efe1]/10">
+            <div className="bg-[#1a3a1c] rounded-sm p-6">
               <p className="text-[#f5efe1] leading-relaxed">
                 Una obra que captura la esencia de la literatura contemporánea con 
                 prosas poéticas y personajes inolvidables. Perfecta para quienes buscan 
@@ -161,7 +161,7 @@ const WeeklyRecommendation = () => {
               <button
                 onClick={handleAddToCart}
                 disabled={recommendation.stock === 0 || cartLoading}
-                className={`flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 px-6 rounded-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
                   recommendation.stock > 0 && !cartLoading
                     ? "bg-[#f5efe1] text-[#2e4b30] hover:bg-[#e8dcc8] hover:shadow-lg"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -182,7 +182,7 @@ const WeeklyRecommendation = () => {
               
               <button
                 onClick={handleViewDetails}
-                className="flex-1 py-3 px-6 rounded-xl font-medium transition-all duration-300 bg-[#1a3a1c] text-[#f5efe1] hover:bg-black hover:shadow-lg flex items-center justify-center gap-2 border border-[#f5efe1]/20"
+                className="flex-1 py-3 px-6 rounded-sm font-medium transition-all duration-300 bg-[#1a3a1c] text-[#f5efe1] hover:bg-black hover:shadow-lg flex items-center justify-center gap-2 border border-[#f5efe1]/20"
               >
                 Ver detalles
                 <ArrowRight className="w-4 h-4" />
@@ -194,7 +194,7 @@ const WeeklyRecommendation = () => {
           <div className="flex justify-center lg:justify-end">
             <div className="relative group">
               {/* Badge flotante */}
-              <div className="absolute -top-3 -right-3 z-10 bg-[#f5efe1] text-[#2e4b30] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <div className="absolute -top-3 -right-3 z-10 bg-[#f5efe1] text-[#2e4b30] px-3 py-1 rounded-sm text-xs font-bold flex items-center gap-1">
                 <Star className="w-3 h-3 fill-current" />
                 Top Pick
               </div>
@@ -202,7 +202,7 @@ const WeeklyRecommendation = () => {
               {/* Contenedor de la imagen */}
               <div 
                 onClick={handleViewDetails}
-                className="relative bg-[#f5efe1] rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-[#f5efe1]/20"
+                className="relative bg-[#f5efe1] rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
               >
                 <div className="aspect-[3/4] w-80">
                   {recommendation.image && !imageError ? (

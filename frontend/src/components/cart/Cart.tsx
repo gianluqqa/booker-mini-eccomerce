@@ -183,13 +183,13 @@ const Cart = () => {
               <p className="text-red-600 text-lg mb-4">{error}</p>
               <button
                 onClick={() => fetchCart()}
-                className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium inline-block mr-4"
+                className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200 inline-block mr-4"
               >
                 Reintentar
               </button>
               <Link
                 href="/"
-                className="bg-gray-200 text-[#2e4b30] px-6 py-3 rounded-lg hover:bg-gray-300 transition-all duration-200 font-medium inline-block"
+                className="bg-white border border-[#2e4b30] text-[#2e4b30] px-6 py-3 rounded-sm font-medium hover:bg-gray-50 transition-all duration-200 inline-block"
               >
                 Volver al inicio
               </Link>
@@ -208,13 +208,13 @@ const Cart = () => {
             <h1 className="text-3xl font-bold text-[#2e4b30]">Carrito de Compras</h1>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-8 text-center">
+          <div className="bg-white rounded-sm shadow-sm p-8 text-center">
             <ShoppingBag className="w-24 h-24 text-[#2e4b30]/30 mx-auto mb-6" />
             <h2 className="text-2xl font-bold text-[#2e4b30] mb-4">Tu carrito está vacío</h2>
             <p className="text-[#2e4b30]/70 mb-8">¡Añade algunos libros para comenzar!</p>
             <Link
               href="/"
-              className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium"
+              className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium"
             >
               Explorar Libros
             </Link>
@@ -229,7 +229,7 @@ const Cart = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center mb-8">
           <h1 className="text-3xl font-bold text-[#2e4b30]">Carrito de Compras</h1>
-          <span className="ml-4 bg-[#2e4b30] text-[#f5efe1] px-3 py-1 rounded-full text-sm font-medium">
+          <span className="ml-4 bg-[#2e4b30] text-[#f5efe1] px-3 py-1 rounded-sm text-sm font-medium">
             {cartItems.length} {cartItems.length === 1 ? "artículo" : "artículos"}
           </span>
         </div>
@@ -246,65 +246,66 @@ const Cart = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 overflow-hidden">
+            <div className="bg-white rounded-sm shadow-sm overflow-hidden">
               <div className="divide-y divide-[#2e4b30]/10">
                 {cartItems.map((item) => (
                   <div key={item.id} className="p-6">
                     <div className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <Image
-                          src={item.book.image || "/placeholder-book.jpg"}
-                          alt={item.book.title}
-                          width={80}
-                          height={120}
-                          className="rounded-lg"
-                        />
-                      </div>
-
-                      <div className="flex-1 min-w-0 ml-6">
-                        <h3 className="text-lg font-semibold text-[#2e4b30]">{item.book.title}</h3>
-                        <p className="text-[#2e4b30]/70 text-sm mb-2">por {item.book.author}</p>
-                        <p className="text-lg font-bold text-[#2e4b30]">${(item.book.price * item.quantity).toFixed(2)}</p>
-                      </div>
-
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={isUpdating[item.id] || hasPendingOrder}
-                            className={`p-1.5 rounded-lg transition-all duration-200 ${
-                              isUpdating[item.id] || hasPendingOrder
-                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
-                                : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
-                            }`}
-                          >
-                            {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
-                          </button>
-                          <span className="text-[#2e4b30] font-medium min-w-[2rem] text-center">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            disabled={isUpdating[item.id] || hasPendingOrder}
-                            className={`p-1.5 rounded-lg transition-all duration-200 ${
-                              isUpdating[item.id] || hasPendingOrder
-                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
-                                : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
-                            }`}
-                          >
-                            {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                          </button>
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={item.book.image || "/placeholder-book.jpg"}
+                            alt={item.book.title}
+                            width={80}
+                            height={120}
+                            className="rounded-sm"
+                          />
                         </div>
-
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          disabled={isRemoving[item.id] || hasPendingOrder}
-                          className={`p-2 rounded-full transition-colors duration-200 ${
-                            isRemoving[item.id] || hasPendingOrder
-                              ? 'text-gray-400 cursor-not-allowed bg-gray-100' 
-                              : 'text-red-500 hover:text-red-600 hover:bg-red-50'
-                          }`}
-                        >
-                          {isRemoving[item.id] ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
-                        </button>
+  
+                        <div className="flex-1 min-w-0 ml-6">
+  
+                          <h3 className="text-lg font-semibold text-[#2e4b30]">{item.book.title}</h3>
+                          <p className="text-[#2e4b30]/70 text-sm mb-2">por {item.book.author}</p>
+                          <p className="text-lg font-bold text-[#2e4b30]">${(item.book.price * item.quantity).toFixed(2)}</p>
+                        </div>
+  
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              disabled={isUpdating[item.id] || hasPendingOrder}
+                              className={`p-1.5 rounded-sm transition-all duration-200 ${
+                                isUpdating[item.id] || hasPendingOrder
+                                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
+                                  : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
+                              }`}
+                            >
+                              {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
+                            </button>
+                            <span className="text-[#2e4b30] font-medium min-w-[2rem] text-center">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              disabled={isUpdating[item.id] || hasPendingOrder}
+                              className={`p-1.5 rounded-sm transition-all duration-200 ${
+                                isUpdating[item.id] || hasPendingOrder
+                                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
+                                  : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
+                              }`}
+                            >
+                              {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                            </button>
+                          </div>
+  
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            disabled={isRemoving[item.id] || hasPendingOrder}
+                            className={`p-2 rounded-sm transition-colors duration-200 ${
+                              isRemoving[item.id] || hasPendingOrder
+                                ? 'text-gray-400 cursor-not-allowed bg-gray-100' 
+                                : 'text-red-500 hover:text-red-600 hover:bg-red-50'
+                            }`}
+                          >
+                            {isRemoving[item.id] ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                          </button>
                       </div>
                     </div>
                   </div>
@@ -329,7 +330,7 @@ const Cart = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6 sticky top-24">
+            <div className="bg-white rounded-sm shadow-sm p-6 sticky top-24">
               <h2 className="text-xl font-bold text-[#2e4b30] mb-6">Resumen del Pedido</h2>
 
               <div className="space-y-4 mb-6">
@@ -352,10 +353,10 @@ const Cart = () => {
               <button
                 onClick={handleCheckout}
                 disabled={hasPendingOrder}
-                className={`w-full py-3 px-6 rounded-lg font-medium transition-all duration-200 mb-4 ${
+                className={`w-full py-3 px-6 rounded-sm font-medium transition-all duration-200 mb-4 ${
                   hasPendingOrder 
                     ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                    : 'bg-[#2e4b30] hover:bg-[#2e4b30]/90 text-[#f5efe1]'
+                    : 'bg-[#2e4b30] hover:bg-[#1a3a1c] text-[#f5efe1]'
                 }`}
               >
                 {hasPendingOrder ? 'Orden Pendiente en Proceso' : 'Proceder al Pago'}

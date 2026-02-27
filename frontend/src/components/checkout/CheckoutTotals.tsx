@@ -8,7 +8,7 @@ interface CheckoutTotalsProps {
 
 export const CheckoutTotals: React.FC<CheckoutTotalsProps> = ({ subtotal, tax, total }) => {
   return (
-    <div className="bg-white rounded-lg p-6 border border-[#2e4b30]/10">
+    <div className="bg-white rounded-sm p-6">
       <div className="space-y-3 mb-4">
         <div className="flex justify-between text-[#2e4b30]">
           <span>Subtotal</span>

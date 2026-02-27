@@ -9,7 +9,7 @@ interface CartPreviewProps {
 
 export const CartPreview: React.FC<CartPreviewProps> = ({ cartItems }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6 mb-6">
+    <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
       <CartPreviewHeader />
       <CartItemsList cartItems={cartItems} />
     </div>
@@ -40,7 +40,7 @@ const CartItemsList: React.FC<{ cartItems: ICartItem[] }> = ({ cartItems }) => {
 // Fila de item del carrito
 const CartItemRow: React.FC<{ item: ICartItem }> = ({ item }) => {
   return (
-    <div className="flex items-center space-x-4 p-4 bg-[#f5efe1]/30 rounded-lg">
+    <div className="flex items-center space-x-4 p-4 bg-[#f5efe1]/30 rounded-sm">
       <CartItemBookImage book={item.book} />
       <CartItemDetails item={item} />
       <CartItemPrice item={item} />
@@ -57,7 +57,7 @@ const CartItemBookImage: React.FC<{ book: ICartItem['book'] }> = ({ book }) => {
         alt={book.title}
         width={80}
         height={112}
-        className="w-20 h-28 object-cover rounded-lg shadow-sm"
+        className="w-20 h-28 object-cover rounded-sm shadow-sm"
       />
     </div>
   );

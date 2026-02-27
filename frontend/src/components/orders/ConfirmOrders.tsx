@@ -12,7 +12,7 @@ interface ConfirmOrdersProps {
 const ConfirmOrders: React.FC<ConfirmOrdersProps> = ({ orders }) => {
   if (!orders || orders.length === 0) {
     return (
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+      <div className="bg-white rounded-sm p-6 shadow-sm mb-8">
         <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
           <Package className="w-5 h-5" />
           Pedidos Confirmados
@@ -23,14 +23,14 @@ const ConfirmOrders: React.FC<ConfirmOrdersProps> = ({ orders }) => {
   }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+    <div className="bg-white rounded-sm p-6 shadow-sm mb-8">
       <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
         <Package className="w-5 h-5" />
         Pedidos Confirmados
       </h2>
       <div className="space-y-4">
         {orders.map((order) => (
-          <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          <div key={order.id} className="bg-gray-50 rounded-sm p-4 hover:shadow-md transition-shadow">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-3">
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -41,7 +41,7 @@ const ConfirmOrders: React.FC<ConfirmOrdersProps> = ({ orders }) => {
               </div>
               <div className="flex flex-col sm:items-end gap-1">
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  className={`px-3 py-1 rounded-sm text-xs font-medium ${
                     order.status === 'paid'
                       ? 'bg-green-100 text-green-800'
                       : order.status === 'shipped'
@@ -56,7 +56,7 @@ const ConfirmOrders: React.FC<ConfirmOrdersProps> = ({ orders }) => {
                 )}
               </div>
             </div>
-            <div className="border-t border-gray-100 pt-3">
+            <div className="bg-white bg-opacity-60 p-3 rounded-sm">
               <div className="space-y-2">
                 {order.items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between text-sm">

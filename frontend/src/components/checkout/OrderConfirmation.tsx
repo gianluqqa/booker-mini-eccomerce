@@ -11,7 +11,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) =
   return (
     <div className="min-h-screen bg-[#f5efe1] pt-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-8 text-center">
+        <div className="bg-white rounded-sm shadow-sm p-8 text-center">
           <OrderConfirmationHeader />
           <OrderConfirmationDetails order={order} />
           <OrderConfirmationItems order={order} />
@@ -37,7 +37,7 @@ const OrderConfirmationHeader: React.FC = () => {
 // Detalles de la orden
 const OrderConfirmationDetails: React.FC<{ order: IOrder }> = ({ order }) => {
   return (
-    <div className="bg-[#f5efe1]/30 rounded-lg p-6 mb-6 text-left">
+    <div className="bg-[#f5efe1]/30 rounded-sm p-6 mb-6 text-left">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <OrderDetailItem label="Número de Orden" value={order.id} isBold />
         <OrderStatusBadge status={order.status} />
@@ -65,7 +65,7 @@ const OrderStatusBadge: React.FC<{ status: string }> = ({ status }) => {
   return (
     <div className="text-center sm:text-left">
       <p className="text-sm text-[#2e4b30]/70 mb-1">Estado</p>
-      <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.bg}`}>{config.text}</div>
+      <div className={`inline-flex items-center px-3 py-1 rounded-sm text-sm font-medium ${config.bg}`}>{config.text}</div>
     </div>
   );
 };
@@ -100,7 +100,7 @@ const OrderItemRow: React.FC<{ item: IOrder['items'][0] }> = ({ item }) => {
   const totalPrice = item.totalPrice || item.price * item.quantity;
 
   return (
-    <div className="flex justify-between items-center p-4 bg-[#f5efe1]/30 rounded-lg">
+    <div className="flex justify-between items-center p-4 bg-[#f5efe1]/30 rounded-sm">
       <div className="flex-1">
         <p className="font-semibold text-[#2e4b30]">{item.book.title}</p>
         <p className="text-sm text-[#2e4b30]/70">
@@ -119,7 +119,7 @@ const OrderConfirmationTotal: React.FC<{ order: IOrder }> = ({ order }) => {
   const total = subtotal + tax;
 
   return (
-    <div className="bg-white rounded-lg p-6 border border-[#2e4b30]/10">
+    <div className="bg-white rounded-sm p-6 border border-booker-green/10">
       <div className="space-y-3 mb-4">
         <div className="flex justify-between text-[#2e4b30]">
           <span>Subtotal</span>
@@ -146,13 +146,13 @@ const OrderConfirmationActions: React.FC = () => {
     <div className="flex flex-col sm:flex-row gap-4">
       <Link
         href="/"
-        className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/90 transition-all duration-200 font-medium text-center"
+        className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium text-center"
       >
         Volver al Inicio
       </Link>
       <Link
         href="/profile"
-        className="flex-1 bg-[#2e4b30]/10 text-[#2e4b30] px-6 py-3 rounded-lg hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium text-center"
+        className="flex-1 bg-[#2e4b30]/10 text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-sm hover:bg-[#2e4b30]/20 transition-all duration-200 font-medium text-center"
       >
         Ver Mis Pedidos
       </Link>

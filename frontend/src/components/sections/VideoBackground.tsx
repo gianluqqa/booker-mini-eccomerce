@@ -34,7 +34,7 @@ const VideoBackground = () => {
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <div className="space-y-8">
             {/* Badge de bienvenida */}
-            <div className="inline-flex items-center rounded-full border border-booker-beige/30 bg-booker-green/20 px-4 py-2 backdrop-blur-sm">
+            <div className="inline-flex items-center rounded-sm border border-[#2e4b30] bg-booker-green/20 px-4 py-2 backdrop-blur-sm">
               <span className="text-sm font-medium text-booker-beige">
                 Bienvenidos a Booker
               </span>
@@ -55,11 +55,11 @@ const VideoBackground = () => {
 
             {/* Botones de acción */}
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <button className="bg-[#2e4b30] text-[#f5efe1] px-8 py-3 rounded-lg hover:bg-[#1a3a1c] transition-all duration-200 font-medium">
+              <button className="bg-[#2e4b30] text-[#f5efe1] px-8 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium">
                 Explorar Catálogo
               </button>
               
-              <button className="bg-booker-beige text-booker-green px-8 py-3 rounded-lg border border-booker-green hover:bg-booker-green hover:text-booker-beige hover:shadow-lg transition-all duration-200 font-medium">
+              <button className="bg-booker-beige text-booker-green px-8 py-3 rounded-sm border border-booker-green hover:bg-booker-green hover:text-booker-beige hover:shadow-lg transition-all duration-200 font-medium">
                 Ver Novedades
               </button>
             </div>

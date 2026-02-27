@@ -153,7 +153,7 @@ const Collections = () => {
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             <button
               onClick={() => setSelectedGenre("")}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-sm text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                 selectedGenre === ""
                   ? "bg-[#2e4b30] text-[#f5efe1]"
                   : "bg-white text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1]"
@@ -166,7 +166,7 @@ const Collections = () => {
               <button
                 key={genre}
                 onClick={() => setSelectedGenre(genre)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-sm text-sm font-medium transition-all duration-300 flex items-center gap-2 ${
                   selectedGenre === genre
                     ? "bg-[#2e4b30] text-[#f5efe1]"
                     : "bg-white text-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1]"
@@ -182,11 +182,11 @@ const Collections = () => {
         {/* Muestra de Colecciones */}
         {selectedGenre === "" ? (
           // Mostrar carrusel para todos los libros
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#2e4b30]/10">
+          <div className="bg-white rounded-sm p-8 shadow-lg">
             {/* Encabezado del Carrusel */}
             <div className="text-center mb-8">
               <h3 className="text-3xl font-bold text-[#1a3a1c] mb-4 flex items-center justify-center gap-3">
-                <div className="p-2 bg-[#2e4b30] text-[#f5efe1] rounded-lg">
+                <div className="p-2 bg-[#2e4b30] text-[#f5efe1] rounded-sm">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 Todos los Géneros
@@ -201,7 +201,7 @@ const Collections = () => {
               {/* Flechas de Navegación */}
               <button
                 onClick={prevSlide}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-[#2e4b30] text-[#f5efe1] p-3 rounded-full shadow-lg hover:bg-[#1a3a1c] transition-all duration-300"
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-[#2e4b30] text-[#f5efe1] p-3 rounded-sm shadow-lg hover:bg-[#1a3a1c] transition-all duration-300"
                 aria-label="Libros anteriores"
               >
                 <ChevronLeft className="w-6 h-6" />
@@ -209,7 +209,7 @@ const Collections = () => {
 
               <button
                 onClick={nextSlide}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-[#2e4b30] text-[#f5efe1] p-3 rounded-full shadow-lg hover:bg-[#1a3a1c] transition-all duration-300"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-[#2e4b30] text-[#f5efe1] p-3 rounded-sm shadow-lg hover:bg-[#1a3a1c] transition-all duration-300"
                 aria-label="Siguientes libros"
               >
                 <ChevronRight className="w-6 h-6" />
@@ -230,7 +230,7 @@ const Collections = () => {
                   <button
                     key={i}
                     onClick={() => setCurrentIndex(i)}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    className={`w-3 h-3 rounded-sm transition-all duration-300 ${
                       i === currentIndex % 5
                         ? 'bg-[#2e4b30]'
                         : 'bg-[#2e4b30]/30 hover:bg-[#2e4b30]/50'
@@ -250,7 +250,7 @@ const Collections = () => {
           </div>
         ) : (
           // Mostrar la colección del género seleccionado
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-[#2e4b30]/10">
+          <div className="bg-white rounded-sm p-8 shadow-lg">
             {/* Botón de Regreso */}
             <button
               onClick={() => setSelectedGenre("")}
@@ -262,7 +262,7 @@ const Collections = () => {
 
             {/* Encabezado de la Colección Seleccionada */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="p-4 bg-[#2e4b30] text-[#f5efe1] rounded-xl">
+              <div className="p-4 bg-[#2e4b30] text-[#f5efe1] rounded-sm">
                 {getGenreIcon(selectedGenre)}
               </div>
               <div>

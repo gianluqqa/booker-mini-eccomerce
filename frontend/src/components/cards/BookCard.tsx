@@ -65,18 +65,18 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
   // Validar que el libro tenga ID antes de renderizar
   if (!book.id) {
     return (
-      <div className="block bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 rounded-xl p-6 opacity-50">
+      <div className="block bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm rounded-sm p-6 opacity-50">
         <p className="text-red-500 text-sm">Error: Libro sin ID válido</p>
       </div>
     );
   }
 
   return (
-    <div className="block bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm border border-[#f5efe1] border-opacity-20 rounded-xl p-6 hover:bg-opacity-10 transition-all duration-300 group">
+    <div className="block bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm rounded-sm p-6 hover:bg-opacity-10 transition-all duration-300 group">
       {/* Imagen del libro */}
       <div 
         onClick={handleViewDetails}
-        className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-lg mb-4 flex items-center justify-center overflow-hidden cursor-pointer"
+        className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-sm mb-4 flex items-center justify-center overflow-hidden cursor-pointer"
       >
         {book.image && !imageError ? (
           <img
@@ -105,7 +105,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
           <div className="text-2xl font-bold text-[#1a3a1c]">${book.price}</div>
 
           <div
-            className={`px-3 py-1 rounded-full text-xs font-medium ${
+            className={`px-3 py-1 rounded-sm text-xs font-medium ${
               book.stock > 0
                 ? "bg-[#2e4b30] text-[#f5efe1]"
                 : "bg-red-100 text-red-600"
@@ -118,10 +118,10 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
         {/* Mensajes de feedback */}
         {(error || successMessage) && (
           <div
-            className={`px-3 py-2 rounded-lg text-xs font-medium ${
+            className={`px-3 py-2 rounded-sm text-xs font-medium ${
               error
-                ? "bg-red-100 text-red-700 border border-red-300"
-                : "bg-green-100 text-green-700 border border-green-300"
+                ? "bg-red-100 text-red-700"
+                : "bg-green-100 text-green-700"
             }`}
           >
             {error || successMessage}
@@ -132,7 +132,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
         <div className="flex gap-2">
           <button
             onClick={handleAddToCart}
-            className={`flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm ${
+            className={`flex-1 py-2 px-3 rounded-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 text-sm ${
               book.stock > 0 && !loading
                 ? "bg-[#2e4b30] text-[#f5efe1] hover:bg-[#1a3a1c] hover:shadow-lg"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -155,7 +155,7 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
           {/* Botón de Detalles*/}
           <button
             onClick={handleViewDetails}
-            className="flex-1 py-2 px-3 rounded-lg font-medium transition-all duration-200 bg-[#f5efe1] text-[#2e4b30] border border-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm cursor-pointer"
+            className="flex-1 py-2 px-3 rounded-sm font-medium transition-all duration-200 bg-[#f5efe1] text-[#2e4b30] border border-[#2e4b30] hover:bg-[#2e4b30] hover:text-[#f5efe1] hover:shadow-lg flex items-center justify-center gap-2 text-sm cursor-pointer"
           >
             <Eye className="w-4 h-4" />
             Detalles

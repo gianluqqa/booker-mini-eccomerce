@@ -184,7 +184,7 @@ const Profile = () => {
           <p className="text-red-600 text-lg mb-4">{error || 'No se pudo cargar el perfil'}</p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
+            className="bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
           >
             Reintentar
           </button>
@@ -208,10 +208,10 @@ const Profile = () => {
     <div className="min-h-screen bg-[#f5efe1] pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Encabezado del Perfil */}
-        <div className="bg-[#2e4b30] rounded-2xl p-8 mb-8 shadow-lg">
+        <div className="bg-[#2e4b30] rounded-sm p-8 mb-8 shadow-lg">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             {/* Avatar del usuario */}
-            <div className="w-28 h-28 bg-[#f5efe1] bg-opacity-20 rounded-full flex items-center justify-center overflow-hidden">
+            <div className="w-28 h-28 bg-[#f5efe1] bg-opacity-20 rounded-sm flex items-center justify-center overflow-hidden">
               <Image
                 src={getGenderIcon(userData.gender)}
                 alt="Avatar del usuario"
@@ -227,7 +227,7 @@ const Profile = () => {
                 {userData.name} {userData.surname}
               </h1>
               <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(userData.role)}`}>
+                <span className={`px-3 py-1 rounded-sm text-sm font-medium ${getRoleColor(userData.role)}`}>
                   {getRoleDisplay(userData.role)}
                 </span>
                 <span className="text-[#f5efe1] text-sm opacity-80">
@@ -242,7 +242,7 @@ const Profile = () => {
             <div className="w-full md:w-auto flex justify-end">
               <button
                 onClick={handleToggleForm}
-                className="bg-[#f5efe1] text-[#2e4b30] px-5 py-2 rounded-lg font-semibold hover:bg-white transition-colors duration-200"
+                className="bg-[#f5efe1] text-[#2e4b30] px-5 py-2 rounded-sm font-semibold hover:bg-white transition-colors duration-200"
               >
                 {isEditing ? 'Cerrar' : 'Editar Perfil'}
               </button>
@@ -251,13 +251,13 @@ const Profile = () => {
         </div>
 
         {successMessage && (
-          <div className="bg-green-100 text-green-800 border border-green-200 rounded-xl p-4 mb-6 text-sm">
+          <div className="bg-green-100 text-green-800 rounded-sm p-4 mb-6 text-sm">
             {successMessage}
           </div>
         )}
 
         {isEditing && formData && (
-          <div className="bg-[#2e4b30] rounded-2xl p-6 mb-8 shadow-lg">
+          <div className="bg-[#2e4b30] rounded-sm p-6 mb-8 shadow-lg">
             <h2 className="text-xl font-semibold text-[#f5efe1] mb-4">Actualizar información</h2>
             <UpdateUserForm
               value={formData}
@@ -275,7 +275,7 @@ const Profile = () => {
         {/* Cuadrícula de Información */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Información de Contacto */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-sm p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
               <Mail className="w-5 h-5" />
               Información de Contacto
@@ -308,7 +308,7 @@ const Profile = () => {
           </div>
 
           {/* Estadísticas de Actividad */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="bg-white rounded-sm p-6 shadow-sm">
             <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
               <Calendar className="w-5 h-5" />
               Actividad
@@ -340,7 +340,7 @@ const Profile = () => {
         <ConfirmOrders orders={orders} />
 
         {/* Carrito Actual */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+        <div className="bg-white rounded-sm p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
             Carrito Actual
@@ -348,7 +348,7 @@ const Profile = () => {
           {cartItems && cartItems.length > 0 ? (
             <div className="space-y-3">
               {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 bg-[#f5efe1] bg-opacity-30 rounded-lg">
+                <div key={item.id} className="flex items-center justify-between p-3 bg-[#f5efe1] bg-opacity-30 rounded-sm">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <ShoppingCart className="w-4 h-4 text-[#4a6b4d] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -371,11 +371,11 @@ const Profile = () => {
         <div className="flex flex-col sm:flex-row gap-4 mt-8">
           <button
             onClick={handleToggleForm}
-            className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-lg font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
+            className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
           >
             {isEditing ? 'Cerrar formulario' : 'Editar Perfil'}
           </button>
-          <button className="flex-1 bg-white text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-lg font-medium hover:bg-[#f5efe1] transition-colors duration-200">
+          <button className="flex-1 bg-white text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-sm font-medium hover:bg-[#f5efe1] transition-colors duration-200">
             Ver Historial
           </button>
         </div>

@@ -47,8 +47,9 @@ apiClient.interceptors.response.use(
       if (typeof window !== 'undefined') {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // Opcional: redirigir al login
-        // window.location.href = '/login';
+        
+        // Disparar un evento personalizado para que AuthContext se entere
+        window.dispatchEvent(new Event('auth-logout'));
       }
     }
 
@@ -58,7 +59,8 @@ apiClient.interceptors.response.use(
       error.message ||
       'Error desconocido';
 
-    return Promise.reject(new Error(errorMessage));
+    // Mantener la estructura del error si es posible para que el llamador pueda verificar el status
+    return Promise.reject(error);
   }
 );
 

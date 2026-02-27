@@ -91,7 +91,7 @@ const Bestsellers = () => {
           {bestsellers.map((book, index) => (
             <div key={book.id} className="relative">
               {/* Bestseller Badge */}
-              <div className="absolute -top-2 -right-2 z-10 bg-[#f5efe1] text-[#2e4b30] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+              <div className="absolute -top-2 -right-2 z-10 bg-[#f5efe1] text-[#2e4b30] px-3 py-1 rounded-sm text-xs font-bold flex items-center gap-1">
                 <Star className="w-3 h-3 fill-current" />
                 #{index + 1}
               </div>

@@ -105,7 +105,7 @@ const Testimonials = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 border border-[#2e4b30]/20 rounded-full mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 rounded-sm mb-6">
             <Quote className="w-4 h-4 text-[#2e4b30]" />
             <span className="text-[#2e4b30] text-sm font-medium tracking-wide">
               Voces de nuestros lectores
@@ -125,10 +125,10 @@ const Testimonials = () => {
 
         {/* Filtros */}
         <div className="flex justify-center mb-12">
-          <div className="inline-flex bg-white rounded-lg shadow-sm border border-[#2e4b30]/10 p-1">
+          <div className="inline-flex bg-white rounded-sm shadow-sm p-1">
             <button
               onClick={() => setActiveFilter('todos')}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-sm text-sm font-medium transition-colors ${
                 activeFilter === 'todos'
                   ? 'bg-[#2e4b30] text-[#f5efe1]'
                   : 'text-[#2e4b30] hover:text-[#2e4b30]/80'
@@ -138,7 +138,7 @@ const Testimonials = () => {
             </button>
             <button
               onClick={() => setActiveFilter('lectores')}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-sm text-sm font-medium transition-colors ${
                 activeFilter === 'lectores'
                   ? 'bg-[#2e4b30] text-[#f5efe1]'
                   : 'text-[#2e4b30] hover:text-[#2e4b30]/80'
@@ -148,7 +148,7 @@ const Testimonials = () => {
             </button>
             <button
               onClick={() => setActiveFilter('criticos')}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-6 py-2 rounded-sm text-sm font-medium transition-colors ${
                 activeFilter === 'criticos'
                   ? 'bg-[#2e4b30] text-[#f5efe1]'
                   : 'text-[#2e4b30] hover:text-[#2e4b30]/80'
@@ -164,12 +164,12 @@ const Testimonials = () => {
           {filteredTestimonials.map((testimonial) => (
             <div
               key={testimonial.id}
-              className="bg-white rounded-xl shadow-sm border border-[#2e4b30]/10 p-6 hover:shadow-md transition-shadow duration-300"
+              className="bg-white rounded-sm shadow-sm p-6 hover:shadow-md transition-shadow duration-300"
             >
               {/* Header del testimonio */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#2e4b30]/10 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#2e4b30]/10 rounded-sm flex items-center justify-center">
                     <User className="w-6 h-6 text-[#2e4b30]" />
                   </div>
                   <div>
@@ -213,7 +213,7 @@ const Testimonials = () => {
         </div>
 
         {/* Sección de invitación */}
-        <div className="text-center bg-white rounded-2xl p-8 border border-[#2e4b30]/10 shadow-sm">
+        <div className="text-center bg-white rounded-sm p-8 shadow-sm">
           <div className="max-w-2xl mx-auto">
             <h3 className="text-xl font-semibold text-[#2e4b30] mb-3">
               Tu voz también importa
@@ -224,10 +224,10 @@ const Testimonials = () => {
               que trasciende las páginas.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-6 py-3 bg-[#2e4b30] text-[#f5efe1] rounded-lg hover:bg-[#2e4b30]/90 transition-colors text-sm font-medium">
+              <button className="px-6 py-3 bg-[#2e4b30] text-[#f5efe1] rounded-sm hover:bg-[#2e4b30]/90 transition-colors text-sm font-medium">
                 Escribir una reseña
               </button>
-              <button className="px-6 py-3 bg-[#f5efe1] text-[#2e4b30] border border-[#2e4b30] rounded-lg hover:bg-white transition-colors text-sm font-medium">
+              <button className="px-6 py-3 bg-[#f5efe1] text-[#2e4b30] border border-[#2e4b30] rounded-sm hover:bg-white transition-colors text-sm font-medium">
                 Leer más voces
               </button>
             </div>

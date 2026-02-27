@@ -40,7 +40,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   const isOwner = currentUserId === review.userId;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+    <div className="bg-white rounded-sm p-4 shadow-sm">
       <div className="flex justify-between items-start mb-3">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -62,7 +62,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
               {onEdit && (
                 <button
                   onClick={() => onEdit(review)}
-                  className="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                  className="p-1 text-blue-600 hover:bg-blue-50 rounded-sm transition-colors"
                   title="Editar reseña"
                 >
                   <Edit className="w-4 h-4" />
@@ -71,7 +71,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
               {onDelete && (
                 <button
                   onClick={() => onDelete(review.id)}
-                  className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                  className="p-1 text-red-600 hover:bg-red-50 rounded-sm transition-colors"
                   title="Eliminar reseña"
                 >
                   <Trash2 className="w-4 h-4" />
