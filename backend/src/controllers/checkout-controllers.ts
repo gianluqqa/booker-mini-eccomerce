@@ -78,7 +78,6 @@ export const processCheckoutController = async (req: Request, res: Response) => 
 
     // Recibir datos de pago del frontend
     const paymentData = req.body;
-    console.log('Datos de pago recibidos:', paymentData);
 
     const order = await processCheckoutService(authUser.id, paymentData);
 

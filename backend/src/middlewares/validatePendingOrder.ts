@@ -26,13 +26,6 @@ export const validateNoPendingOrder = async (req: Request, res: Response, next: 
       relations: ["user", "items"]
     });
 
-    console.log('🔍 Middleware validateNoPendingOrder - Usuario:', authUser.id);
-    console.log('🔍 Buscando órdenes PENDING...');
-    console.log('🔍 Orden encontrada:', pendingOrder ? {
-      id: pendingOrder.id,
-      status: pendingOrder.status,
-      total: pendingOrder.total
-    } : 'Ninguna');
 
     if (pendingOrder) {
       const pendingOrderData: PendingOrderResponse = {
@@ -84,13 +77,6 @@ export const checkPendingOrderStatus = async (req: Request, res: Response, next:
       relations: ["user", "items"]
     });
 
-    console.log('🔍 Middleware checkPendingOrderStatus - Usuario:', authUser.id);
-    console.log('🔍 Buscando órdenes PENDING...');
-    console.log('🔍 Orden encontrada:', pendingOrder ? {
-      id: pendingOrder.id,
-      status: pendingOrder.status,
-      total: pendingOrder.total
-    } : 'Ninguna');
 
     // Agregar información de orden pendiente al request para que los controladores puedan usarla
     (req as any).pendingOrder = pendingOrder;

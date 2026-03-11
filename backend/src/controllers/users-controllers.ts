@@ -74,12 +74,9 @@ export const firebaseLoginController = async (req: Request, res: Response) => {
     const result = await firebaseLoginService(payload);
 
     // Compatibilidad: devolver campos de usuario al nivel raíz + accessToken
-    return res
-      .status(200)
-      .json({ ...result.user, accessToken: result.accessToken });
+    return res.status(200).json({ ...result.user, accessToken: result.accessToken });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Error desconocido";
+    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
     if (errorMessage.includes("requerido")) {
       return res.status(400).json({ message: errorMessage });

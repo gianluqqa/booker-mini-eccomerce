@@ -1,11 +1,5 @@
 import { Request, Response } from "express";
-import {
-  addBookToCartService,
-  getUserCartService,
-  updateCartItemQuantityService,
-  removeBookFromCartService,
-  clearCartService,
-} from "../services/carts-services";
+import { addBookToCartService, getUserCartService, updateCartItemQuantityService, removeBookFromCartService, clearCartService } from "../services/carts-services";
 import { AddToCartDto, UpdateCartDto } from "../dto/CartDto";
 
 //? Añadir un libro al carrito (POST).
@@ -31,10 +25,7 @@ export const addBookToCartController = async (req: Request, res: Response) => {
       });
     }
 
-    if (
-      quantity !== undefined &&
-      (quantity <= 0 || !Number.isInteger(quantity))
-    ) {
+    if (quantity !== undefined && (quantity <= 0 || !Number.isInteger(quantity))) {
       return res.status(400).json({
         success: false,
         message: "La cantidad debe ser un número entero positivo",
@@ -109,10 +100,7 @@ export const getUserCartController = async (req: Request, res: Response) => {
 };
 
 //? Actualizar cantidad de un item del carrito (PUT).
-export const updateCartItemQuantityController = async (
-  req: Request,
-  res: Response
-) => {
+export const updateCartItemQuantityController = async (req: Request, res: Response) => {
   try {
     const authUser = (req as any).authUser as
       | { id: string; role: string }
@@ -164,10 +152,7 @@ export const updateCartItemQuantityController = async (
 };
 
 //? Eliminar un item del carrito (DELETE).
-export const removeBookFromCartController = async (
-  req: Request,
-  res: Response
-) => {
+export const removeBookFromCartController = async (req: Request, res: Response) => {
   try {
     const authUser = (req as any).authUser as
       | { id: string; role: string }

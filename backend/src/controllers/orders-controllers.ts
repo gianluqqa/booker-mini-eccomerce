@@ -1,4 +1,4 @@
-﻿import { Request, Response } from "express";
+import { Request, Response } from "express";
 import { getOrderByIdService, getUserOrdersService, getUserPendingOrdersService, getAllOrdersService, cancelPaidOrderService, clearAllOrdersService, clearCancelledOrdersService } from "../services/orders-services";
 
 //? Obtener una orden por ID (GET).
@@ -79,19 +79,12 @@ export const getUserPendingOrdersController = async (req: Request, res: Response
       });
     }
 
-    console.log('🔍 [BACKEND] getUserPendingOrdersController - Buscando órdenes PENDING para usuario:', authUser.id);
 
     const orders = await getUserPendingOrdersService(authUser.id);
 
     // Devolver la primera orden PENDING como array para mantener consistencia con frontend
     const pendingOrder = orders && orders.length > 0 ? orders[0] : null;
 
-    console.log('📋 [BACKEND] getUserPendingOrdersController - Órdenes encontradas:', orders?.length || 0);
-    console.log('📋 [BACKEND] getUserPendingOrdersController - Orden PENDING:', pendingOrder ? {
-      id: pendingOrder.id,
-      status: pendingOrder.status,
-      expiresAt: pendingOrder.expiresAt
-    } : 'Ninguna');
 
     return res.json({
       success: true,

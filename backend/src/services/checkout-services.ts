@@ -20,8 +20,7 @@ export const createStockReservationForCheckoutService = async (userId: string): 
   const orderRepository = AppDataSource.getRepository(Order);
 
   try {
-    console.log('🚨 [DEBUG] createStockReservationForCheckoutService - Inicio para usuario:', userId);
-    
+
     // 🔍 VERIFICAR SI YA EXISTE ORDEN PENDING
     const existingPendingOrder = await orderRepository.findOne({
       where: {
@@ -29,12 +28,11 @@ export const createStockReservationForCheckoutService = async (userId: string): 
         status: OrderStatus.PENDING
       }
     });
-    
+
     if (existingPendingOrder) {
-      console.log('🚨 [ERROR] Ya existe orden PENDIENTE ID:', existingPendingOrder.id, 'NO se debe crear reserva');
-      throw { 
-        status: 409, 
-        message: "Ya tienes una orden pendiente. No se puede crear otra reserva." 
+      throw {
+        status: 409,
+        message: "Ya tienes una orden pendiente. No se puede crear otra reserva."
       };
     }
     const cartItems = await cartRepository.find({
@@ -112,38 +110,33 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
   await queryRunner.startTransaction();
 
   try {
-    console.log('🔄 Backend - Cancelando checkout para usuario:', userId);
     const orderRepository = queryRunner.manager.getRepository(Order);
     const orderItemRepository = queryRunner.manager.getRepository(OrderItem);
     const bookRepository = queryRunner.manager.getRepository(Book);
     const stockReservationRepository = queryRunner.manager.getRepository(StockReservation);
 
-    console.log('🔄 Cancelando checkout para usuario:', userId);
 
     // Buscar orden PENDING activa
     const pendingOrder = await orderRepository.findOne({
-      where: { 
-        user: { id: userId }, 
-        status: OrderStatus.PENDING 
+      where: {
+        user: { id: userId },
+        status: OrderStatus.PENDING
       },
       relations: ['items', 'items.book']
     });
 
     if (pendingOrder) {
-      console.log('📋 Orden PENDING encontrada, cancelando:', pendingOrder.id);
-      
+
       // Cancelar expiración automática
       cancelOrderExpiration(pendingOrder.id);
-      console.log('⏹️ Expiración automática cancelada por cancelación manual');
-      
+
       // Devolver stock de los items de la orden
       for (const item of pendingOrder.items) {
-        const book = await bookRepository.findOne({ 
-          where: { id: item.book.id } 
+        const book = await bookRepository.findOne({
+          where: { id: item.book.id }
         });
-        
+
         if (book) {
-          console.log(`📚 Devolviendo stock: ${item.quantity} unidades del libro ${book.title}`);
           book.stock += item.quantity;
           await bookRepository.save(book);
         }
@@ -152,15 +145,13 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
       // Cambiar estado a cancelled
       pendingOrder.status = OrderStatus.CANCELLED;
       await orderRepository.save(pendingOrder);
-      console.log('🚫 Orden marcada como cancelled');
-      
+
       // Eliminar items de la orden
       await orderItemRepository.delete({ order: { id: pendingOrder.id } });
-      
+
       // Eliminar la orden
       await orderRepository.delete({ id: pendingOrder.id });
-      
-      console.log('✅ Orden cancelada y eliminada exitosamente');
+
     }
 
     // Limpiar el carrito del usuario
@@ -168,10 +159,9 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
     const cartItems = await cartRepository.find({
       where: { user: { id: userId } },
     });
-    
+
     if (cartItems.length > 0) {
       await cartRepository.remove(cartItems);
-      console.log('🛒 Carrito limpiado exitosamente');
     }
 
     // También eliminar cualquier reserva de stock antigua (por compatibilidad)
@@ -180,14 +170,13 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
     });
 
     if (reservation) {
-      console.log('🔄 Eliminando reserva de stock antigua:', reservation.id);
       await stockReservationRepository.remove(reservation);
     }
 
     await queryRunner.commitTransaction();
 
     return {
-      message: pendingOrder 
+      message: pendingOrder
         ? "Orden cancelada y stock devuelto exitosamente"
         : "Reserva de stock cancelada exitosamente",
       orderId: pendingOrder?.id,
@@ -204,12 +193,7 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
 };
 
 //? Procesar checkout - Crear orden PENDING o procesar pago (POST).
-export const processCheckoutService = async (userId: string, paymentData?: {
-  cardNumber: string;
-  cardName: string;
-  expiryDate: string;
-  cvc: string;
-}): Promise<OrderResponseDto> => {
+export const processCheckoutService = async (userId: string, paymentData?: { cardNumber: string; cardName: string; expiryDate: string; cvc: string; }): Promise<OrderResponseDto> => {
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
   await queryRunner.startTransaction();
@@ -222,8 +206,6 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     const userRepository = queryRunner.manager.getRepository(User);
     const stockReservationRepository = queryRunner.manager.getRepository(StockReservation);
 
-    console.log('� [DEBUG] processCheckoutService - Inicio para usuario:', userId);
-    console.log('🚨 [DEBUG] paymentData:', paymentData ? 'CON DATOS DE PAGO' : 'SIN DATOS DE PAGO');
 
     // Verificar usuario
     const user = await userRepository.findOne({ where: { id: userId } });
@@ -233,38 +215,30 @@ export const processCheckoutService = async (userId: string, paymentData?: {
 
     // Verificar si ya existe una orden PENDING para este usuario
     const existingPendingOrder = await orderRepository.findOne({
-      where: { 
+      where: {
         user: { id: userId },
-        status: OrderStatus.PENDING 
+        status: OrderStatus.PENDING
       },
       relations: ["items", "items.book"],
     });
 
-    console.log('🚨 [DEBUG] Búsqueda de orden PENDING existente:', existingPendingOrder ? {
-      id: existingPendingOrder.id,
-      status: existingPendingOrder.status,
-      total: existingPendingOrder.total
-    } : 'Ninguna encontrada');
 
     // CASO 1: YA EXISTE ORDEN PENDING - Procesar pago
     if (existingPendingOrder) {
-      console.log('⚠️ [DEBUG] Ya existe orden PENDING ID:', existingPendingOrder.id);
 
       // Si no hay datos de pago completos, ERROR - no se debe crear otra orden
       if (!paymentData || !paymentData.cardNumber || !paymentData.cardName || !paymentData.expiryDate || !paymentData.cvc) {
-        console.log('� [ERROR] Ya existe orden PENDING y no hay datos de pago - NO SE DEBE CREAR OTRA ORDEN');
-        throw { 
-          status: 409, 
-          message: "Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar." 
+        throw {
+          status: 409,
+          message: "Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar."
         };
       }
 
       // Procesar pago y cambiar estado a PAID
-      console.log('💳 Procesando pago para orden PENDING existente...');
-      
+
       // Simulación de procesamiento de pago
       const paymentSuccessful = true; // Simulación exitosa
-      
+
       if (!paymentSuccessful) {
         throw { status: 400, message: "El pago fue rechazado" };
       }
@@ -274,11 +248,9 @@ export const processCheckoutService = async (userId: string, paymentData?: {
       existingPendingOrder.expiresAt = undefined;
       await orderRepository.save(existingPendingOrder);
 
-      console.log(' Orden PAGADA exitosamente - ID:', existingPendingOrder.id);
 
       // Cancelar expiración automática
       cancelOrderExpiration(existingPendingOrder.id);
-      console.log(' Expiración automática cancelada por pago');
 
       // Eliminar cualquier reserva de stock existente
       const reservation = await stockReservationRepository.findOne({
@@ -286,7 +258,6 @@ export const processCheckoutService = async (userId: string, paymentData?: {
       });
       if (reservation) {
         await stockReservationRepository.remove(reservation);
-        console.log('🗑️ Reserva de stock eliminada');
       }
 
       // Limpiar el carrito
@@ -295,7 +266,6 @@ export const processCheckoutService = async (userId: string, paymentData?: {
       });
       if (cartItems.length > 0) {
         await cartRepository.remove(cartItems);
-        console.log('🛒 Carrito limpiado');
       }
 
       await queryRunner.commitTransaction();
@@ -326,7 +296,6 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     }
 
     // CASO 2: NO EXISTE ORDEN PENDING - Crear nueva orden PENDING
-    console.log('🆕 [DEBUG] No existe orden PENDING - Creando nueva orden...');
 
     // Obtener items del carrito
     const cartItems = await cartRepository.find({
@@ -371,14 +340,12 @@ export const processCheckoutService = async (userId: string, paymentData?: {
 
     if (paymentData && paymentData.cardNumber && paymentData.cardName && paymentData.expiryDate && paymentData.cvc) {
       // Si hay datos de pago completos, procesar pago inmediatamente
-      console.log(' Datos de pago completos - Procesando pago inmediatamente...');
-      
+
       // Simulación de procesamiento de pago
       const paymentSuccessful = true; // Simulación exitosa
-      
+
       if (paymentSuccessful) {
         orderStatus = OrderStatus.PAID;
-        console.log('✅ Pago procesado inmediatamente - Orden PAID');
 
         // Reducir stock real solo si el pago es exitoso
         for (const cartItem of cartItems) {
@@ -391,7 +358,6 @@ export const processCheckoutService = async (userId: string, paymentData?: {
 
         // Limpiar carrito solo si el pago es exitoso
         await cartRepository.remove(cartItems);
-        console.log('🛒 Carrito limpiado por pago exitoso');
       } else {
         throw { status: 400, message: "El pago fue rechazado" };
       }
@@ -399,19 +365,15 @@ export const processCheckoutService = async (userId: string, paymentData?: {
       // Si no hay datos de pago, crear expiración de 5 minutos y reservar stock
       expiresAt = new Date();
       expiresAt.setMinutes(expiresAt.getMinutes() + RESERVATION_MINUTES);
-      console.log('⏰ Orden PENDING creada con expiración:', expiresAt);
-      
       // Reservar stock temporalmente para orden PENDING
       for (const cartItem of cartItems) {
         const book = await bookRepository.findOne({ where: { id: cartItem.book.id } });
         if (book) {
-          console.log(`📚 Reservando stock: ${cartItem.quantity} unidades del libro ${book.title}`);
           book.stock -= cartItem.quantity;
           await bookRepository.save(book);
         }
       }
-      console.log('✅ Stock reservado temporalmente para orden PENDING');
-      
+
       // Crear registro de reserva de stock en la base de datos
       const reservationItems = cartItems.map(item => ({
         bookId: item.book.id,
@@ -419,18 +381,17 @@ export const processCheckoutService = async (userId: string, paymentData?: {
         quantity: item.quantity,
         price: Number(item.book.price),
       }));
-      
+
       const reservationTotal = reservationItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
+
       const stockReservation = stockReservationRepository.create({
         userId: userId,
         itemsJson: JSON.stringify(reservationItems),
         totalAmount: reservationTotal,
         expiresAt: expiresAt,
       });
-      
+
       await stockReservationRepository.save(stockReservation);
-      console.log('📋 Reserva de stock creada en BD - ID:', stockReservation.id);
     }
 
     // Crear la orden
@@ -442,7 +403,6 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     });
 
     const savedOrder = await orderRepository.save(order);
-    console.log('🚨 [DEBUG] Orden creada - ID:', savedOrder.id, 'Estado:', orderStatus);
 
     // Asignar orden a los items y guardar
     for (const orderItem of orderItems) {
@@ -455,7 +415,6 @@ export const processCheckoutService = async (userId: string, paymentData?: {
     // Configurar expiración automática solo si es PENDING
     if (orderStatus === OrderStatus.PENDING) {
       setupOrderExpiration(savedOrder.id, RESERVATION_MINUTES);
-      console.log(` Expiración automática configurada para orden ${savedOrder.id} (${RESERVATION_MINUTES} minutos)`);
     }
 
     // Recargar la orden con relaciones para la respuesta

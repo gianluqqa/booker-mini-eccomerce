@@ -6,10 +6,7 @@ import { OrderStatus } from "../enums/OrderStatus";
 import { OrderResponseDto } from "../dto/OrderDto";
 
 //? Obtener una orden por ID (GET).
-export const getOrderByIdService = async (
-  orderId: string,
-  userId: string
-): Promise<OrderResponseDto> => {
+export const getOrderByIdService = async (orderId: string, userId: string): Promise<OrderResponseDto> => {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
     const order = await orderRepository.findOne({
@@ -58,9 +55,7 @@ export const getOrderByIdService = async (
 };
 
 //? Obtener todas las órdenes confirmadas del usuario (GET).
-export const getUserOrdersService = async (
-  userId: string
-): Promise<OrderResponseDto[]> => {
+export const getUserOrdersService = async (userId: string): Promise<OrderResponseDto[]> => {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
 
@@ -106,9 +101,7 @@ export const getUserOrdersService = async (
 };
 
 //? Obtener todas las órdenes pendientes del usuario (GET).
-export const getUserPendingOrdersService = async (
-  userId: string
-): Promise<OrderResponseDto[]> => {
+export const getUserPendingOrdersService = async (userId: string): Promise<OrderResponseDto[]> => {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
 
@@ -230,7 +223,6 @@ export const cancelPaidOrderService = async (orderId: string): Promise<OrderResp
         if (book) {
           book.stock += item.quantity;
           await bookRepository.save(book);
-          console.log(`📈 [BACKEND] Stock devuelto: ${book.title} +${item.quantity} unidades`);
         }
       }
     }
@@ -241,7 +233,6 @@ export const cancelPaidOrderService = async (orderId: string): Promise<OrderResp
     // Guardar los cambios
     await orderRepository.save(order);
 
-    console.log(`🚫 [BACKEND] Orden ${orderId} cancelada por administrador. Estado: ${order.status}`);
 
     // Devolver la orden actualizada
     return {
@@ -287,7 +278,6 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
     const orderRepository = AppDataSource.getRepository(Order);
     const bookRepository = AppDataSource.getRepository(Book);
     
-    console.log(`🗑️ [BACKEND] Iniciando limpieza TOTAL de órdenes...`);
 
     // Primero obtener todas las órdenes para procesar stock y contar
     const orders = await orderRepository.find({
@@ -297,7 +287,6 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
     let restoredStock = 0;
     let deletedOrders = orders.length;
 
-    console.log(`📊 [BACKEND] Se encontraron ${orders.length} órdenes para eliminar`);
 
     // Procesar restauración de stock para órdenes PENDING
     for (const order of orders) {
@@ -309,7 +298,6 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
               book.stock += item.quantity;
               await bookRepository.save(book);
               restoredStock += item.quantity;
-              console.log(`📈 [BACKEND] Stock devuelto: ${book.title} +${item.quantity} unidades`);
             }
           }
         }
@@ -325,7 +313,6 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
       .from(OrderItem)
       .execute();
 
-    console.log(`🗑️ [BACKEND] Items de órdenes eliminados: ${deletedItems.affected}`);
 
     // Luego eliminar todas las órdenes
     const deletedOrdersResult = await orderRepository
@@ -334,9 +321,6 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
       .from(Order)
       .execute();
 
-    console.log(`🗑️ [BACKEND] Órdenes eliminadas: ${deletedOrdersResult.affected}`);
-
-    console.log(`✅ [BACKEND] Limpieza TOTAL completada. Órdenes eliminadas: ${deletedOrdersResult.affected}, Stock restaurado: ${restoredStock} unidades`);
 
     return {
       deletedOrders: deletedOrdersResult.affected || 0,
@@ -354,17 +338,14 @@ export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: nu
   try {
     const orderRepository = AppDataSource.getRepository(Order);
     
-    console.log(`🗑️ [BACKEND] Iniciando limpieza de órdenes CANCELADAS...`);
 
     // Primero contar cuántas órdenes canceladas existen
     const cancelledOrdersCount = await orderRepository.count({
       where: { status: OrderStatus.CANCELLED }
     });
 
-    console.log(`📊 [BACKEND] Se encontraron ${cancelledOrdersCount} órdenes CANCELADAS para eliminar`);
 
     if (cancelledOrdersCount === 0) {
-      console.log(`ℹ️ [BACKEND] No hay órdenes canceladas para eliminar`);
       return { deletedOrders: 0 };
     }
 
@@ -389,7 +370,6 @@ export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: nu
         .where("orderId IN (:...orderIds)", { orderIds: cancelledOrderIds })
         .execute();
 
-      console.log(`🗑️ [BACKEND] Items de órdenes canceladas eliminados: ${deletedItems.affected}`);
 
       // Luego eliminar las órdenes canceladas
       const deletedOrdersResult = await orderRepository
@@ -399,9 +379,6 @@ export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: nu
         .where("status = :status", { status: OrderStatus.CANCELLED })
         .execute();
 
-      console.log(`🗑️ [BACKEND] Órdenes canceladas eliminadas: ${deletedOrdersResult.affected}`);
-
-      console.log(`✅ [BACKEND] Limpieza de órdenes CANCELADAS completada. Órdenes eliminadas: ${deletedOrdersResult.affected}`);
 
       return {
         deletedOrders: deletedOrdersResult.affected || 0,

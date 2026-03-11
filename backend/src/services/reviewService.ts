@@ -2,21 +2,13 @@ import { AppDataSource } from "../config/data-source";
 import { Review } from "../entities/Review";
 import { Book } from "../entities/Book";
 import { User } from "../entities/User";
-import { 
-  CreateReviewDto, 
-  UpdateReviewDto, 
-  ReviewResponseDto, 
-  ReviewListDto 
-} from "../dto/ReviewDto";
+import { CreateReviewDto, UpdateReviewDto, ReviewResponseDto, ReviewListDto } from "../dto/ReviewDto";
 
 const reviewRepository = AppDataSource.getRepository(Review);
 const bookRepository = AppDataSource.getRepository(Book);
 const userRepository = AppDataSource.getRepository(User);
 
-export const createReviewService = async (
-  reviewData: CreateReviewDto,
-  userId: string
-): Promise<ReviewResponseDto> => {
+export const createReviewService = async (reviewData: CreateReviewDto, userId: string): Promise<ReviewResponseDto> => {
   const { bookId, comment, rating, title } = reviewData;
 
   // Verificar que el libro existe
@@ -74,11 +66,7 @@ export const createReviewService = async (
   };
 };
 
-export const getReviewsByBookService = async (
-  bookId: string,
-  page: number = 1,
-  limit: number = 10
-): Promise<ReviewListDto> => {
+export const getReviewsByBookService = async (bookId: string, page: number = 1, limit: number = 10): Promise<ReviewListDto> => {
   // Verificar que el libro existe
   const book = await bookRepository.findOne({ where: { id: bookId } });
   if (!book) {
@@ -141,11 +129,7 @@ export const getReviewsByBookService = async (
   };
 };
 
-export const updateReviewService = async (
-  reviewId: string,
-  userId: string,
-  updateData: UpdateReviewDto
-): Promise<ReviewResponseDto> => {
+export const updateReviewService = async (reviewId: string, userId: string, updateData: UpdateReviewDto): Promise<ReviewResponseDto> => {
   const review = await reviewRepository.findOne({
     where: { id: reviewId, userId },
     relations: ["user"]
@@ -184,10 +168,7 @@ export const updateReviewService = async (
   };
 };
 
-export const deleteReviewService = async (
-  reviewId: string,
-  userId: string
-): Promise<void> => {
+export const deleteReviewService = async (reviewId: string, userId: string): Promise<void> => {
   const review = await reviewRepository.findOne({
     where: { id: reviewId, userId }
   });
@@ -199,11 +180,7 @@ export const deleteReviewService = async (
   await reviewRepository.remove(review);
 };
 
-export const getUserReviewsService = async (
-  userId: string,
-  page: number = 1,
-  limit: number = 10
-): Promise<ReviewListDto> => {
+export const getUserReviewsService = async (userId: string, page: number = 1, limit: number = 10): Promise<ReviewListDto> => {
   const skip = (page - 1) * limit;
 
   const [reviews, total] = await reviewRepository.findAndCount({
