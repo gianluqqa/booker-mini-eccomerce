@@ -6,6 +6,27 @@ import {
   ReviewListDto 
 } from "../types/Review";
 
+export const getAllReviews = async (
+  page: number = 1, 
+  limit: number = 6
+): Promise<ReviewListDto> => {
+  try {
+    const response = await apiClient.get("/reviews", {
+      params: { page, limit }
+    });
+    return {
+      reviews: response.data.reviews,
+      total: response.data.total,
+      averageRating: response.data.averageRating,
+      ratingDistribution: response.data.ratingDistribution
+    };
+  } catch (error: unknown) {
+    console.error("Error al obtener todas las reseñas:", error);
+    const errorMessage = error instanceof Error ? error.message : "Error al obtener las reseñas";
+    throw new Error(errorMessage);
+  }
+};
+
 export const createReview = async (reviewData: CreateReviewDto): Promise<Review> => {
   try {
     const response = await apiClient.post("/reviews", reviewData);

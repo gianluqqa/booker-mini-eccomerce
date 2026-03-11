@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createReviewService, getReviewsByBookService, updateReviewService, deleteReviewService, getUserReviewsService } from "../services/reviewService";
+import { createReviewService, getReviewsByBookService, updateReviewService, deleteReviewService, getUserReviewsService, getAllReviewsService } from "../services/reviewService";
 import { CreateReviewDto, UpdateReviewDto } from "../dto/ReviewDto";
 
 export const createReview = async (req: Request, res: Response) => {
@@ -100,5 +100,21 @@ export const getUserReviews = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Error al obtener reseñas del usuario:", error);
     res.status(400).json({ message: error.message || "Error al obtener las reseñas del usuario" });
+  }
+};
+export const getAllReviews = async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+
+    const result = await getAllReviewsService(page, limit);
+
+    res.json({
+      message: "Reseñas globales obtenidas exitosamente",
+      ...result
+    });
+  } catch (error: any) {
+    console.error("Error al obtener reseñas globales:", error);
+    res.status(400).json({ message: error.message || "Error al obtener las reseñas" });
   }
 };

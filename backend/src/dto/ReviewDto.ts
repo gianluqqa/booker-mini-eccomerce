@@ -25,6 +25,10 @@ export interface ReviewResponseDto {
     name: string;
     surname: string;
   };
+  book?: {
+    title: string;
+    author: string;
+  };
 }
 
 export interface ReviewListDto {

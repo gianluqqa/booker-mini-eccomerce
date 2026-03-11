@@ -99,10 +99,10 @@ const Collections = () => {
 
         {/* HEADER AREA */}
         <div className="grid lg:grid-cols-12 gap-8 items-end mb-20">
-          <div className="lg:col-span-8 space-y-6">
-            <div className="flex items-center gap-4 text-[#2e4b30]/40 uppercase tracking-[0.5em] text-[10px] font-black">
-              <div className="h-[1px] w-12 bg-[#2e4b30]/20"></div>
-              <span>Archivos de Booker</span>
+          <div className="lg:col-span-8 space-y-6 border-l-4 border-[#2e4b30] pl-8 animate-fade-in-up">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-[2px] w-12 bg-[#2e4b30]/20"></div>
+              <span className="text-[#2e4b30]/60 text-xs font-black uppercase tracking-[0.4em]">Archivos de Booker</span>
             </div>
             <h2 className="text-6xl md:text-8xl font-black text-[#1a3a1c] uppercase tracking-tighter leading-[0.8] mb-4">
               Nuestras <br />

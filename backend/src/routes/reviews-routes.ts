@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { authenticateJWT } from "../middlewares/auth";
-import { createReview, getReviewsByBook, updateReview, deleteReview, getUserReviews } from "../controllers/reviewController";
+import { createReview, getReviewsByBook, updateReview, deleteReview, getUserReviews, getAllReviews } from "../controllers/reviewController";
 
 const router = Router();
+
+// Obtener todas las reseñas globales (para testimonios)
+router.get("/", getAllReviews);
 
 // Crear una nueva reseña (requiere autenticación)
 router.post("/", authenticateJWT, createReview);

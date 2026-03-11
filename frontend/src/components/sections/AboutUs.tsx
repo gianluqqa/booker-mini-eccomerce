@@ -1,22 +1,17 @@
-import React from "react";
-import { BookOpen, Zap, CheckCircle, Shield, Globe, Layers } from "lucide-react";
+import { BookOpen, Zap, CheckCircle, Shield, Globe, Layers, Users, Sparkles } from "lucide-react";
 
 const About = () => {
   return (
     <section id="about" className="bg-[#2e4b30] py-32 px-4 relative overflow-hidden">
-      {/* Decorative background elements */}
-      <div className="absolute top-0 right-0 w-1/3 h-full bg-[#f5efe1]/5 -skew-x-12 translate-x-1/2 pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 w-64 h-64 border-t border-r border-[#f5efe1]/10 pointer-events-none"></div>
-
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid lg:grid-cols-12 gap-16 items-start">
 
           {/* LADO IZQUIERDO: EL MANIFIESTO (Col 7) */}
           <div className="lg:col-span-7 space-y-12">
-            <div className="space-y-6">
-              <div className="flex items-center gap-4 text-[#f5efe1]/40 uppercase tracking-[0.5em] text-[10px] font-black">
-                <div className="h-[1px] w-12 bg-[#2e4b30]/30 lg:bg-[#f5efe1]/20"></div>
-                <span>Nuestra Identidad</span>
+            <div className="space-y-10 border-l-4 border-[#f5efe1]/20 pl-8 animate-fade-in-up">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-[2px] w-12 bg-[#f5efe1]/20"></div>
+                <span className="text-[#f5efe1]/40 text-xs font-black uppercase tracking-[0.5em]">Nuestra Identidad</span>
               </div>
 
               <h2 className="text-6xl md:text-8xl font-black text-[#f5efe1] uppercase tracking-tighter leading-[0.8] mb-8">
@@ -25,7 +20,7 @@ const About = () => {
               </h2>
 
               <div className="max-w-xl">
-                <p className="text-[#f5efe1] text-xl md:text-2xl font-medium leading-tight mb-8 italic border-l-4 border-[#f5efe1] pl-6 py-2">
+                <p className="text-[#f5efe1] text-xl md:text-2xl font-medium leading-tight mb-8 border-l-2 border-[#f5efe1]/10 pl-6 py-2">
                   No somos solo una tienda; somos el puente entre las grandes mentes y los buscadores de conocimiento.
                 </p>
                 <p className="text-[#f5efe1]/70 text-sm md:text-base leading-relaxed font-light">
@@ -34,22 +29,19 @@ const About = () => {
               </div>
             </div>
 
-            {/* Métrica de Impacto */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-8">
-              <div className="relative group">
-                <span className="absolute -top-8 -left-4 text-6xl font-black text-[#f5efe1]/5 group-hover:text-[#f5efe1]/10 transition-colors">01</span>
-                <p className="text-4xl font-black text-[#f5efe1] tracking-tighter mb-1">5k+</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#f5efe1]/40">Almas Conectadas</p>
+            {/* Métrica de Impacto - Cuadros Beige con Texto Verde */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[#f5efe1]/10 border border-[#f5efe1]/10 mt-20 max-w-3xl">
+              <div className="bg-[#f5efe1] p-10 flex flex-col items-center justify-center text-center">
+                <p className="text-5xl font-black text-[#2e4b30] tracking-tighter mb-2">5k+</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2e4b30]/60 leading-tight">Almas <br/> Conectadas</p>
               </div>
-              <div className="relative group">
-                <span className="absolute -top-8 -left-4 text-6xl font-black text-[#f5efe1]/5 group-hover:text-[#f5efe1]/10 transition-colors">02</span>
-                <p className="text-4xl font-black text-[#f5efe1] tracking-tighter mb-1">20+</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#f5efe1]/40">Joyas Curadas</p>
+              <div className="bg-[#f5efe1] p-10 flex flex-col items-center justify-center text-center">
+                <p className="text-5xl font-black text-[#2e4b30] tracking-tighter mb-2">20+</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2e4b30]/60 leading-tight">Joyas <br/> Curadas</p>
               </div>
-              <div className="relative group hidden md:block">
-                <span className="absolute -top-8 -left-4 text-6xl font-black text-[#f5efe1]/5 group-hover:text-[#f5efe1]/10 transition-colors">03</span>
-                <p className="text-4xl font-black text-[#f5efe1] tracking-tighter mb-1">100%</p>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#f5efe1]/40">Compromiso Estético</p>
+              <div className="bg-[#f5efe1] p-10 flex flex-col items-center justify-center text-center">
+                <p className="text-5xl font-black text-[#2e4b30] tracking-tighter mb-2">100%</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#2e4b30]/60 leading-tight">Compromiso <br/> Estético</p>
               </div>
             </div>
           </div>

@@ -219,3 +219,40 @@ export const getUserReviewsService = async (userId: string, page: number = 1, li
     ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
   };
 };
+export const getAllReviewsService = async (page: number = 1, limit: number = 6): Promise<ReviewListDto> => {
+  const skip = (page - 1) * limit;
+
+  const [reviews, total] = await reviewRepository.findAndCount({
+    relations: ["user", "book"],
+    order: { createdAt: "DESC" },
+    skip,
+    take: limit
+  });
+
+  const reviewResponseDtos: ReviewResponseDto[] = reviews.map(review => ({
+    id: review.id,
+    comment: review.comment,
+    rating: review.rating,
+    title: review.title || undefined,
+    createdAt: review.createdAt,
+    updatedAt: review.updatedAt,
+    bookId: review.bookId,
+    userId: review.userId,
+    user: {
+      id: review.user.id,
+      name: review.user.name,
+      surname: review.user.surname
+    },
+    book: review.book ? {
+      title: review.book.title,
+      author: review.book.author
+    } : undefined
+  }));
+
+  return {
+    reviews: reviewResponseDtos,
+    total,
+    averageRating: 0,
+    ratingDistribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+  };
+};

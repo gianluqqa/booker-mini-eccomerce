@@ -44,10 +44,10 @@ const Books = () => {
   }
 
   return (
-    <section id="books" className="bg-[#f5efe1] py-24 overflow-hidden border-y border-[#2e4b30]/10">
-      <div className="max-w-[1800px] mx-auto">
+    <section id="books" className="bg-[#f5efe1] py-24 px-4 overflow-hidden border-y border-[#2e4b30]/10">
+      <div className="max-w-7xl mx-auto">
         {/* Header - Brutalist & Premium */}
-        <div className="px-6 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8 border-l-4 border-[#2e4b30] pl-8 animate-fade-in-up">
           <div className="max-w-2xl">
             <div className="inline-block px-2 py-1 bg-[#2e4b30] text-[#f5efe1] text-[10px] font-black uppercase tracking-[0.3em] mb-4">
               Archive 001
@@ -56,7 +56,7 @@ const Books = () => {
               The <br />Library
             </h2>
           </div>
-          <p className="text-[#2e4b30] text-xs font-bold uppercase tracking-widest max-w-[280px] leading-relaxed opacity-60">
+          <p className="text-[#2e4b30] text-sm font-medium uppercase tracking-widest max-w-[280px] leading-relaxed opacity-60">
             Una selección técnica y estética de ejemplares literarios. Curaduría constante, renovación infinita.
           </p>
         </div>

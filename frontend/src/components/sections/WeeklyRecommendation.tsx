@@ -89,10 +89,10 @@ const WeeklyRecommendation = () => {
 
           {/* LADO IZQUIERDO: TEXTO Y ACCIONES (Col 7) */}
           <div className="lg:col-span-7 space-y-10 order-2 lg:order-1">
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 text-[#f5efe1]/60 uppercase tracking-[0.4em] text-[10px] font-black">
-                <div className="h-[1px] w-12 bg-[#f5efe1]/30"></div>
-                <span>Curaduría Exclusiva</span>
+            <div className="space-y-6 border-l-4 border-[#f5efe1]/30 pl-8 animate-fade-in-up">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="h-[2px] w-12 bg-[#f5efe1]/30"></div>
+                <span className="text-[#f5efe1]/60 text-xs font-black uppercase tracking-[0.4em]">Propuesta Semanal</span>
               </div>
 
               <h2 className="text-5xl md:text-7xl font-black text-[#f5efe1] uppercase tracking-tighter leading-[0.85]">
