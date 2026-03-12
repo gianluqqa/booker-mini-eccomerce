@@ -241,8 +241,8 @@ export const deleteAllUsersExceptAdminService = async () => {
       return { message: "No hay usuarios clientes para eliminar", deletedCount: 0 };
     }
 
-    // Eliminar todos los usuarios encontrados
-    await userRepo.remove(usersToDelete);
+    // Eliminar todos los usuarios encontrados de forma masiva
+    await userRepo.delete({ role: UserRole.CUSTOMER });
     
     return { 
       message: "Se eliminaron todos los usuarios clientes exitosamente", 

@@ -15,7 +15,7 @@ export class Order {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
-  @ManyToOne(() => User, (user) => user.orders)
+  @ManyToOne(() => User, (user) => user.orders, { onDelete: "CASCADE" })
   user!: User;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {

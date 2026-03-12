@@ -37,6 +37,6 @@
     // Tipos para testing
     "types": ["node", "jest", "jsonwebtoken"]
   },
-  "include": ["src/**/*", "test/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist", "coverage"]
 }
