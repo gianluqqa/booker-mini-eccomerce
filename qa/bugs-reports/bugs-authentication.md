@@ -9,8 +9,8 @@
     1. Ir al formulario de registro.
     2. Completar todos los datos correctamente y pulsar Registrarse.
 - **Resultado esperado**: El sistema debería mostrar una alerta o banner indicando "Cuenta creada con éxito" antes o durante la redirección al inicio de sesión.
-- **Resultado actual**: El sistema redirige al usuario a la pantalla de inicio de sesión sin dar ningún tipo de feedback o aviso de que la operación fue exitosa.
-- **Estado**: 🔴 **OPEN**
+- **Resultado actual**: El sistema redirige al usuario a la pantalla de inicio de sesión mostrando una alerta de éxito.
+- **Estado**: ✅ **CLOSED**
 - **Evidencia**: 
 - **Test Case relacionado**: TC-AUTH-001
 
@@ -25,9 +25,9 @@
     3. Completar el resto de los campos requeridos con cualquier dato válido.
     4. Hacer clic en el botón Registrarse.
 - **Resultado esperado**: El sistema debe mostrar un mensaje claro y amigable para el usuario, por ejemplo: "Este email ya se encuentra registrado, por favor intenta con otro o inicia sesión".
-- **Resultado actual**: El sistema muestra un mensaje de error técnico: "Request failed with status code 400".
-- **Estado**: 🔴 **OPEN**
-- **Evidencia**: bug-auth-002.png
+- **Resultado actual**: El sistema muestra un mensaje de error técnico más especifico: Este email ya se encuentra registrado, por favor intenta con otro o inicia sesión.
+- **Estado**: ✅ **CLOSED**
+- **Evidencia**: /qa/bugs-reports/evidences/bug-auth-002.png
 - **Test Case relacionado**: TC-AUTH-003
 
 ### BUG-AUTH-003: Mensaje de error técnico al iniciar sesión con contraseña incorrecta
@@ -40,10 +40,10 @@
     2. Ingresar el email registrado.
     3. Ingresar una contraseña incorrecta.
     4. Hacer clic en el botón Iniciar Sesión.
-- **Resultado esperado**: El sistema debe mostrar un mensaje claro y amigable para el usuario, por ejemplo: "Credenciales inválidas".
-- **Resultado actual**: El sistema muestra un mensaje de error técnico: "Request failed with status code 400".
-- **Estado**: 🔴 **OPEN**
-- **Evidencia**: bug-auth-003.png
+- **Resultado esperado**: El sistema debe mostrar un mensaje claro y amigable para el usuario, por ejemplo: "Credenciales inválidas", o dependiendo del campo un mensaje más específico.
+- **Resultado actual**: El sistema muestra un mensaje de error técnico: Credenciales inválidas.
+- **Estado**: ✅ **CLOSED**
+- **Evidencia**: /qa/bugs-reports/evidences/bug-auth-003.png
 - **Test Case relacionado**: TC-AUTH-009
 
 ### BUG-AUTH-004: Mensaje de error técnico al iniciar sesión con email inexistente
@@ -56,10 +56,10 @@
     2. Ingresar el email registrado.
     3. Ingresar una contraseña incorrecta.
     4. Hacer clic en el botón Iniciar Sesión.
-- **Resultado esperado**: El sistema debe mostrar un mensaje claro y amigable para el usuario, por ejemplo: "Credenciales inválidas".
-- **Resultado actual**: El sistema muestra un mensaje de error técnico: "Request failed with status code 400".
-- **Estado**: 🔴 **OPEN**
-- **Evidencia**: bug-auth-004.png
+- **Resultado esperado**: El sistema debe mostrar un mensaje claro y amigable para el usuario, por ejemplo:Deberia mostrar un mensaje mas especifico como ejemplo Usuario no encontrado o inexistente.
+- **Resultado actual**: El sistema muestra un mensaje de error técnico: Usuario no encontrado o inexistente.
+- **Estado**: ✅ **CLOSED**
+- **Evidencia**: /qa/bugs-reports/evidences/bug-auth-004.png
 - **Test Case relacionado**: TC-AUTH-010
 
 ### BUG-AUTH-005: El sistema permite crear una cuenta con simbolos y numeros en el nombre
@@ -71,8 +71,8 @@
     1. Ir al formulario de registro.
     2. Completar todos los datos correctamente y pulsar Registrarse.
 - **Resultado esperado**: El sistema debería detectar que no es un nombre válido y mostrar una alerta o impedir el registro. 
-- **Resultado actual**: Me permite crear la cuenta con simbolos y numeros en el nombre.
-- **Estado**: 🔴 **OPEN**
-- **Evidencia**: bug-auth-005.png
+- **Resultado actual**: El sistema detecta que no es un nombre válido y muestra una alerta o impedir el registro.
+- **Estado**: ✅ **CLOSED**
+- **Evidencia**: /qa/bugs-reports/evidences/bug-auth-005.png
 - **Test Case relacionado**: TC-AUTH-011
 

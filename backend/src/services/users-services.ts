@@ -75,11 +75,11 @@ export const loginUserService = async (user: LoginUserDTO) => {
   // 2️⃣ Verificar que el usuario exista
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
-    if (!existingUser) throw new Error("Credenciales inválidas");
+    if (!existingUser) throw new Error("Usuario no encontrado");
 
   // 3️⃣ Verificar password
   const isPasswordValid = await bcrypt.compare(user.password, existingUser.password);
-  if (!isPasswordValid) throw new Error("Invalid credentials");
+  if (!isPasswordValid) throw new Error("Contraseña incorrecta");
 
   // 4️⃣ Emitir access token (15m)
   const accessToken = jwt.sign(

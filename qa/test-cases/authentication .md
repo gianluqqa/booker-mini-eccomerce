@@ -14,10 +14,10 @@
     4. Completar los campos obligatorios: Nombre, Apellido, Email, Contraseña y Confirmar Contraseña.
     5. Hacer clic en el botón Registrarse.
 - **Resultado esperado**: El sitio web nos lleva a la pantalla de Iniciar Sesión. Los datos de la cuenta se guardan correctamente para poder ingresar.
-- **Resultado Actual**: Sucedio lo esperado pero no aparece ninguna alerta que diga que se registro correctamente.
+- **Resultado Actual**: El sistema muestra una alerta de confirmación con barra de progreso antes de redirigir al Login.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ❌ **FAILED**
-- **Observaciones**: Falta una alerta que diga que se registro correctamente.
+- **Status**: ✅ **PASSED**
+- **Observaciones**: Bug BUG-AUTH-001 solucionado con el nuevo componente SuccessAlert.
 
 ---
 
@@ -49,10 +49,10 @@
     2. Ingresar el email que ya existe (test@test.com).
     3. Completar el resto de los datos y hacer clic en Registrarse.
 - **Resultado esperado**: Aparece un aviso indicando que el usuario o el email ya se encuentran registrados.
-- **Resultado Actual**: La cuenta no se creo pero envia un "Request failed with status code 400" lo cual deberia ser un mensaje de error mas claro.
+- **Resultado Actual**: El sistema muestra un mensaje claro: "Este email ya se encuentra registrado, por favor intenta con otro o inicia sesión" debajo del campo de email.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ❌ **FAILED**
-- **Observaciones**: 
+- **Status**: ✅ **PASSED**
+- **Observaciones**: Bug BUG-AUTH-002 solucionado.
 
 ---
 
@@ -151,10 +151,10 @@
     3. Ingresar una contraseña incorrecta.
     4. Hacer clic en el botón Iniciar Sesión.
 - **Resultado esperado**: El sistema no permite el ingreso y muestra un mensaje de aviso que dice: Credenciales inválidas.
-- **Resultado Actual**: No te permite iniciar sesion pero el mensaje de error es un "Request failed with status code 400" lo cual deberia ser un mensaje de error mas claro.
+- **Resultado Actual**: El sistema muestra el mensaje "Credenciales inválidas" debajo del campo de contraseña.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ❌ **FAILED**
-- **Observaciones**: 
+- **Status**: ✅ **PASSED**
+- **Observaciones**: Bug BUG-AUTH-003 solucionado. Mejora en la consistencia de errores.
 
 ---
 
@@ -168,10 +168,10 @@
     2. Ingresar un email inexistente y cualquier contraseña.
     3. Hacer clic en el botón Iniciar Sesión.
 - **Resultado esperado**: El sistema no permite el ingreso y muestra el mensaje: Credenciales inválidas.
-- **Resultado Actual**: No te permite iniciar sesion pero el mensaje de error es un "Request failed with status code 400" lo cual deberia ser un mensaje de error mas claro.
+- **Resultado Actual**: El sistema muestra el mensaje "Usuario no encontrado o inexistente" debajo del campo de email.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ❌ **FAILED**
-- **Observaciones**: 
+- **Status**: ✅ **PASSED**
+- **Observaciones**: Bug BUG-AUTH-004 solucionado.
 
 ---
 
@@ -185,10 +185,10 @@
     2. Completar el resto de los campos correctamente.
     3. Hacer clic en el botón Registrarse.
 - **Resultado esperado**: El sistema debería detectar que no es un nombre válido y mostrar una alerta o impedir el registro. 
-- **Resultado Actual**: Me permite crear la cuenta con simbolos y numeros en el nombre.
+- **Resultado Actual**: El sistema detecta el nombre inválido e impide el registro con un mensaje específico bajo el campo.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ❌ **FAILED**
-- **Observaciones**: 
+- **Status**: ✅ **PASSED**
+- **Observaciones**: Bug BUG-AUTH-005 solucionado mediante validación por regex en backend y frontend.
 
 ---
 

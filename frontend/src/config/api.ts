@@ -53,13 +53,15 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Extraer mensaje de error del backend
-    const errorMessage = 
-      (error.response?.data as { message?: string })?.message ||
-      error.message ||
-      'Error desconocido';
+    // Extraer mensaje de error del backend para que sea accesible fácilmente
+    const backendMessage = (error.response?.data as { message?: string })?.message;
+    
+    if (backendMessage) {
+      // Si el backend envió un mensaje, lo usamos como el mensaje principal del error
+      error.message = backendMessage;
+    }
 
-    // Mantener la estructura del error si es posible para que el llamador pueda verificar el status
+    // Mantener la estructura del error para que el llamador pueda verificar el status
     return Promise.reject(error);
   }
 );

@@ -40,10 +40,24 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     errors.push("Las contraseñas no coinciden");
   }
 
-  // Name & Surname length validation (si se envían)
-    if (name && name.trim().length === 0) errors.push("El nombre es requerido");
-    if (surname && surname.trim().length === 0)
-    errors.push("El apellido es requerido");
+  // Name & Surname validation
+  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+  
+  if (name) {
+    if (name.trim().length === 0) {
+      errors.push("El nombre es requerido");
+    } else if (!nameRegex.test(name)) {
+      errors.push("El nombre solo puede contener letras y espacios");
+    }
+  }
+
+  if (surname) {
+    if (surname.trim().length === 0) {
+      errors.push("El apellido es requerido");
+    } else if (!nameRegex.test(surname)) {
+      errors.push("El apellido solo puede contener letras y espacios");
+    }
+  }
 
   // Optional fields validations
   if (phone) {
@@ -106,14 +120,24 @@ export const validateUpdateUser = (user: UpdateUserDTO) => {
 
   const { name, surname, password, phone, address, country, city, role, bio, gender } = user;
 
+  const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+
   // Name validation
-  if (name !== undefined && name.trim().length === 0) {
-    errors.push("El nombre no puede estar vacío");
+  if (name !== undefined) {
+    if (name.trim().length === 0) {
+      errors.push("El nombre no puede estar vacío");
+    } else if (!nameRegex.test(name)) {
+      errors.push("El nombre solo puede contener letras y espacios");
+    }
   }
 
   // Surname validation
-  if (surname !== undefined && surname.trim().length === 0) {
-    errors.push("El apellido no puede estar vacío");
+  if (surname !== undefined) {
+    if (surname.trim().length === 0) {
+      errors.push("El apellido no puede estar vacío");
+    } else if (!nameRegex.test(surname)) {
+      errors.push("El apellido solo puede contener letras y espacios");
+    }
   }
 
   // Password validation

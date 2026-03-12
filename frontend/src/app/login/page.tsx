@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
 
   const getRedirectPath = () => {
     return user?.role === "admin" ? "/admin" : "/profile";
@@ -32,23 +33,50 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setFieldErrors({});
     setLoading(true);
 
     try {
       await login(formData);
       router.push(getRedirectPath());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al iniciar sesión");
+    } catch (err: any) {
+      const backendMessage = err.response?.data?.message || err.message || "Error al iniciar sesión";
+      
+      // Manejar errores específicos de credenciales (400 o 401)
+      if (err.response?.status === 400 || err.response?.status === 401) {
+        const msg = backendMessage.toLowerCase();
+        // Detectar variaciones de 'incorrecto', 'inválido' o 'password' tanto en ES como EN
+        if (msg.includes('contraseña') || msg.includes('password') || 
+            msg.includes('inválid') || msg.includes('invalid') || 
+            msg.includes('incorrect') || msg.includes('credenciales')) {
+          setFieldErrors({ password: 'Credenciales inválidas' });
+        } else if (msg.includes('email') || msg.includes('usuario no encontrado') || msg.includes('exist')) {
+          setFieldErrors({ email: 'Usuario no encontrado o inexistente' });
+        } else {
+          setError(backendMessage);
+        }
+      } else {
+        // Errores de servidor u otros
+        setError(backendMessage);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+    // Limpiar error del campo al escribir
+    if (fieldErrors[name as keyof typeof fieldErrors]) {
+      setFieldErrors({
+        ...fieldErrors,
+        [name]: undefined
+      });
+    }
   };
 
   return (
@@ -57,7 +85,11 @@ export default function LoginPage() {
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold text-center mb-6 text-[#2c3e50]">Iniciar Sesión</h1>
 
-          {error && <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
+          {error && Object.keys(fieldErrors).length === 0 && (
+            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -71,9 +103,16 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-400 bg-white"
+                className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-400 bg-white transition-all ${
+                  fieldErrors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
+                }`}
                 placeholder="tu@email.com"
               />
+              {fieldErrors.email && (
+                <p className="mt-1 text-xs font-semibold text-red-600 animate-fade-in-up">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             <div>
@@ -88,7 +127,9 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2 pr-16 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-400 bg-white"
+                  className={`w-full px-4 py-2 pr-16 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-400 bg-white transition-all ${
+                    fieldErrors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="••••••••"
                 />
                 <button
@@ -99,6 +140,11 @@ export default function LoginPage() {
                   {showPassword ? "Ocultar" : "Mostrar"}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p className="mt-1 text-xs font-semibold text-red-600 animate-fade-in-up">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             <button
