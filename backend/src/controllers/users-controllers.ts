@@ -34,7 +34,7 @@ export const loginUserController = async (req: Request, res: Response) => {
     // 1️⃣ Validar que el body exista
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
-        message: "Email y contraseña son requeridos",
+        message: "Los campos email y contraseña son obligatorios",
       });
     }
 
@@ -50,8 +50,10 @@ export const loginUserController = async (req: Request, res: Response) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
-    // 4️⃣ Mapear errores a status codes
-    if (errorMessage.includes("requerido") || errorMessage.includes("requeridos") || (errorMessage.includes("formato") && errorMessage.includes("inválido"))) {
+    // 4️⃣ Mapear errores a status codes según contrato
+    if (errorMessage.includes("obligatorios")) {
+      return res.status(400).json({ message: errorMessage });
+    } else if (errorMessage.includes("formato") && errorMessage.includes("inválido")) {
       return res.status(400).json({ message: errorMessage });
     } else if (errorMessage.includes("Credenciales inválidas")) {
       return res.status(401).json({ message: errorMessage });
@@ -108,7 +110,7 @@ export const getUsersController = async (req: Request, res: Response) => {
 export const getCurrentUserController = async (req: Request, res: Response) => {
   try {
     const authUser = (req as any).authUser as { id: string; role: string } | undefined;
-    
+
     if (!authUser) {
       return res.status(401).json({
         success: false,

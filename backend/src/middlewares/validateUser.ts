@@ -59,7 +59,7 @@ export const validateLoginUser = (user: LoginUserDTO) => {
 
   // Email validation
   if (!email || email.trim() === "") {
-    errors.push("El email es requerido");
+    errors.push("Los campos email y contraseña son obligatorios");
   } else {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -69,7 +69,7 @@ export const validateLoginUser = (user: LoginUserDTO) => {
 
   // Password validation
   if (!password || password.trim() === "") {
-    errors.push("La contraseña es requerida");
+    errors.push("Los campos email y contraseña son obligatorios");
   }
 
   return errors;

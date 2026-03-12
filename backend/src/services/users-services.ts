@@ -70,17 +70,17 @@ export const loginUserService = async (user: LoginUserDTO) => {
   // 1️⃣ Validación del request
   const errors = validateLoginUser(user);
   if (errors.length > 0) {
-    throw new Error(errors.join(", "));
+    throw new Error(errors[0]); // Tomar solo el primer error para consistencia
   }
 
   // 2️⃣ Verificar que el usuario exista
   const userRepo = AppDataSource.getRepository(User);
   const existingUser = await userRepo.findOne({ where: { email: user.email } });
-    if (!existingUser) throw new Error("Usuario no encontrado");
+  if (!existingUser) throw new Error("Credenciales inválidas");
 
   // 3️⃣ Verificar password
   const isPasswordValid = await bcrypt.compare(user.password, existingUser.password);
-  if (!isPasswordValid) throw new Error("Contraseña incorrecta");
+  if (!isPasswordValid) throw new Error("Credenciales inválidas");
 
   // 4️⃣ Emitir access token (15m)
   const accessToken = jwt.sign(
