@@ -27,14 +27,15 @@ export const registerUserService = async (user: RegisterUserDTO) => {
 
   if (missingFields.length > 0) {
     throw new Error(
-      "Email, contraseña, confirmación de contraseña, nombre y apellido son requeridos"
+      "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"
     );
   }
 
-  // 2️⃣ Validación de contenido (longitud de password, coincidencia de confirmPassword, formato de email, etc.)
+  // 2️⃣ Validación de contenido (password, email format, name, surname)
   const errors = validateRegisterUser(user);
   if (errors.length > 0) {
-    throw new Error(errors.join(", "));
+    // Lanzamos el primer error encontrado para mantener consistencia
+    throw new Error(errors[0]);
   }
 
   // 3️⃣ Check duplicado

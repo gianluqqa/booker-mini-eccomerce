@@ -11,16 +11,9 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     confirmPassword,
     name,
     surname,
-    address,
-    country,
-    city,
-    phone,
-    role,
-    bio,
-    gender,
   } = user;
 
-  // Email validation
+  // 1. Email validation
   if (email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -28,65 +21,32 @@ export const validateRegisterUser = (user: RegisterUserDTO) => {
     }
   }
 
-  // Password validation
-  if (password && password.length < 8) {
-    errors.push(
-      "La contraseña debe contener al menos 8 caracteres, mayúsculas, minúsculas y números"
-    );
+  // 2. Password complexity validation (min 8 chars, 1 upper, 1 lower, 1 number)
+  if (password) {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      errors.push("La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número");
+    }
   }
 
-  // Confirm password validation
+  // 3. Confirm password validation
   if (password && confirmPassword && password !== confirmPassword) {
     errors.push("Las contraseñas no coinciden");
   }
 
-  // Name & Surname validation
+  // 4. Name validation
   const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-  
   if (name) {
-    if (name.trim().length === 0) {
-      errors.push("El nombre es requerido");
-    } else if (!nameRegex.test(name)) {
+    if (!nameRegex.test(name)) {
       errors.push("El nombre solo puede contener letras y espacios");
     }
   }
 
+  // 5. Surname validation
   if (surname) {
-    if (surname.trim().length === 0) {
-      errors.push("El apellido es requerido");
-    } else if (!nameRegex.test(surname)) {
+    if (!nameRegex.test(surname)) {
       errors.push("El apellido solo puede contener letras y espacios");
     }
-  }
-
-  // Optional fields validations
-  if (phone) {
-    const phoneRegex = /^[0-9]{7,15}$/;
-    if (!phoneRegex.test(phone)) {
-      errors.push(
-        "El número de teléfono debe contener solo dígitos y tener entre 7 y 15 caracteres"
-      );
-    }
-  }
-
-  if (address && address.length < 3)
-    errors.push("La dirección debe tener al menos 3 caracteres");
-  if (country && country.length < 2)
-    errors.push("El país debe tener al menos 2 caracteres");
-  if (city && city.length < 2)
-    errors.push("La ciudad debe tener al menos 2 caracteres");
-
-  if (bio && bio.length > 500) {
-    errors.push("La biografía no puede superar los 500 caracteres");
-  }
-
-  if (gender && !Object.values(UserGender).includes(gender as UserGender)) {
-    errors.push("El género debe ser 'hombre', 'mujer' o 'no_especifico'");
-  }
-
-  // Role validation
-  if (role && !Object.values(UserRole).includes(role as UserRole)) {
-    errors.push("El rol debe ser 'customer' o 'admin'");
   }
 
   return errors;

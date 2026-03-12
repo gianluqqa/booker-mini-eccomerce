@@ -9,7 +9,7 @@ export const registerUserController = async (req: Request, res: Response) => {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
-        message: "Email, contraseña, confirmación de contraseña, nombre y apellido son requeridos"
+        message: "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"
       });
     }
 
@@ -20,7 +20,7 @@ export const registerUserController = async (req: Request, res: Response) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
-    if (errorMessage.includes("ya existe")) {
+    if (errorMessage.includes("Ya existe")) {
       res.status(409).json({ message: errorMessage });
     } else {
       res.status(400).json({ message: errorMessage });

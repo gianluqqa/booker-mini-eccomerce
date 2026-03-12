@@ -25,7 +25,7 @@ export default function RegisterPage() {
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
-  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; name?: string; surname?: string }>({});
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; confirmPassword?: string; name?: string; surname?: string }>({});
 
   const getRedirectPath = () => {
     return user?.role === "admin" ? "/admin" : "/profile";
@@ -43,25 +43,52 @@ export default function RegisterPage() {
     setError('');
     setFieldErrors({});
 
-    // Validar nombre y apellido (solo letras)
+    // 1. Validar campos obligatorios vacíos y formato
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
     let hasErrors = false;
     const newFieldErrors: any = {};
 
-    if (!nameRegex.test(formData.name)) {
+    if (!formData.name.trim()) {
+      newFieldErrors.name = "El nombre solo puede contener letras y espacios";
+      hasErrors = true;
+    } else if (!nameRegex.test(formData.name)) {
       newFieldErrors.name = "El nombre solo puede contener letras y espacios";
       hasErrors = true;
     }
 
-    if (!nameRegex.test(formData.surname)) {
+    if (!formData.surname.trim()) {
+      newFieldErrors.surname = "El apellido solo puede contener letras y espacios";
+      hasErrors = true;
+    } else if (!nameRegex.test(formData.surname)) {
       newFieldErrors.surname = "El apellido solo puede contener letras y espacios";
       hasErrors = true;
     }
 
-    // Validar que las contraseñas coincidan
-    if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+    if (!formData.email.trim()) {
+      newFieldErrors.email = "El email es obligatorio";
       hasErrors = true;
+    }
+
+    if (!formData.password.trim()) {
+      newFieldErrors.password = "La contraseña es obligatoria";
+      hasErrors = true;
+    }
+
+    if (!formData.confirmPassword.trim()) {
+      newFieldErrors.confirmPassword = "La confirmación es obligatoria";
+      hasErrors = true;
+    }
+
+    // 2. Validar complejidad de contraseña (solo si no está vacía)
+    if (formData.password.trim()) {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(formData.password)) {
+        newFieldErrors.password = "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número";
+        hasErrors = true;
+      } else if (formData.password !== formData.confirmPassword) {
+        newFieldErrors.confirmPassword = 'Las contraseñas no coinciden';
+        hasErrors = true;
+      }
     }
 
     if (hasErrors) {
@@ -74,22 +101,24 @@ export default function RegisterPage() {
     try {
       await register(formData);
       setShowSuccess(true);
-      // Esperar 3 segundos para que el usuario vea la alerta
       setTimeout(() => {
         router.push('/login');
       }, 3000);
     } catch (err: any) {
       const backendMessage = err.response?.data?.message || err.message || 'Error al registrar usuario';
       
-      // Manejar errores de validación
+      // Mapeo exacto basado en el nuevo contrato del Backend
       if (err.response?.status === 400 || err.response?.status === 409) {
-        const msg = backendMessage.toLowerCase();
-        if (msg.includes('email') || msg.includes('duplicado')) {
-          setFieldErrors({ email: 'Este email ya se encuentra registrado, por favor intenta con otro o inicia sesión' });
-        } else if (msg.includes('nombre')) {
+        if (backendMessage.includes("email") || backendMessage.includes("Ya existe")) {
+          setFieldErrors({ email: backendMessage });
+        } else if (backendMessage.includes("nombre")) {
           setFieldErrors({ name: backendMessage });
-        } else if (msg.includes('apellido')) {
+        } else if (backendMessage.includes("apellido")) {
           setFieldErrors({ surname: backendMessage });
+        } else if (backendMessage.includes("contraseña") || backendMessage.includes("mayúscula")) {
+          setFieldErrors({ password: backendMessage });
+        } else if (backendMessage.includes("coinciden")) {
+          setFieldErrors({ confirmPassword: backendMessage });
         } else {
           setError(backendMessage);
         }
@@ -132,7 +161,7 @@ export default function RegisterPage() {
           )}
 
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -144,7 +173,6 @@ export default function RegisterPage() {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  required
                   className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white transition-all ${
                     fieldErrors.name ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
                   }`}
@@ -167,7 +195,6 @@ export default function RegisterPage() {
                   name="surname"
                   value={formData.surname}
                   onChange={handleChange}
-                  required
                   className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white transition-all ${
                     fieldErrors.surname ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
                   }`}
@@ -191,7 +218,6 @@ export default function RegisterPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                   className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white ${
                     fieldErrors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
                   }`}
@@ -215,10 +241,16 @@ export default function RegisterPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white"
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white transition-all ${
+                    fieldErrors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="••••••••"
                 />
+                {fieldErrors.password && (
+                  <p className="mt-1 text-xs font-semibold text-red-600 animate-fade-in-up">
+                    {fieldErrors.password}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -231,10 +263,16 @@ export default function RegisterPage() {
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white"
+                  className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-500 bg-white transition-all ${
+                    fieldErrors.confirmPassword ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="••••••••"
                 />
+                {fieldErrors.confirmPassword && (
+                  <p className="mt-1 text-xs font-semibold text-red-600 animate-fade-in-up">
+                    {fieldErrors.confirmPassword}
+                  </p>
+                )}
               </div>
             </div>
 

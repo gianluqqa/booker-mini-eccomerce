@@ -34,6 +34,26 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setFieldErrors({});
+
+    // 1. Validar campos obligatorios en el Frontend
+    let hasErrors = false;
+    const newFieldErrors: any = {};
+
+    if (!formData.email.trim()) {
+      newFieldErrors.email = "El email es obligatorio";
+      hasErrors = true;
+    }
+
+    if (!formData.password.trim()) {
+      newFieldErrors.password = "La contraseña es obligatoria";
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      setFieldErrors(newFieldErrors);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -42,21 +62,16 @@ export default function LoginPage() {
     } catch (err: any) {
       const backendMessage = err.response?.data?.message || err.message || "Error al iniciar sesión";
       
-      // Manejar errores específicos de credenciales (400 o 401)
+      // Mapeo exacto basado en el contrato del Backend
       if (err.response?.status === 400 || err.response?.status === 401) {
-        const msg = backendMessage.toLowerCase();
-        // Detectar variaciones de 'incorrecto', 'inválido' o 'password' tanto en ES como EN
-        if (msg.includes('contraseña') || msg.includes('password') || 
-            msg.includes('inválid') || msg.includes('invalid') || 
-            msg.includes('incorrect') || msg.includes('credenciales')) {
-          setFieldErrors({ password: 'Credenciales inválidas' });
-        } else if (msg.includes('email') || msg.includes('usuario no encontrado') || msg.includes('exist')) {
-          setFieldErrors({ email: 'Usuario no encontrado o inexistente' });
+        if (backendMessage.includes('email') || backendMessage.includes('encontrado')) {
+          setFieldErrors({ email: backendMessage });
+        } else if (backendMessage.includes('ontraseña') || backendMessage.includes('incorrecta')) {
+          setFieldErrors({ password: backendMessage });
         } else {
           setError(backendMessage);
         }
       } else {
-        // Errores de servidor u otros
         setError(backendMessage);
       }
     } finally {
@@ -91,7 +106,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
@@ -102,7 +117,6 @@ export default function LoginPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
                 className={`w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-400 bg-white transition-all ${
                   fieldErrors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
                 }`}
@@ -126,7 +140,6 @@ export default function LoginPage() {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  required
                   className={`w-full px-4 py-2 pr-16 border rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-gray-900 placeholder:text-gray-400 bg-white transition-all ${
                     fieldErrors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-300'
                   }`}

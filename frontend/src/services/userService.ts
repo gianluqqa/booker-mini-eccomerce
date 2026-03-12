@@ -73,7 +73,7 @@ export const deleteAllUsersExceptAdmin = async (): Promise<{ message: string; de
   try {
     const response = await apiClient.delete<{ success: boolean; data: { deletedCount: number; message?: string } }>('/users/')
     return {
-      message: response.data.data.message || 'Usuarios eliminados exitosamente',
+      message: (response.data as any).message || 'Usuarios eliminados exitosamente',
       deletedCount: response.data.data.deletedCount
     }
   } catch (error: unknown) {
