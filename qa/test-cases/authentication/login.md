@@ -14,7 +14,7 @@
 - **Resultado esperado**: El sistema permite el ingreso. El botón Acceder cambia por un icono de usuario. El sitio nos lleva automáticamente a la sección de Mi Perfil.
 - **Resultado Actual**: Sucedio lo esperado.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ✅ **PASSED**
+- **Status**: ✅ Passed.
 - **Observaciones**: 
 
 ---
@@ -31,7 +31,7 @@
 - **Resultado esperado**: El administrador ingresa correctamente y el sitio lo redirige directamente al Panel de Control de administración.
 - **Resultado Actual**: Sucedio lo esperado.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ✅ **PASSED**
+- **Status**: ✅ Passed.
 - **Observaciones**: 
 
 ---
@@ -48,7 +48,7 @@
 - **Resultado esperado**: Al pulsar Mostrar, el texto se vuelve legible. Al pulsar Ocultar, se vuelve a cubrir la contraseña.
 - **Resultado Actual**: Sucedio lo esperado.
 - **Automatización relacionada**: N/A
-- **Status**: ✅ **PASSED**
+- **Status**: ✅ Passed.
 - **Observaciones**: 
 
 ---
@@ -64,7 +64,7 @@
 - **Resultado esperado**: El usuario sale de su cuenta de forma segura. El sitio vuelve a mostrar el botón Acceder y nos redirige a la página de inicio.
 - **Resultado Actual**: Sucedio lo esperado.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ✅ **PASSED**
+- **Status**: ✅ Passed.
 - **Observaciones**: 
 
 ---
@@ -79,7 +79,7 @@
 - **Resultado esperado**: El sitio detecta que ya hay una sesión activa y nos devuelve automáticamente a nuestro perfil o a la página principal, sin dejarnos ver el formulario de login.
 - **Resultado Actual**: Sucedio lo esperado.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ✅ **PASSED**
+- **Status**: ✅ Passed.
 - **Observaciones**: 
 
 ---
@@ -94,11 +94,11 @@
     2. Ingresar el email registrado.
     3. Ingresar una contraseña incorrecta.
     4. Hacer clic en el botón Iniciar Sesión.
-- **Resultado esperado**: El sistema no permite el ingreso y muestra un mensaje de aviso que dice: Credenciales inválidas.
-- **Resultado Actual**: El sistema muestra el mensaje "Credenciales inválidas" debajo del campo de contraseña.
+- **Resultado esperado**: El sistema no permite el ingreso y muestra un mensaje de aviso que dice: Credenciales inválidas debajo del campo de contraseña.
+- **Resultado Actual**: Sucedio lo esperado.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ✅ **PASSED**
-- **Observaciones**: Bug BUG-AUTH-003 solucionado. Mejora en la consistencia de errores.
+- **Status**: ✅ Passed.
+- **Observaciones**:
 
 ---
 
@@ -111,8 +111,8 @@
     1. Entrar a la página de Iniciar Sesión.
     2. Ingresar un email inexistente y cualquier contraseña.
     3. Hacer clic en el botón Iniciar Sesión.
-- **Resultado esperado**: El sistema no permite el ingreso y muestra el mensaje: Credenciales inválidas.
-- **Resultado Actual**: El sistema muestra el mensaje "Usuario no encontrado o inexistente" debajo del campo de email.
+- **Resultado esperado**: El sistema no permite el ingreso y muestra el mensaje: Credenciales inválidas debajo del campo de contraseña.
+- **Resultado Actual**: Sucedio lo esperado.
 - **Automatización relacionada**: Playwright (Pendiente)
-- **Status**: ✅ **PASSED**
-- **Observaciones**: Bug BUG-AUTH-004 solucionado.
+- **Status**: ✅ Passed.
+- **Observaciones**:

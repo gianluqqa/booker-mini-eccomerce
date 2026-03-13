@@ -49,14 +49,14 @@
     2. Ingresar el email que ya existe (test@test.com).
     3. Completar el resto de los datos y hacer clic en Registrarse.
 - **Resultado esperado**: Aparece un aviso indicando que el usuario o el email ya se encuentran registrados.
-- **Resultado Actual**: El sistema muestra un mensaje claro: "Este email ya se encuentra registrado, por favor intenta con otro o inicia sesión" debajo del campo de email.
+- **Resultado Actual**: El sistema muestra un mensaje claro: "Ya existe un usuario con ese email".
 - **Automatización relacionada**: Playwright (Pendiente)
 - **Status**: ✅ **PASSED**
 - **Observaciones**: Bug BUG-AUTH-002 solucionado.
 
 ---
 
-### TC-AUTH-011: Intentar registro con números o símbolos en el campo Nombre
+### TC-AUTH-011: Intentar registro con números o símbolos en el campo Nombre o Apellido
 - **ID**: TC-AUTH-011
 - **Título**: Intentar registro con números o símbolos en el campo Nombre
 - **Modulo**: Authentication
@@ -65,8 +65,8 @@
     1. En el campo de Nombre, ingresar un valor con símbolos o números (ej: Juan123! o $$$).
     2. Completar el resto de los campos correctamente.
     3. Hacer clic en el botón Registrarse.
-- **Resultado esperado**: El sistema debería detectar que no es un nombre válido y mostrar una alerta o impedir el registro. 
-- **Resultado Actual**: El sistema detecta el nombre inválido e impide el registro con un mensaje específico bajo el campo.
+- **Resultado esperado**: El sistema debería detectar que no es un nombre o apellido válido y deberia mostrar una alerta o impedir el registro. 
+- **Resultado Actual**: El sistema detecta el nombre o apellido inválido e impide el registro con un mensaje específico bajo el campo.
 - **Automatización relacionada**: Playwright (Pendiente)
 - **Status**: ✅ **PASSED**
 - **Observaciones**: Bug BUG-AUTH-005 solucionado mediante validación por regex en backend y frontend.

@@ -7,6 +7,15 @@ import { ILoginUser } from "@/types/User";
 import Link from "next/link";
 import LoginWithGoogle from "@/components/buttons/LoginWithGoogle";
 
+interface ApiError extends Error {
+  response?: {
+    status?: number;
+    data?: {
+      message?: string;
+    };
+  };
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { login, isAuthenticated, user } = useAuth();
@@ -19,33 +28,33 @@ export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
 
-  const getRedirectPath = () => {
+  const getRedirectPath = React.useCallback(() => {
     return user?.role === "admin" ? "/admin" : "/profile";
-  };
+  }, [user]);
 
   // Redirigir si ya está autenticado
   React.useEffect(() => {
     if (isAuthenticated) {
       router.push(getRedirectPath());
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, getRedirectPath]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setFieldErrors({});
 
-    // 1. Validar campos obligatorios en el Frontend
+    // 1. Validar campos obligatorios en el Frontend (coherente con backend)
     let hasErrors = false;
-    const newFieldErrors: any = {};
+    const newFieldErrors: { email?: string; password?: string } = {};
 
     if (!formData.email.trim()) {
-      newFieldErrors.email = "El email es obligatorio";
+      newFieldErrors.email = "Los campos email y contraseña son obligatorios";
       hasErrors = true;
     }
 
     if (!formData.password.trim()) {
-      newFieldErrors.password = "La contraseña es obligatoria";
+      newFieldErrors.password = "Los campos email y contraseña son obligatorios";
       hasErrors = true;
     }
 
@@ -59,15 +68,29 @@ export default function LoginPage() {
     try {
       await login(formData);
       router.push(getRedirectPath());
-    } catch (err: any) {
-      const backendMessage = err.response?.data?.message || err.message || "Error al iniciar sesión";
+    } catch (err: unknown) {
+      const backendMessage = err instanceof Error && 'response' in err 
+        ? (err as ApiError).response?.data?.message || err.message || "Error al iniciar sesión"
+        : "Error al iniciar sesión";
       
-      // Mapeo exacto basado en el contrato del Backend
-      if (err.response?.status === 400 || err.response?.status === 401) {
-        if (backendMessage.includes('email') || backendMessage.includes('encontrado')) {
+      // Mapeo exacto basado en el nuevo contrato del Backend
+      if (err instanceof Error && 'response' in err) {
+        const response = (err as ApiError).response;
+        if (response?.status === 400 || response?.status === 401) {
+        if (backendMessage.includes('obligatorios')) {
+          // Mensaje general para campos obligatorios
+          setError(backendMessage);
+        } else if (backendMessage.includes('formato') && backendMessage.includes('inválido')) {
+          // Error de formato de email
           setFieldErrors({ email: backendMessage });
-        } else if (backendMessage.includes('ontraseña') || backendMessage.includes('incorrecta')) {
+        } else if (backendMessage.includes('Credenciales inválidas')) {
+          // Credenciales incorrectas (usuario no existe o contraseña incorrecta)
+          // Mostrar como error de campo debajo de la contraseña para consistencia
           setFieldErrors({ password: backendMessage });
+        } else {
+          // Otros errores
+          setError(backendMessage);
+        }
         } else {
           setError(backendMessage);
         }
@@ -101,8 +124,10 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-center mb-6 text-[#2c3e50]">Iniciar Sesión</h1>
 
           {error && Object.keys(fieldErrors).length === 0 && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700">
-              {error}
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md animate-fade-in-up">
+              <p className="text-sm font-semibold text-red-600">
+                {error}
+              </p>
             </div>
           )}
 
