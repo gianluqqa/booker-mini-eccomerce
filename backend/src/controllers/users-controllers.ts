@@ -9,21 +9,32 @@ export const registerUserController = async (req: Request, res: Response) => {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
+        success: false,
         message: "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"
       });
     }
 
     const user = req.body as RegisterUserDTO;
     const newUser = await registerUserService(user);
-    res.status(201).json(newUser);
+    res.status(201).json({
+      success: true,
+      message: "Usuario creado exitosamente",
+      data: newUser
+    });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
     if (errorMessage.includes("Ya existe")) {
-      res.status(409).json({ message: errorMessage });
+      res.status(409).json({
+        success: false,
+        message: errorMessage
+      });
     } else {
-      res.status(400).json({ message: errorMessage });
+      res.status(400).json({
+        success: false,
+        message: errorMessage
+      });
     }
   }
 };
@@ -34,6 +45,7 @@ export const loginUserController = async (req: Request, res: Response) => {
     // 1️⃣ Validar que el body exista
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
+        success: false,
         message: "Los campos email y contraseña son obligatorios",
       });
     }
@@ -43,22 +55,39 @@ export const loginUserController = async (req: Request, res: Response) => {
     // 2️⃣ Llamar al service (incluye validación de formato y campos vacíos)
     const loginResult = await loginUserService(user);
 
-    // 3️⃣ Retornar compatibilidad: campos de usuario al nivel raíz + accessToken
-    // loginResult = { user: SafeUser, accessToken }
-    return res.status(200).json({ ...loginResult.user, accessToken: loginResult.accessToken });
+    // 3️⃣ Retornar estructura consistente con el resto de la API
+    return res.status(200).json({
+      success: true,
+      data: {
+        user: loginResult.user,
+        accessToken: loginResult.accessToken
+      }
+    });
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
     // 4️⃣ Mapear errores a status codes según contrato
     if (errorMessage.includes("obligatorios")) {
-      return res.status(400).json({ message: errorMessage });
+      return res.status(400).json({
+        success: false,
+        message: errorMessage
+      });
     } else if (errorMessage.includes("formato") && errorMessage.includes("inválido")) {
-      return res.status(400).json({ message: errorMessage });
+      return res.status(400).json({
+        success: false,
+        message: errorMessage
+      });
     } else if (errorMessage.includes("Credenciales inválidas")) {
-      return res.status(401).json({ message: errorMessage });
+      return res.status(401).json({
+        success: false,
+        message: errorMessage
+      });
     } else {
-      return res.status(400).json({ message: errorMessage });
+      return res.status(400).json({
+        success: false,
+        message: errorMessage
+      });
     }
   }
 };
@@ -68,23 +97,47 @@ export const firebaseLoginController = async (req: Request, res: Response) => {
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
+        success: false,
         message: "Email es requerido para el login con Firebase",
       });
     }
 
     const payload = req.body as FirebaseLoginDTO;
+    
+    // Validar formato de email
+    if (!payload.email || payload.email.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Email es requerido para el login con Firebase"
+      });
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(payload.email)) {
+      return res.status(400).json({
+        success: false,
+        message: "El formato del email es inválido"
+      });
+    }
+
     const result = await firebaseLoginService(payload);
 
-    // Compatibilidad: devolver campos de usuario al nivel raíz + accessToken
-    return res.status(200).json({ ...result.user, accessToken: result.accessToken });
+    // Devolver estructura consistente indicando si es usuario nuevo o existente
+    return res.status(200).json({
+      success: true,
+      data: {
+        user: result.user,
+        accessToken: result.accessToken,
+        isNewUser: result.isNewUser
+      }
+    });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Error desconocido";
 
-    if (errorMessage.includes("requerido")) {
-      return res.status(400).json({ message: errorMessage });
-    }
-
-    return res.status(400).json({ message: errorMessage });
+    return res.status(400).json({
+      success: false,
+      message: errorMessage
+    });
   }
 };
 

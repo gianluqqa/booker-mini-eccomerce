@@ -108,6 +108,7 @@ export const firebaseLoginService = async (payload: FirebaseLoginDTO) => {
   const userRepo = AppDataSource.getRepository(User);
 
   let existingUser = await userRepo.findOne({ where: { email } });
+  const isNewUser = !existingUser;
 
   // Crear usuario si no existe
   if (!existingUser) {
@@ -142,7 +143,7 @@ export const firebaseLoginService = async (payload: FirebaseLoginDTO) => {
   );
 
   const { password: _, ...safeUser } = existingUser;
-  return { user: safeUser, accessToken };
+  return { user: safeUser, accessToken, isNewUser };
 };
 
 //? Obtener todos los usuarios (GET).

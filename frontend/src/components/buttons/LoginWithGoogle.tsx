@@ -25,7 +25,14 @@ const LoginWithGoogle: React.FC = () => {
       const surname = rest.join(" ");
 
       // 2) Avisar al backend para crear/buscar usuario y emitir JWT
-      const response = await apiClient.post<IUser & { accessToken: string }>(
+      const response = await apiClient.post<{
+        success: boolean;
+        data: {
+          user: IUser;
+          accessToken: string;
+          isNewUser: boolean;
+        };
+      }>(
         "/users/firebase-login",
         {
           email: firebaseUser.email,
@@ -34,14 +41,19 @@ const LoginWithGoogle: React.FC = () => {
         }
       );
 
-      const { accessToken, ...userData } = response.data;
+      const { user, accessToken, isNewUser } = response.data.data;
 
       // 3) Guardar usuario y token en el contexto de auth
-      setAuthFromExternal(userData, accessToken);
+      setAuthFromExternal(user, accessToken);
 
       // 4) Redirigir según rol
-      const redirectPath = userData.role === "admin" ? "/admin" : "/profile";
+      const redirectPath = user.role === "admin" ? "/admin" : "/profile";
       router.push(redirectPath);
+      
+      // 5) Opcional: mostrar mensaje si es usuario nuevo
+      if (isNewUser) {
+        console.log("Bienvenido! Tu cuenta ha sido creada automáticamente.");
+      }
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
     }

@@ -62,17 +62,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: ILoginUser) => {
     try {
-      const response = await apiClient.post<IUser & { accessToken: string }>('/users/login', credentials);
+      const response = await apiClient.post<{ success: boolean; data: { user: IUser; accessToken: string } }>('/users/login', credentials);
       
-      // El backend retorna { ...user, accessToken } directamente (sin { success, data })
-      const { accessToken, ...userData } = response.data;
+      // El backend ahora retorna { success: true, data: { user, accessToken } }
+      const { user, accessToken } = response.data.data;
 
       setToken(accessToken);
-      setUser(userData);
+      setUser(user);
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', accessToken);
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(user));
       }
     } catch (error) {
       throw error;
@@ -81,10 +81,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (userData: IRegisterUser) => {
     try {
-      const response = await apiClient.post<IUser>('/users/register', userData);
+      const response = await apiClient.post<{ success: boolean; data: IUser; message: string }>('/users/register', userData);
       
-      // El backend retorna el usuario directamente (sin { success, data })
-      const newUser = response.data;
+      // El backend ahora retorna { success: true, message: "...", data: usuario }
+      const newUser = response.data.data;
       setUser(newUser);
 
       if (typeof window !== 'undefined') {
