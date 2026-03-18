@@ -8,9 +8,15 @@ import { Genre } from "../entities/Genre";
 export const getBooksController = async (req: Request, res: Response) => {
   try {
     const books = await getBooksService(req.query.q as string);
-    res.status(200).json(books);
+    res.status(200).json({
+      success: true,
+      data: books,
+    });
   } catch (error) {
-    res.status(500).json({ message: (error as Error).message });
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    });
   }
 };
 
@@ -117,13 +123,19 @@ export const deleteBookController = async (req: Request, res: Response) => {
     const bookId = req.params.id;
 
     // 🔹 Validar el rol de admin.
-    const errors = validateDeleteBook(req);
-
-    if (errors.length > 0) {
-      return res.status(400).json({
+    const authUser = (req as any).authUser as { id: string; role: string } | undefined;
+    
+    if (!authUser) {
+      return res.status(401).json({
         success: false,
-        message: "Error de validación",
-        errors,
+        message: "No autorizado",
+      });
+    }
+
+    if (authUser.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Prohibido: Solo los administradores pueden eliminar libros",
       });
     }
 

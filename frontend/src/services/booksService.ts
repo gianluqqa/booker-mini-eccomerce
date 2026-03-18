@@ -17,9 +17,9 @@ export interface IGenre {
 export const getBooks = async (query?: string): Promise<IBook[]> => {
   try {
     const params = query ? { q: query } : {}
-    const response = await apiClient.get<IBook[]>('/books', { params })
-    // El backend retorna directamente un array de libros
-    return Array.isArray(response.data) ? response.data : []
+    const response = await apiClient.get<{ success: boolean; data: IBook[] }>('/books', { params })
+    // El backend ahora retorna { success: true, data: libros[] }
+    return response.data.data || []
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cargar los libros'
     throw new Error(errorMessage)
@@ -47,8 +47,9 @@ export const getBookById = async (id: string): Promise<IBook> => {
  */
 export const getGenres = async (): Promise<IGenre[]> => {
   try {
-    const response = await apiClient.get<IGenre[]>('/books/genres')
-    return Array.isArray(response.data) ? response.data : []
+    const response = await apiClient.get<{ success: boolean; data: IGenre[] }>('/books/genres')
+    // El backend ahora retorna { success: true, data: genres[] }
+    return response.data.data || []
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cargar los géneros'
     throw new Error(errorMessage)
