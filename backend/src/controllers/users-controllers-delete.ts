@@ -31,11 +31,15 @@ export const deleteUserController = async (req: Request, res: Response) => {
       data: { userId: result.userId },
     });
   } catch (error: any) {
-    const status = error.status || 500;
-    const message = error.message || "Error interno del servidor";
-    res.status(status).json({
+    if (error.status && error.message) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message
+      });
+    }
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Error interno del servidor"
     });
   }
 };
@@ -68,11 +72,15 @@ export const deleteAllUsersExceptAdminController = async (req: Request, res: Res
       data: { deletedCount: result.deletedCount },
     });
   } catch (error: any) {
-    const status = error.status || 500;
-    const message = error.message || "Error interno del servidor";
-    res.status(status).json({
+    if (error.status && error.message) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message
+      });
+    }
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Error interno del servidor"
     });
   }
 };

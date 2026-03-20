@@ -58,6 +58,7 @@ export const loginUserController = async (req: Request, res: Response) => {
     // 3️⃣ Retornar estructura consistente con el resto de la API
     return res.status(200).json({
       success: true,
+      message: "Inicio de sesión exitoso",
       data: {
         user: loginResult.user,
         accessToken: loginResult.accessToken
@@ -81,7 +82,7 @@ export const loginUserController = async (req: Request, res: Response) => {
     } else if (errorMessage.includes("Credenciales inválidas")) {
       return res.status(401).json({
         success: false,
-        message: errorMessage
+        message: "Credenciales inválidas"
       });
     } else {
       return res.status(400).json({
@@ -122,9 +123,10 @@ export const firebaseLoginController = async (req: Request, res: Response) => {
 
     const result = await firebaseLoginService(payload);
 
-    // Devolver estructura consistente indicando si es usuario nuevo o existente
+    // Devolver estructura consistente
     return res.status(200).json({
       success: true,
+      message: "Autenticación con Firebase exitosa",
       data: {
         user: result.user,
         accessToken: result.accessToken,
@@ -150,11 +152,15 @@ export const getUsersController = async (req: Request, res: Response) => {
       data: allUsers,
     });
   } catch (error: any) {
-    const status = error.status || 500;
-    const message = error.message || "Error interno del servidor";
-    res.status(status).json({
+    if (error.status && error.message) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message
+      });
+    }
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Error interno del servidor"
     });
   }
 };
@@ -177,11 +183,15 @@ export const getCurrentUserController = async (req: Request, res: Response) => {
       data: user,
     });
   } catch (error: any) {
-    const status = error.status || 500;
-    const message = error.message || "Error interno del servidor";
-    res.status(status).json({
+    if (error.status && error.message) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message
+      });
+    }
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Error interno del servidor"
     });
   }
 };
@@ -196,11 +206,15 @@ export const getUserByIdController = async (req: Request, res: Response) => {
       data: user,
     });
   } catch (error: any) {
-    const status = error.status || 500;
-    const message = error.message || "Error interno del servidor";
-    res.status(status).json({
+    if (error.status && error.message) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message
+      });
+    }
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Error interno del servidor"
     });
   }
 };
@@ -254,11 +268,15 @@ export const updateUserController = async (req: Request, res: Response) => {
       data: updatedUser,
     });
   } catch (error: any) {
-    const status = error.status || 500;
-    const message = error.message || "Error interno del servidor";
-    res.status(status).json({
+    if (error.status && error.message) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message
+      });
+    }
+    return res.status(500).json({
       success: false,
-      message,
+      message: "Error interno del servidor"
     });
   }
 };

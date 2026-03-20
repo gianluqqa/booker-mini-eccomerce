@@ -184,7 +184,7 @@ export const removeBookFromCartService = async (
 };
 
 //? Limpiar todo el carrito del usuario (DELETE).
-export const clearCartService = async (userId: string): Promise<void> => {
+export const clearCartService = async (userId: string): Promise<number> => {
   const cartRepository = AppDataSource.getRepository(Cart);
 
   try {
@@ -192,9 +192,13 @@ export const clearCartService = async (userId: string): Promise<void> => {
       where: { user: { id: userId } },
     });
 
-    if (cartItems.length > 0) {
+    const deletedCount = cartItems.length;
+
+    if (deletedCount > 0) {
       await cartRepository.remove(cartItems);
     }
+
+    return deletedCount;
   } catch (error) {
     console.error("Error clearing cart:", error);
     throw { status: 500, message: "No se pudo vaciar el carrito" };

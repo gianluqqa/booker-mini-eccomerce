@@ -75,9 +75,9 @@ export const getUserCartController = async (req: Request, res: Response) => {
       data: cart,
     };
 
-    // Si hay una orden pendiente, agregar la información a la respuesta
+    // Si hay una orden pendiente, agregar la información dentro de data
     if (pendingOrder) {
-      response.pendingOrder = {
+      response.data.pendingOrder = {
         id: pendingOrder.id,
         total: pendingOrder.total,
         createdAt: pendingOrder.createdAt,
@@ -178,6 +178,9 @@ export const removeBookFromCartController = async (req: Request, res: Response) 
     return res.status(200).json({
       success: true,
       message: "Libro eliminado del carrito exitosamente",
+      data: {
+        deletedItemId: cartId
+      }
     });
   } catch (error: any) {
     const status = error.status || 500;
@@ -203,11 +206,14 @@ export const clearCartController = async (req: Request, res: Response) => {
       });
     }
 
-    await clearCartService(authUser.id);
+    const deletedCount = await clearCartService(authUser.id);
 
     return res.status(200).json({
       success: true,
       message: "Carrito vaciado exitosamente",
+      data: {
+        deletedItemsCount: deletedCount
+      }
     });
   } catch (error: any) {
     const status = error.status || 500;

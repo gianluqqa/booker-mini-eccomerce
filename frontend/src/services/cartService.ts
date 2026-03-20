@@ -10,8 +10,7 @@ interface CartResponse extends ICartResponse {
 
 interface ApiResponse {
   success: boolean;
-  data: ICartResponse;
-  pendingOrder?: IPendingOrder;
+  data: ICartResponse & { pendingOrder?: IPendingOrder };
 }
 
 /**
@@ -25,14 +24,14 @@ export const getUserCart = async (): Promise<CartResponse> => {
     
     const responseData = response.data;
     
-    // Extraer el carrito y mantener pendingOrder si existe
+    // Extraer el carrito y mantener pendingOrder si existe (ahora viene dentro de data)
     const cartData = responseData.success ? responseData.data : (responseData as unknown as ICartResponse);
     
     return {
       items: cartData.items,
       totalItems: cartData.totalItems,
       totalPrice: cartData.totalPrice,
-      pendingOrder: responseData.pendingOrder
+      pendingOrder: cartData.pendingOrder
     };
   } catch (error: unknown) {
     throw error // Re-lanzar para que el interceptor o el contexto manejen el status
@@ -60,9 +59,10 @@ export const addToCart = async (addToCartData: IAddToCart): Promise<ICartItem> =
  * @returns Promise que se resuelve cuando el ítem se ha eliminado correctamente
  * @throws Error si no se puede eliminar el ítem del carrito
  */
-export const removeFromCart = async (cartId: string): Promise<void> => {
+export const removeFromCart = async (cartId: string): Promise<{ deletedItemId: string }> => {
   try {
-    await apiClient.delete(`/carts/${cartId}`);
+    const response = await apiClient.delete<{ success: boolean; data: { deletedItemId: string } }>(`/carts/${cartId}`);
+    return response.data.data;
   } catch (error: unknown) {
     throw error;
   }
@@ -73,9 +73,10 @@ export const removeFromCart = async (cartId: string): Promise<void> => {
  * @returns Promise que se resuelve cuando el carrito se ha vaciado correctamente
  * @throws Error si no se puede vaciar el carrito
  */
-export const clearCart = async (): Promise<void> => {
+export const clearCart = async (): Promise<{ deletedItemsCount: number }> => {
   try {
-    await apiClient.delete('/carts');
+    const response = await apiClient.delete<{ success: boolean; data: { deletedItemsCount: number } }>('/carts');
+    return response.data.data;
   } catch (error: unknown) {
     throw error;
   }
