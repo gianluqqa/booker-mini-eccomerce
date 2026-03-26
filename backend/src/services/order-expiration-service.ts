@@ -11,9 +11,12 @@ const activeTimeouts = new Map<string, NodeJS.Timeout>();
 //? Configurar expiración automática para una orden PENDING
 export const setupOrderExpiration = (orderId: string, expirationMinutes: number = 2): void => {
 
-  // Limpiar timeout existente si hay uno
+  // Limpiar timeouts existentes si hay alguno (evitar duplicados)
   if (activeTimeouts.has(orderId)) {
     clearTimeout(activeTimeouts.get(orderId)!);
+  }
+  if (activeTimeouts.has(`${orderId}_deletion`)) {
+    clearTimeout(activeTimeouts.get(`${orderId}_deletion`)!);
   }
 
   // Configurar timeout para expiración
@@ -51,13 +54,15 @@ export const markOrderAsExpired = async (orderId: string): Promise<void> => {
     const bookRepository = queryRunner.manager.getRepository(Book);
     const stockReservationRepository = queryRunner.manager.getRepository(StockReservation);
 
-    // Buscar la orden PENDING
+    // Buscar la orden PENDING - Validar estado antes de operar
     const order = await orderRepository.findOne({
       where: { id: orderId, status: OrderStatus.PENDING },
       relations: ['user', 'items', 'items.book']
     });
 
+    // Si no existe o no está en PENDING, salir sin hacer nada (idempotente)
     if (!order) {
+      await queryRunner.rollbackTransaction();
       return;
     }
 
@@ -108,13 +113,15 @@ export const deleteExpiredOrder = async (orderId: string): Promise<void> => {
     const orderItemRepository = queryRunner.manager.getRepository(OrderItem);
     const stockReservationRepository = queryRunner.manager.getRepository(StockReservation);
 
-    // Buscar la orden EXPIRED
+    // Buscar la orden EXPIRED - Validar estado antes de operar
     const order = await orderRepository.findOne({
       where: { id: orderId, status: OrderStatus.EXPIRED },
       relations: ['items', 'user']
     });
 
+    // Si no existe o no está en EXPIRED, salir sin hacer nada (idempotente)
     if (!order) {
+      await queryRunner.rollbackTransaction();
       return;
     }
 
@@ -134,7 +141,7 @@ export const deleteExpiredOrder = async (orderId: string): Promise<void> => {
     // Eliminar la orden
     await orderRepository.delete({ id: orderId });
 
-    // Limpiar timeouts del mapa
+    // Limpiar timeouts del mapa (siempre ejecutar)
     activeTimeouts.delete(orderId);
     activeTimeouts.delete(`${orderId}_deletion`);
 
@@ -143,6 +150,10 @@ export const deleteExpiredOrder = async (orderId: string): Promise<void> => {
   } catch (error: any) {
     await queryRunner.rollbackTransaction();
     console.error(`❌ Error al eliminar orden ${orderId}:`, error);
+    
+    // Asegurar limpieza de timeouts incluso en caso de error
+    activeTimeouts.delete(orderId);
+    activeTimeouts.delete(`${orderId}_deletion`);
   } finally {
     await queryRunner.release();
   }
