@@ -14,18 +14,11 @@ export const getOrderByIdController = async (req: Request, res: Response) => {
       });
     }
 
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "ID de orden es requerido",
-      });
-    }
-
     const order = await getOrderByIdService(id, authUser.id);
 
     return res.json({
       success: true,
-      order,
+      data: order,
     });
   } catch (error: any) {
     const status = error.status || 500;
@@ -54,7 +47,7 @@ export const getUserOrdersController = async (req: Request, res: Response) => {
 
     return res.json({
       success: true,
-      orders,
+      data: orders,
     });
   } catch (error: any) {
     const status = error.status || 500;
@@ -79,16 +72,14 @@ export const getUserPendingOrdersController = async (req: Request, res: Response
       });
     }
 
-
     const orders = await getUserPendingOrdersService(authUser.id);
 
     // Devolver la primera orden PENDING como array para mantener consistencia con frontend
     const pendingOrder = orders && orders.length > 0 ? orders[0] : null;
 
-
     return res.json({
       success: true,
-      orders: pendingOrder ? [pendingOrder] : [], 
+      data: pendingOrder ? [pendingOrder] : [],
     });
   } catch (error: any) {
     const status = error.status || 500;
@@ -128,19 +119,12 @@ export const cancelPaidOrderController = async (req: Request, res: Response) => 
   try {
     const { id } = req.params;
 
-    if (!id) {
-      return res.status(400).json({
-        success: false,
-        message: "ID de orden es requerido",
-      });
-    }
-
     const order = await cancelPaidOrderService(id);
 
     return res.json({
       success: true,
       message: "Orden cancelada exitosamente",
-      order,
+      data: order,
     });
   } catch (error: any) {
     const status = error.status || 500;

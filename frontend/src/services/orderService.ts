@@ -10,8 +10,8 @@ import { IOrder } from '@/types/Order'
  */
 export const getUserOrders = async (): Promise<IOrder[]> => {
   try {
-    const response = await apiClient.get<{ success: boolean; orders: IOrder[] }>('/orders')
-    return response.data.orders || []
+    const response = await apiClient.get<{ success: boolean; data: IOrder[] }>('/orders')
+    return extractData<IOrder[]>(response)
   } catch (error: unknown) {
     // Si no hay órdenes, devolver array vacío en lugar de lanzar error
     if (error instanceof Error && error.message.includes('404')) {
@@ -29,8 +29,8 @@ export const getUserOrders = async (): Promise<IOrder[]> => {
  */
 export const getUserPendingOrders = async (): Promise<IOrder[]> => {
   try {
-    const response = await apiClient.get<{ success: boolean; orders: IOrder[] }>('/orders/pending')
-    return response.data.orders || []
+    const response = await apiClient.get<{ success: boolean; data: IOrder[] }>('/orders/pending')
+    return extractData<IOrder[]>(response)
   } catch (error: unknown) {
     // Si no hay órdenes, devolver array vacío en lugar de lanzar error
     if (error instanceof Error && error.message.includes('404')) {
@@ -49,11 +49,19 @@ export const getUserPendingOrders = async (): Promise<IOrder[]> => {
  */
 export const getOrderById = async (orderId: string): Promise<IOrder> => {
   try {
-    const response = await apiClient.get<{ success: boolean; order: IOrder }>(`/orders/${orderId}`)
-    return extractData<IOrder>(response.data)
+    const response = await apiClient.get<{ success: boolean; data: IOrder }>(`/orders/${orderId}`)
+    return extractData<IOrder>(response)
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Error al cargar la orden'
+    
+    // Manejar específicamente errores de permisos (403) y no encontrado (404)
+    if (errorMessage.includes('403')) {
+      throw new Error('No tienes permiso para ver esta orden')
+    }
+    if (errorMessage.includes('404')) {
+      throw new Error('La orden no existe')
+    }
+    
     throw new Error(errorMessage)
   }
 }
-

@@ -123,9 +123,10 @@ export const getAllOrders = async (): Promise<IOrder[]> => {
  */
 export const cancelPaidOrder = async (orderId: string): Promise<IOrder> => {
   try {
-    const response = await apiClient.patch<{ success: boolean; message: string; order: IOrder }>(
+    const response = await apiClient.patch<{ success: boolean; message: string; data: IOrder }>(
       `/orders/admin/${orderId}/cancel`
     );
+    
     return extractData<IOrder>(response);
   } catch (error) {
     const errorMessage =
@@ -136,17 +137,14 @@ export const cancelPaidOrder = async (orderId: string): Promise<IOrder> => {
       errorMessage.includes("administrador")
     ) {
       throw new Error("No tienes permisos para cancelar órdenes");
+    } else if (errorMessage.includes("404")) {
+      throw new Error("La orden no existe");
+    } else if (errorMessage.includes("400")) {
+      // Manejar específicamente el caso de orden no cancelable
+      throw new Error("La orden no se puede cancelar en su estado actual");
+    } else {
+      throw new Error(errorMessage);
     }
-
-    if (errorMessage.includes("400") && errorMessage.includes("PAID")) {
-      throw new Error("Solo se pueden cancelar órdenes en estado PAID o PENDING");
-    }
-
-    if (errorMessage.includes("404")) {
-      throw new Error("Orden no encontrada");
-    }
-
-    throw new Error(errorMessage);
   }
 };
 
