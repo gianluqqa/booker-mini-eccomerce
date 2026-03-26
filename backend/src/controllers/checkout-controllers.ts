@@ -49,8 +49,11 @@ export const cancelCheckoutController = async (req: Request, res: Response) => {
 
     return res.status(200).json({
       success: true,
-      message: result.message,
-      data: result,
+      message: "Orden cancelada y stock devuelto exitosamente",
+      data: {
+        orderId: result.orderId,
+        reservationId: result.reservationId,
+      },
     });
   } catch (error: any) {
     const status = error.status || 500;
@@ -81,9 +84,14 @@ export const processCheckoutController = async (req: Request, res: Response) => 
 
     const order = await processCheckoutService(authUser.id, paymentData);
 
+    // Diferenciar mensaje según la acción realizada
+    const message = paymentData && paymentData.cardNumber 
+      ? "Pago procesado exitosamente" 
+      : "Orden pendiente creada exitosamente";
+
     return res.status(201).json({
       success: true,
-      message: "Orden creada exitosamente",
+      message,
       data: order,
     });
   } catch (error: any) {

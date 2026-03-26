@@ -132,15 +132,15 @@ export const checkPendingOrder = async (): Promise<IOrder | null> => {
  * @returns Confirmación de cancelación
  * @throws Error si no se puede cancelar el checkout
  */
-export const cancelCheckout = async (): Promise<{ message: string; reservationId: string }> => {
+export const cancelCheckout = async (): Promise<{ orderId?: string; reservationId?: string }> => {
   try {
     const response = await apiClient.delete<{ 
       success: boolean; 
       message: string; 
-      data: { message: string; reservationId: string }
+      data: { orderId?: string; reservationId?: string }
     }>('/checkout/cancel');
     
-    const result = extractData<{ message: string; reservationId: string }>(response);
+    const result = extractData<{ orderId?: string; reservationId?: string }>(response);
     return result;
   } catch (error: unknown) {
     throw error;
