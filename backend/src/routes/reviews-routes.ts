@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { authenticateJWT } from "../middlewares/auth";
+import { authenticateJWT, requireAdmin } from "../middlewares/auth";
 import { createReview, getReviewsByBook, updateReview, deleteReview, getUserReviews, getAllReviews } from "../controllers/reviewController";
+import { getAllReviewsAdminController, deleteReviewAdminController } from "../controllers/adminReviewsController";
 
 const router = Router();
 
@@ -21,5 +22,11 @@ router.put("/:reviewId", authenticateJWT, updateReview);
 
 // Eliminar una reseña (requiere autenticación)
 router.delete("/:reviewId", authenticateJWT, deleteReview);
+
+// Obtener todas las reviews con filtros (solo administradores)
+router.get("/admin/all", authenticateJWT, requireAdmin, getAllReviewsAdminController);
+
+// Eliminar una review (solo administradores)
+router.delete("/admin/:reviewId", authenticateJWT, requireAdmin, deleteReviewAdminController);
 
 export default router;

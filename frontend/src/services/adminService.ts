@@ -6,6 +6,45 @@ import { IUser } from "@/types/User";
 import { IBook, ICreateBook, IUpdateBook } from "@/types/Book";
 import { IOrder } from "@/types/Order";
 
+// Tipos para reviews de admin
+export interface IAdminReview {
+  id: string;
+  comment: string;
+  rating: number;
+  title?: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  bookId: string;
+  userId: string;
+  user: {
+    id: string;
+    name: string;
+    surname: string;
+  };
+  book?: {
+    title: string;
+    author: string;
+  };
+}
+
+export interface IAdminReviewsFilters {
+  bookId?: string;
+  userId?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface IAdminReviewsResponse {
+  reviews: IAdminReview[];
+  total: number;
+  page: number;
+  limit: number;
+  filters: {
+    bookId: string | null;
+    userId: string | null;
+  };
+}
+
 /**
  * Obtiene todos los usuarios (solo para administradores)
  * Endpoint: GET /users
@@ -206,6 +245,85 @@ export const clearCancelledOrders = async (): Promise<{ deletedOrders: number; r
       errorMessage.includes("administrador")
     ) {
       throw new Error("No tienes permisos para limpiar órdenes canceladas");
+    }
+
+    throw new Error(errorMessage);
+  }
+};
+
+/**
+ * Obtiene todas las reviews con filtros (solo para administradores)
+ * Endpoint: GET /reviews/admin/all
+ * Requiere: Autenticación JWT + rol admin
+ * @param filters - Filtros opcionales (bookId, userId, page, limit)
+ * @returns Lista de reviews con información completa
+ * @throws Error si no se pueden obtener las reviews o si no es admin
+ */
+export const getAllReviewsAdmin = async (
+  filters: IAdminReviewsFilters = {}
+): Promise<IAdminReviewsResponse> => {
+  try {
+    // Construir query params
+    const params = new URLSearchParams();
+    if (filters.bookId) params.append('bookId', filters.bookId);
+    if (filters.userId) params.append('userId', filters.userId);
+    if (filters.page) params.append('page', filters.page.toString());
+    if (filters.limit) params.append('limit', filters.limit.toString());
+
+    const response = await apiClient.get<{ 
+      success: boolean; 
+      message: string; 
+      data: IAdminReviewsResponse 
+    }>(
+      `/reviews/admin/all?${params.toString()}`
+    );
+    
+    return extractData<IAdminReviewsResponse>(response);
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Error al cargar las reviews";
+
+    if (
+      errorMessage.includes("403") ||
+      errorMessage.includes("administrador")
+    ) {
+      throw new Error("No tienes permisos para ver todas las reviews");
+    }
+
+    throw new Error(errorMessage);
+  }
+};
+
+/**
+ * Elimina una review (solo para administradores)
+ * Endpoint: DELETE /reviews/admin/:reviewId
+ * Requiere: Autenticación JWT + rol admin
+ * @param reviewId - ID de la review a eliminar
+ * @returns Confirmación de eliminación
+ * @throws Error si no se puede eliminar la review o si no es admin
+ */
+export const deleteReviewAdmin = async (reviewId: string): Promise<{ message: string; reviewId: string }> => {
+  try {
+    const response = await apiClient.delete<{ 
+      success: boolean; 
+      message: string; 
+      data: { message: string; reviewId: string }
+    }>(
+      `/reviews/admin/${reviewId}`
+    );
+    
+    return extractData<{ message: string; reviewId: string }>(response);
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Error al eliminar la review";
+
+    if (
+      errorMessage.includes("403") ||
+      errorMessage.includes("administrador")
+    ) {
+      throw new Error("No tienes permisos para eliminar reviews");
+    } else if (errorMessage.includes("404")) {
+      throw new Error("La review no existe");
     }
 
     throw new Error(errorMessage);

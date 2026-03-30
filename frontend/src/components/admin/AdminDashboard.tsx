@@ -4,12 +4,13 @@ import React, { useEffect } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { Users, BookOpen, BarChart3, Settings } from 'lucide-react'
+import { Users, BookOpen, BarChart3, Settings, Star } from 'lucide-react'
 import { getRoleDisplay } from '@/utils/helpers'
 import UsersTable from './UserTable'
 import CreateBook from './CreateBook'
 import BookList from './BookList'
 import OrdersTable from './OrdersTable'
+import ReviewsAdminTable from './ReviewsAdminTable'
 
 const AdminDashboard: React.FC = () => {
   const { user, isAuthenticated, loading } = useAuth()
@@ -214,6 +215,25 @@ const AdminDashboard: React.FC = () => {
           </div>
 
           <OrdersTable />
+        </div>
+
+        {/* Gestión de Reviews */}
+        <div className="bg-[#fcfaf5] rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200/50 space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
+              <Star className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-[#2e4b30]">
+                Gestión de Reviews
+              </h2>
+              <p className="text-xs text-gray-600">
+                Visualiza y filtra todas las reviews del sistema con información de usuarios y libros.
+              </p>
+            </div>
+          </div>
+
+          <ReviewsAdminTable />
         </div>
       </div>
     </div>
