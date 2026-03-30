@@ -184,19 +184,19 @@ export const clearAllOrders = async (): Promise<{ deletedOrders: number; restore
  * Limpia todas las órdenes canceladas de la base de datos (solo para administradores)
  * Endpoint: DELETE /orders/admin/clear-cancelled
  * Requiere: Autenticación JWT + rol admin
- * @returns Objeto con número de órdenes eliminadas
+ * @returns Objeto con estadísticas de la operación (deletedOrders y restoredStock)
  * @throws Error si no se pueden limpiar las órdenes canceladas o si no es admin
  */
-export const clearCancelledOrders = async (): Promise<{ deletedOrders: number }> => {
+export const clearCancelledOrders = async (): Promise<{ deletedOrders: number; restoredStock: number }> => {
   try {
     const response = await apiClient.delete<{ 
       success: boolean; 
       message: string; 
-      data: { deletedOrders: number } 
+      data: { deletedOrders: number; restoredStock: number } 
     }>(
       "/orders/admin/clear-cancelled"
     );
-    return extractData<{ deletedOrders: number }>(response);
+    return extractData<{ deletedOrders: number; restoredStock: number }>(response);
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudieron limpiar las órdenes canceladas";

@@ -334,7 +334,7 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
 };
 
 //? Limpiar todas las órdenes canceladas de la base de datos (solo para administradores).
-export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: number }> => {
+export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: number; restoredStock: number }> => {
   try {
     const orderRepository = AppDataSource.getRepository(Order);
     
@@ -346,7 +346,7 @@ export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: nu
 
 
     if (cancelledOrdersCount === 0) {
-      return { deletedOrders: 0 };
+      return { deletedOrders: 0, restoredStock: 0 };
     }
 
     // USAR QUERY BUILDER PARA ELIMINAR EFICIENTE
@@ -382,10 +382,11 @@ export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: nu
 
       return {
         deletedOrders: deletedOrdersResult.affected || 0,
+        restoredStock: 0, // Estandarizar estructura con clearAllOrdersService
       };
     }
 
-    return { deletedOrders: 0 };
+    return { deletedOrders: 0, restoredStock: 0 }; // Estandarizar estructura
   } catch (error: any) {
     console.error("Error al limpiar órdenes canceladas:", error);
     if (error.status && error.message) throw error;

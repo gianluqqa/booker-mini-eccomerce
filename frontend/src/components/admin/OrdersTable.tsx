@@ -95,7 +95,7 @@ const OrdersTable: React.FC = () => {
       setOrders(prevOrders => prevOrders.filter(order => order.status?.toLowerCase() !== 'cancelled'))
       
       // Mostrar mensaje de éxito
-      alert(`✅ Limpieza completada:\n• ${result.deletedOrders} órdenes canceladas eliminadas`)
+      alert(`✅ Limpieza completada:\n• ${result.deletedOrders} órdenes canceladas eliminadas\n• ${result.restoredStock} unidades de stock restauradas`)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al limpiar órdenes canceladas'
       setError(errorMessage)
