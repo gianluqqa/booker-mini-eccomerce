@@ -3,17 +3,49 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IBookCardProps } from "@/types/Book";
-import { Eye, ShoppingCart, Loader2 } from "lucide-react";
+import { Eye, ShoppingCart, Loader2, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
+import { toggleFavorite } from "@/services/userService";
+
 
 
 const BookCard: React.FC<IBookCardProps> = ({ book }) => {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, updateUser } = useAuth();
   const { addBookToCart, loading, error, resetError } = useAddToCart();
+
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(
+    user?.favorites?.some((f) => f.id === book.id) || false
+  );
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated || !user) {
+      router.push("/login");
+      return;
+    }
+
+    try {
+      const result = await toggleFavorite(user.id, book.id!);
+      setIsFavorite(result.isFavorite);
+
+      // Actualizar el objeto usuario en el contexto
+      const updatedFavorites = result.isFavorite
+        ? [...(user.favorites || []), book]
+        : (user.favorites || []).filter((f) => f.id !== book.id);
+
+      updateUser({ ...user, favorites: updatedFavorites });
+    } catch (err) {
+      console.error("Error updating favorite:", err);
+    }
+  };
+
+
 
   const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -73,11 +105,20 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
 
   return (
     <div className="flex flex-col h-full bg-[#f5efe1] bg-opacity-5 backdrop-blur-sm rounded-none p-6 hover:bg-opacity-10 transition-all duration-300 group border border-[#2e4b30]/5 hover:border-[#2e4b30]/20 shadow-sm hover:shadow-md">
-      {/* Imagen del libro */}
       <div
         onClick={handleViewDetails}
-        className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-none mb-4 flex items-center justify-center overflow-hidden cursor-pointer"
+        className="aspect-[3/4] bg-[#f5efe1] bg-opacity-10 rounded-none mb-4 flex items-center justify-center overflow-hidden cursor-pointer relative"
       >
+        {/* Botón de favoritos */}
+        <button
+          onClick={handleToggleFavorite}
+          className="absolute top-2 right-2 z-10 p-2 bg-[#f5efe1]/40 backdrop-blur-md rounded-none border border-[#2e4b30]/10 hover:bg-[#f5efe1] transition-all duration-300 group/heart"
+        >
+          <Heart 
+            className={`w-4 h-4 transition-all duration-300 ${isFavorite ? 'fill-red-600 text-red-600' : 'text-[#2e4b30] group-hover/heart:text-red-600'}`} 
+          />
+        </button>
+
         {book.image && !imageError ? (
           <img
             src={book.image}

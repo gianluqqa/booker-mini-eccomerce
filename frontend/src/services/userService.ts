@@ -2,6 +2,8 @@
 
 import { apiClient, extractData } from '@/config/api'
 import { IUser } from '@/types/User'
+import { IBook } from '@/types/Book'
+
 
 export interface UpdateUserPayload {
   name?: string
@@ -86,4 +88,37 @@ export const deleteAllUsersExceptAdmin = async (): Promise<{ message: string; de
     throw new Error('Error al eliminar los usuarios')
   }
 }
+
+/**
+ * Agrega o quita un libro de favoritos
+ * @param userId ID del usuario
+ * @param bookId ID del libro
+ * @returns Mensaje y estado de favorito
+ */
+export const toggleFavorite = async (userId: string, bookId: string): Promise<{ message: string; isFavorite: boolean }> => {
+  try {
+    const response = await apiClient.post<{ success: boolean; message: string; data: { isFavorite: boolean } }>(`/users/${userId}/favorites/${bookId}`)
+    return {
+      message: response.data.message,
+      isFavorite: response.data.data.isFavorite
+    }
+  } catch {
+    throw new Error('Error al actualizar favoritos')
+  }
+}
+
+/**
+ * Obtiene la lista de libros favoritos del usuario
+ * @param userId ID del usuario
+ * @returns Lista de libros favoritos
+ */
+export const getUserFavorites = async (userId: string): Promise<IBook[]> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: IBook[] }>(`/users/${userId}/favorites`)
+    return extractData<IBook[]>(response)
+  } catch {
+    throw new Error('Error al obtener la lista de favoritos')
+  }
+}
+
 

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService, getCurrentUserService, firebaseLoginService, deleteUserService, deleteAllUsersExceptAdminService } from "../services/users-services";
+import { registerUserService, loginUserService, getUsersService, getUserByIdService, updateUserService, getCurrentUserService, firebaseLoginService, deleteUserService, deleteAllUsersExceptAdminService, toggleFavoriteService, getUserFavoritesService } from "../services/users-services";
+
 import { FirebaseLoginDTO, LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "../dto/UserDto";
 import { validateUpdateUser } from "../middlewares/validateUser";
 import { UserRole } from "../enums/UserRole";
@@ -280,3 +281,78 @@ export const updateUserController = async (req: Request, res: Response) => {
     });
   }
 };
+
+//? Agregar/quitar un libro de favoritos (POST /users/:userId/favorites/:bookId).
+export const toggleFavoriteController = async (req: Request, res: Response) => {
+  try {
+    const { userId, bookId } = req.params;
+    const authUser = (req as any).authUser as { id: string; role: string } | undefined;
+
+    // 🔹 Verificar que el usuario esté autenticado
+    if (!authUser) {
+      return res.status(401).json({
+        success: false,
+        message: "No autorizado",
+      });
+    }
+
+    // 🔹 Validar permisos: customers solo pueden modificar sus propios favoritos
+    if (authUser.role !== UserRole.ADMIN && authUser.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Prohibido: Solo puedes modificar tus propios favoritos",
+      });
+    }
+
+    const { message, isFavorite } = await toggleFavoriteService(userId, bookId);
+
+    return res.status(200).json({
+      success: true,
+      message,
+      data: { isFavorite }
+    });
+  } catch (error: any) {
+    console.error("Error toggling favorite:", error);
+    return res.status(error.status || 500).json({
+      success: false,
+      message: error.message || "Error al procesar favoritos"
+    });
+  }
+};
+
+//? Obtener los libros favoritos de un usuario (GET /users/:userId/favorites).
+export const getUserFavoritesController = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const authUser = (req as any).authUser as { id: string; role: string } | undefined;
+
+    // 🔹 Verificar que el usuario esté autenticado
+    if (!authUser) {
+      return res.status(401).json({
+        success: false,
+        message: "No autorizado",
+      });
+    }
+
+    // 🔹 Validar permisos: customers solo pueden ver sus propios favoritos
+    if (authUser.role !== UserRole.ADMIN && authUser.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Prohibido: Solo puedes ver tus propios favoritos",
+      });
+    }
+
+    const favorites = await getUserFavoritesService(userId);
+
+    return res.status(200).json({
+      success: true,
+      data: favorites
+    });
+  } catch (error: any) {
+    console.error("Error getting user favorites:", error);
+    return res.status(error.status || 500).json({
+      success: false,
+      message: error.message || "Error al obtener favoritos"
+    });
+  }
+};

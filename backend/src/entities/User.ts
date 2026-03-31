@@ -5,12 +5,16 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
+  JoinTable,
 } from "typeorm";
 import { Order } from "./Order";
 import { Cart } from "./Cart";
 import { Review } from "./Review";
+import { Book } from "./Book";
 import { UserRole } from "../enums/UserRole";
 import { UserGender } from "../enums/UserGender";
+
 
 @Entity()
 export class User {
@@ -68,8 +72,13 @@ export class User {
   @OneToMany(() => Review, (review) => review.user)
   reviews!: Review[];
 
+  @ManyToMany(() => Book)
+  @JoinTable({ name: "user_favorites" })
+  favorites!: Book[];
+
   @CreateDateColumn()
   createdAt!: Date;
+
 
   @UpdateDateColumn()
   updatedAt!: Date;

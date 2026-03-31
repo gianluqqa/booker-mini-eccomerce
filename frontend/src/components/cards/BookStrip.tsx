@@ -3,15 +3,47 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IBookCardProps } from "@/types/Book";
-import { Eye, ShoppingCart, Loader2, Plus } from "lucide-react";
+import { Eye, ShoppingCart, Loader2, Plus, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
+import { toggleFavorite } from "@/services/userService";
+
 
 const BookStrip: React.FC<IBookCardProps> = ({ book }) => {
     const router = useRouter();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user, updateUser } = useAuth();
     const { addBookToCart, loading, error, resetError } = useAddToCart();
+
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [isFavorite, setIsFavorite] = useState<boolean>(
+        user?.favorites?.some((f) => f.id === book.id) || false
+    );
+
+    const handleToggleFavorite = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!isAuthenticated || !user) {
+            router.push("/login");
+            return;
+        }
+
+        try {
+            const result = await toggleFavorite(user.id, book.id!);
+            setIsFavorite(result.isFavorite);
+
+            // Actualizar el objeto usuario en el contexto
+            const updatedFavorites = result.isFavorite
+                ? [...(user.favorites || []), book]
+                : (user.favorites || []).filter((f) => f.id !== book.id);
+
+            updateUser({ ...user, favorites: updatedFavorites });
+        } catch (err) {
+            console.error("Error updating favorite:", err);
+        }
+    };
+
+
 
     const handleAddToCart = async (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
@@ -49,7 +81,8 @@ const BookStrip: React.FC<IBookCardProps> = ({ book }) => {
     };
 
     return (
-        <div className="flex items-center justify-between w-[400px] h-16 bg-[#f5efe1] border border-[#2e4b30]/20 hover:border-[#2e4b30] transition-all duration-300 group px-6 relative overflow-hidden">
+        <div className="flex items-center justify-between w-full h-16 bg-[#f5efe1] border border-[#2e4b30]/20 hover:border-[#2e4b30] transition-all duration-300 group px-6 relative overflow-hidden">
+
             {/* Background decoration for brutalist feel */}
             <div className="absolute top-0 left-0 w-1 h-full bg-[#2e4b30] transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300" />
 
@@ -72,6 +105,15 @@ const BookStrip: React.FC<IBookCardProps> = ({ book }) => {
                     title="Ver Detalles"
                 >
                     <Eye className="w-4 h-4" />
+                </button>
+
+                {/* Favorite Button */}
+                <button
+                    onClick={handleToggleFavorite}
+                    className={`p-2 border border-[#2e4b30]/10 transition-all ${isFavorite ? "bg-red-50" : "hover:bg-red-50"}`}
+                    title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+                >
+                    <Heart className={`w-4 h-4 transition-all ${isFavorite ? "fill-red-600 text-red-600" : "text-[#2e4b30]"}`} />
                 </button>
 
                 {/* Add Button */}

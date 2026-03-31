@@ -14,22 +14,39 @@ import { getUserOrders, getUserPendingOrders } from '@/services/orderService'
 import { getRoleDisplay, getRoleColor, formatDate } from '@/utils/helpers'
 import { useCart } from '@/contexts/CartContext'
 import { IOrder } from '@/types/Order'
+import { IBook } from '@/types/Book'
+import { getUserFavorites } from '@/services/userService'
+import { Heart } from 'lucide-react'
+import BookStrip from '@/components/cards/BookStrip'
+
+
 
 const Profile = () => {
-  const { isAuthenticated, loading: authLoading } = useAuth()
+  const { isAuthenticated, loading: authLoading, user, updateUser } = useAuth()
+
   const router = useRouter()
   const [userData, setUserData] = useState<IUser | null>(null)
   const { cart } = useCart()
   const cartItems = cart?.items || []
   const [orders, setOrders] = useState<IOrder[]>([])
   const [pendingOrders, setPendingOrders] = useState<IOrder[]>([])
+  const [favorites, setFavorites] = useState<IBook[]>([])
   const [loading, setLoading] = useState(true)
+
   const [error, setError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState<UpdateUserFormData | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+
+  // Sincronizar favoritos locales con el contexto de auth (para actualización en tiempo real)
+  useEffect(() => {
+    if (user?.favorites) {
+      setFavorites(user.favorites)
+    }
+  }, [user?.favorites])
+
 
   useEffect(() => {
     if (authLoading) {
@@ -47,8 +64,10 @@ const Profile = () => {
         setError(null)
 
         // Obtener perfil del usuario actual
-        const userData = await getUserProfile()
-        setUserData(userData)
+        const data = await getUserProfile()
+        setUserData(data)
+        updateUser(data) // Sincronizar contexto
+
 
         // Obtener órdenes confirmadas del usuario
         try {
@@ -67,7 +86,18 @@ const Profile = () => {
           // Si no hay órdenes pendientes o hay error, simplemente no mostrar órdenes
           setPendingOrders([])
         }
+
+        // Obtener libros favoritos
+        try {
+          const userFavorites = await getUserFavorites(data.id)
+          setFavorites(userFavorites)
+        } catch {
+          setFavorites([])
+        }
+
+
       } catch (err) {
+
         const errorMessage = err instanceof Error ? err.message : 'Error al cargar los datos del perfil'
         setError(errorMessage)
         console.error('Error fetching user data:', err)
@@ -339,7 +369,29 @@ const Profile = () => {
         <PendingOrders orders={pendingOrders} />
         <ConfirmOrders orders={orders} />
 
+        {/* Favoritos */}
+        <div className="bg-white rounded-sm p-6 shadow-sm mb-8">
+          <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
+            <Heart className="w-5 h-5 fill-[#2e4b30] text-[#2e4b30]" />
+            Mis Libros Favoritos
+          </h2>
+          {favorites && favorites.length > 0 ? (
+            <div className="flex flex-col gap-3">
+              {favorites.map((book) => (
+                <BookStrip key={book.id} book={book} />
+              ))}
+            </div>
+          ) : (
+
+            <div className="text-center py-8 bg-[#f5efe1] bg-opacity-30 rounded-sm">
+              <Heart className="w-12 h-12 text-[#2e4b30] opacity-20 mx-auto mb-2" />
+              <p className="text-gray-500">Aún no tienes libros guardados</p>
+            </div>
+          )}
+        </div>
+
         {/* Carrito Actual */}
+
         <div className="bg-white rounded-sm p-6 shadow-sm">
           <h2 className="text-xl font-semibold text-[#2e4b30] mb-4 flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />

@@ -1,3 +1,5 @@
+import { IBook } from "./Book";
+
 // Estructura de datos para User (respuesta del backend)
 export interface IUser {
   id: string;
@@ -12,9 +14,11 @@ export interface IUser {
   token?: string;
   bio?: string | null;
   gender?: 'male' | 'female' | 'not_specific';
+  favorites?: IBook[];
   createdAt?: Date;
   updatedAt?: Date;
 }
+
 
 // Estructura de datos para registro (POST /users/register)
 export interface IRegisterUser {

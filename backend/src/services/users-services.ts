@@ -2,7 +2,9 @@ import { FirebaseLoginDTO, LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from "
 import { validateLoginUser, validateRegisterUser } from "../middlewares/validateUser";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
+import { Book } from "../entities/Book";
 import { UserRole } from "../enums/UserRole";
+
 import { UserGender } from "../enums/UserGender";
 
 import bcrypt from "bcrypt";
@@ -255,3 +257,50 @@ export const deleteAllUsersExceptAdminService = async () => {
     throw { status: 500, message: "No se pudieron eliminar los usuarios" };
   }
 };
+
+//? Agregar/quitar un libro de favoritos (POST /users/:userId/favorites/:bookId).
+export const toggleFavoriteService = async (userId: string, bookId: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const bookRepo = AppDataSource.getRepository(Book);
+
+  const user = await userRepo.findOne({
+    where: { id: userId },
+    relations: ["favorites"],
+  });
+  if (!user) throw { status: 404, message: "Usuario no encontrado" };
+
+  const book = await bookRepo.findOne({ where: { id: bookId } });
+  if (!book) throw { status: 404, message: "Libro no encontrado" };
+
+  const isFavorite = user.favorites.some((f) => f.id === bookId);
+
+  if (isFavorite) {
+    // Si ya es favorito, lo quitamos
+    user.favorites = user.favorites.filter((f) => f.id !== bookId);
+  } else {
+    // Si no es favorito, lo agregamos
+    user.favorites.push(book);
+  }
+
+  await userRepo.save(user);
+
+  return {
+    message: isFavorite
+      ? "Libro eliminado de favoritos"
+      : "Libro agregado a favoritos",
+    isFavorite: !isFavorite,
+  };
+};
+
+//? Obtener los libros favoritos de un usuario (GET /users/:userId/favorites).
+export const getUserFavoritesService = async (userId: string) => {
+  const userRepo = AppDataSource.getRepository(User);
+  const user = await userRepo.findOne({
+    where: { id: userId },
+    relations: ["favorites"],
+  });
+
+  if (!user) throw { status: 404, message: "Usuario no encontrado" };
+
+  return user.favorites;
+};

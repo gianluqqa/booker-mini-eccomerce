@@ -7,16 +7,49 @@ import { IBook } from "@/types/Book";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReviewList } from "@/components/review/ReviewList";
+import { toggleFavorite } from "@/services/userService";
+
 
 const BookDetail = () => {
   const router = useRouter();
   const params = useParams();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, updateUser } = useAuth();
   const [book, setBook] = useState<IBook | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const { addBookToCart, loading: addingToCart, error: cartError } = useAddToCart();
+
+  useEffect(() => {
+    if (user && book) {
+      setIsFavorite(user.favorites?.some(f => f.id === book.id) || false);
+    }
+  }, [user, book]);
+
+  const handleToggleFavorite = async () => {
+    if (!isAuthenticated || !user || !book?.id) {
+      if (!isAuthenticated) router.push("/login");
+      return;
+    }
+
+    try {
+      const result = await toggleFavorite(user.id, book.id);
+      setIsFavorite(result.isFavorite);
+      
+      // Actualizar el objeto usuario en el contexto
+      const updatedFavorites = result.isFavorite 
+        ? [...(user.favorites || []), book]
+        : (user.favorites || []).filter(f => f.id !== book.id);
+      
+      updateUser({ ...user, favorites: updatedFavorites });
+    } catch (err) {
+      console.error("Error updating favorite:", err);
+    }
+  };
+
+
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -90,12 +123,15 @@ const BookDetail = () => {
         {/* HEADER / NAVEGACIÓN */}
         <div className="flex items-center justify-end border-b-2 border-[#2e4b30]/10 pb-6">
           <div className="flex gap-4">
-            <button className="p-2 text-[#2e4b30] hover:bg-[#2e4b30]/10 rounded-none transition-all shadow-sm bg-white/50 border border-[#2e4b30]/10">
-              <Share2 className="w-5 h-5" />
+            <button
+              onClick={handleToggleFavorite}
+
+              className={`p-2 transition-all shadow-sm border rounded-none ${isFavorite ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white/50 border-[#2e4b30]/10 text-[#2e4b30] hover:bg-red-50 hover:text-red-600'}`}
+              title={isFavorite ? "Quitar de favoritos" : "Añadir a favoritos"}
+            >
+              <Heart className={`w-5 h-5 ${isFavorite ? "fill-red-600" : ""}`} />
             </button>
-            <button className="p-2 text-[#2e4b30] hover:bg-red-50 hover:text-red-600 rounded-none transition-all shadow-sm bg-white/50 border border-[#2e4b30]/10">
-              <Heart className="w-5 h-5" />
-            </button>
+
           </div>
         </div>
 
