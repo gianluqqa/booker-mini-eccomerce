@@ -65,7 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: ILoginUser) => {
     try {
       const response = await apiClient.post<{ success: boolean; data: { user: IUser; accessToken: string } }>('/users/login', credentials);
-      
+
       // El backend ahora retorna { success: true, data: { user, accessToken } }
       const { user, accessToken } = response.data.data;
 
@@ -84,7 +84,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (userData: IRegisterUser) => {
     try {
       const response = await apiClient.post<{ success: boolean; data: IUser; message: string }>('/users/register', userData);
-      
+
       // El backend ahora retorna { success: true, message: "...", data: usuario }
       const newUser = response.data.data;
       setUser(newUser);

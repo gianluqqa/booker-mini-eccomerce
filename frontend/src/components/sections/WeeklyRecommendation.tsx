@@ -7,14 +7,18 @@ import { IBook } from '@/types/Book';
 import { useBooks } from '@/hooks/useBooks';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNoAuthAlert } from '@/contexts/NoAuthAlertContext';
 import { useAddToCart } from '@/hooks/useAddToCart';
+
 
 const WeeklyRecommendation = () => {
   const { books, loading } = useBooks();
   const [recommendation, setRecommendation] = useState<IBook | null>(null);
   const router = useRouter();
   const { isAuthenticated } = useAuth();
+  const { showAlert } = useNoAuthAlert();
   const { addBookToCart, loading: cartLoading } = useAddToCart();
+
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<boolean>(false);
 
@@ -32,7 +36,7 @@ const WeeklyRecommendation = () => {
     setSuccessMessage(null);
 
     if (!isAuthenticated) {
-      router.push("/login");
+      showAlert("añadir libros a tu colección");
       return;
     }
 
@@ -145,8 +149,8 @@ const WeeklyRecommendation = () => {
                 onClick={handleAddToCart}
                 disabled={recommendation.stock === 0 || cartLoading}
                 className={`group relative overflow-hidden px-10 py-5 font-black uppercase text-[11px] tracking-[0.3em] transition-all ${recommendation.stock > 0 && !cartLoading
-                    ? "bg-[#f5efe1] text-[#2e4b30] hover:bg-white"
-                    : "bg-gray-500 text-gray-300 cursor-not-allowed"
+                  ? "bg-[#f5efe1] text-[#2e4b30] hover:bg-white"
+                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
                   }`}
               >
                 <span className="relative z-10 flex items-center justify-center gap-3">
@@ -181,15 +185,15 @@ const WeeklyRecommendation = () => {
               {/* Contenedor Principal de Imagen */}
               <div className="w-72 md:w-96 aspect-[3/4.5] bg-[#1a3a1c] shadow-[30px_30px_60px_rgba(0,0,0,0.4)] relative overflow-hidden border-2 border-[#f5efe1]/10">
                 {recommendation.image && !imageError ? (
-                  <Image
+                  <img
                     src={recommendation.image}
                     alt={recommendation.title}
-                    width={400}
-                    height={600}
                     className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
                     onError={() => setImageError(true)}
+                    referrerPolicy="no-referrer"
                   />
                 ) : (
+
                   <div className="w-full h-full flex flex-col items-center justify-center space-y-4">
                     <BookOpen className="w-20 h-20 text-[#f5efe1]/10" />
                     <span className="text-[#f5efe1]/30 font-black uppercase tracking-widest text-[10px]">Sin Imagen</span>

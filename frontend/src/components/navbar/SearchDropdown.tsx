@@ -65,14 +65,14 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
               {/* Imagen del libro */}
               <div className="flex-shrink-0 w-12 h-16 bg-[#f5efe1] rounded-sm overflow-hidden">
                 {book.image ? (
-                  <Image
+                  <img
                     src={book.image}
                     alt={book.title}
-                    width={48}
-                    height={64}
                     className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
                   />
                 ) : (
+
                   <div className="w-full h-full flex items-center justify-center">
                     <BookOpen className="w-6 h-6 text-[#2e4b30]/40" />
                   </div>

@@ -8,6 +8,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import { ReservationProvider } from "@/contexts/ReservationContext";
 import { GlobalCheckoutTimer } from "@/components/timer/GlobalCheckoutTimer";
 import { GlobalReservationTimer } from "@/components/checkout/GlobalReservationTimer";
+import { NoAuthAlertProvider } from "@/contexts/NoAuthAlertContext";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,16 +37,19 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#f5efe1] text-xs sm:text-sm`}
       >
         <AuthProvider>
-          <CartProvider>
-            <ReservationProvider>
-              <Navbar />
-              {children}
-              <Footer />
-              <GlobalCheckoutTimer />
-              <GlobalReservationTimer />
-            </ReservationProvider>
-          </CartProvider>
+          <NoAuthAlertProvider>
+            <CartProvider>
+              <ReservationProvider>
+                <Navbar />
+                {children}
+                <Footer />
+                <GlobalCheckoutTimer />
+                <GlobalReservationTimer />
+              </ReservationProvider>
+            </CartProvider>
+          </NoAuthAlertProvider>
         </AuthProvider>
+
       </body>
     </html>
   );

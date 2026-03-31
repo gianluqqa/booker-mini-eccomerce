@@ -47,7 +47,7 @@ const Cart = () => {
       router.push("/login");
       return;
     }
-    
+
     fetchCart();
   }, [isAuthenticated, authLoading, fetchCart, router]);
 
@@ -56,7 +56,7 @@ const Cart = () => {
       alert("No puedes modificar el carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
       return;
     }
-    
+
     if (newQuantity <= 0) {
       await removeItem(itemId);
       return;
@@ -73,7 +73,7 @@ const Cart = () => {
         );
         return updatedItems;
       });
-      
+
       // Actualizar el contexto del carrito para sincronizar el contador del Navbar
       await refreshCart();
     } catch (error: unknown) {
@@ -91,7 +91,7 @@ const Cart = () => {
       alert("No puedes eliminar productos del carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
       return;
     }
-    
+
     try {
       setIsRemoving((prev) => ({ ...prev, [itemId]: true }));
       await removeFromCart(itemId);
@@ -100,7 +100,7 @@ const Cart = () => {
         const updatedItems = items.filter((item) => item.id !== itemId);
         return updatedItems;
       });
-      
+
       // Actualizar el contexto del carrito para sincronizar el contador del Navbar
       await refreshCart();
     } catch (error: unknown) {
@@ -118,12 +118,12 @@ const Cart = () => {
       alert("No puedes vaciar el carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
       return;
     }
-    
+
     if (window.confirm("¿Estás seguro de que quieres vaciar el carrito?")) {
       try {
         await clearCart();
         setCartItems([]);
-        
+
         // Actualizar el contexto del carrito para sincronizar el contador del Navbar
         await refreshCart();
       } catch (error: unknown) {
@@ -150,12 +150,12 @@ const Cart = () => {
       alert("Tu carrito está vacío");
       return;
     }
-    
+
     if (hasPendingOrder) {
       alert("Ya tienes una orden pendiente. Debes completarla o cancelarla antes de crear una nueva.");
       return;
     }
-    
+
     router.push("/checkout");
   };
 
@@ -251,61 +251,58 @@ const Cart = () => {
                 {cartItems.map((item) => (
                   <div key={item.id} className="p-6">
                     <div className="flex items-start">
-                        <div className="flex-shrink-0">
-                          <Image
-                            src={item.book.image || "/placeholder-book.jpg"}
-                            alt={item.book.title}
-                            width={80}
-                            height={120}
-                            className="rounded-sm"
-                          />
-                        </div>
-  
-                        <div className="flex-1 min-w-0 ml-6">
-  
-                          <h3 className="text-lg font-semibold text-[#2e4b30]">{item.book.title}</h3>
-                          <p className="text-[#2e4b30]/70 text-sm mb-2">por {item.book.author}</p>
-                          <p className="text-lg font-bold text-[#2e4b30]">${(item.book.price * item.quantity).toFixed(2)}</p>
-                        </div>
-  
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              disabled={isUpdating[item.id] || hasPendingOrder}
-                              className={`p-1.5 rounded-sm transition-all duration-200 ${
-                                isUpdating[item.id] || hasPendingOrder
-                                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
-                                  : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
-                              }`}
-                            >
-                              {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
-                            </button>
-                            <span className="text-[#2e4b30] font-medium min-w-[2rem] text-center">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              disabled={isUpdating[item.id] || hasPendingOrder}
-                              className={`p-1.5 rounded-sm transition-all duration-200 ${
-                                isUpdating[item.id] || hasPendingOrder
-                                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50' 
-                                  : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
-                              }`}
-                            >
-                              {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                            </button>
-                          </div>
-  
+                      <div className="flex-shrink-0">
+                        <img
+                          src={item.book.image || "/placeholder-book.jpg"}
+                          alt={item.book.title}
+                          className="w-20 h-28 object-cover rounded-sm"
+                          referrerPolicy="no-referrer"
+                        />
+
+                      </div>
+
+                      <div className="flex-1 min-w-0 ml-6">
+
+                        <h3 className="text-lg font-semibold text-[#2e4b30]">{item.book.title}</h3>
+                        <p className="text-[#2e4b30]/70 text-sm mb-2">por {item.book.author}</p>
+                        <p className="text-lg font-bold text-[#2e4b30]">${(item.book.price * item.quantity).toFixed(2)}</p>
+                      </div>
+
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => removeItem(item.id)}
-                            disabled={isRemoving[item.id] || hasPendingOrder}
-                            className={`p-2 rounded-sm transition-colors duration-200 ${
-                              isRemoving[item.id] || hasPendingOrder
-                                ? 'text-gray-400 cursor-not-allowed bg-gray-100' 
-                                : 'text-red-500 hover:text-red-600 hover:bg-red-50'
-                            }`}
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            disabled={isUpdating[item.id] || hasPendingOrder}
+                            className={`p-1.5 rounded-sm transition-all duration-200 ${isUpdating[item.id] || hasPendingOrder
+                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                              : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
+                              }`}
                           >
-                            {isRemoving[item.id] ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                            {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
                           </button>
+                          <span className="text-[#2e4b30] font-medium min-w-[2rem] text-center">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            disabled={isUpdating[item.id] || hasPendingOrder}
+                            className={`p-1.5 rounded-sm transition-all duration-200 ${isUpdating[item.id] || hasPendingOrder
+                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                              : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
+                              }`}
+                          >
+                            {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                          </button>
+                        </div>
+
+                        <button
+                          onClick={() => removeItem(item.id)}
+                          disabled={isRemoving[item.id] || hasPendingOrder}
+                          className={`p-2 rounded-sm transition-colors duration-200 ${isRemoving[item.id] || hasPendingOrder
+                            ? 'text-gray-400 cursor-not-allowed bg-gray-100'
+                            : 'text-red-500 hover:text-red-600 hover:bg-red-50'
+                            }`}
+                        >
+                          {isRemoving[item.id] ? <Loader2 className="w-5 h-5 animate-spin" /> : <Trash2 className="w-5 h-5" />}
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -313,14 +310,13 @@ const Cart = () => {
               </div>
 
               <div className="p-6 bg-gray-50 border-t border-[#2e4b30]/10">
-                <button 
-                  onClick={handleClearCart} 
+                <button
+                  onClick={handleClearCart}
                   disabled={hasPendingOrder}
-                  className={`font-medium flex items-center ${
-                    hasPendingOrder 
-                      ? 'text-gray-400 cursor-not-allowed' 
-                      : 'text-red-500 hover:text-red-600'
-                  }`}
+                  className={`font-medium flex items-center ${hasPendingOrder
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-red-500 hover:text-red-600'
+                    }`}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Vaciar carrito
@@ -353,11 +349,10 @@ const Cart = () => {
               <button
                 onClick={handleCheckout}
                 disabled={hasPendingOrder}
-                className={`w-full py-3 px-6 rounded-sm font-medium transition-all duration-200 mb-4 ${
-                  hasPendingOrder 
-                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                    : 'bg-[#2e4b30] hover:bg-[#1a3a1c] text-[#f5efe1]'
-                }`}
+                className={`w-full py-3 px-6 rounded-sm font-medium transition-all duration-200 mb-4 ${hasPendingOrder
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  : 'bg-[#2e4b30] hover:bg-[#1a3a1c] text-[#f5efe1]'
+                  }`}
               >
                 {hasPendingOrder ? 'Orden Pendiente en Proceso' : 'Proceder al Pago'}
               </button>

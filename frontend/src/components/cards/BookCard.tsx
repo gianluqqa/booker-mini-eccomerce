@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { IBookCardProps } from "@/types/Book";
 import { Eye, ShoppingCart, Loader2, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNoAuthAlert } from "@/contexts/NoAuthAlertContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
+
 import { toggleFavorite } from "@/services/userService";
 
 
@@ -13,7 +15,9 @@ import { toggleFavorite } from "@/services/userService";
 const BookCard: React.FC<IBookCardProps> = ({ book }) => {
   const router = useRouter();
   const { isAuthenticated, user, updateUser } = useAuth();
+  const { showAlert } = useNoAuthAlert();
   const { addBookToCart, loading, error, resetError } = useAddToCart();
+
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [imageError, setImageError] = useState<boolean>(false);
@@ -26,9 +30,10 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
     e.stopPropagation();
 
     if (!isAuthenticated || !user) {
-      router.push("/login");
+      showAlert("añadir libros a tus favoritos");
       return;
     }
+
 
     try {
       const result = await toggleFavorite(user.id, book.id!);
@@ -56,9 +61,10 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
 
     // Verificar autenticación
     if (!isAuthenticated) {
-      router.push("/login");
+      showAlert("añadir libros al carrito");
       return;
     }
+
 
     // Verificar que el libro tenga ID
     if (!book.id) {
@@ -114,8 +120,8 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
           onClick={handleToggleFavorite}
           className="absolute top-2 right-2 z-10 p-2 bg-[#f5efe1]/40 backdrop-blur-md rounded-none border border-[#2e4b30]/10 hover:bg-[#f5efe1] transition-all duration-300 group/heart"
         >
-          <Heart 
-            className={`w-4 h-4 transition-all duration-300 ${isFavorite ? 'fill-red-600 text-red-600' : 'text-[#2e4b30] group-hover/heart:text-red-600'}`} 
+          <Heart
+            className={`w-4 h-4 transition-all duration-300 ${isFavorite ? 'fill-red-600 text-red-600' : 'text-[#2e4b30] group-hover/heart:text-red-600'}`}
           />
         </button>
 
@@ -125,7 +131,9 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
             alt={book.title}
             className="w-full h-full object-cover transition-transform duration-300"
             onError={() => setImageError(true)}
+            referrerPolicy="no-referrer"
           />
+
         ) : (
           <div className="text-[#2e4b30] text-4xl opacity-50">📚</div>
         )}

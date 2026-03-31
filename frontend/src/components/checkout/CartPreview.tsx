@@ -52,14 +52,14 @@ const CartItemRow: React.FC<{ item: ICartItem }> = ({ item }) => {
 const CartItemBookImage: React.FC<{ book: ICartItem['book'] }> = ({ book }) => {
   return (
     <div className="flex-shrink-0">
-      <Image
+      <img
         src={book.image || ''}
         alt={book.title}
-        width={80}
-        height={112}
         className="w-20 h-28 object-cover rounded-sm shadow-sm"
+        referrerPolicy="no-referrer"
       />
     </div>
+
   );
 };
 

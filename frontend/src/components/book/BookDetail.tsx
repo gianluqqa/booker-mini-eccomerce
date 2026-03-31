@@ -8,13 +8,17 @@ import { useAddToCart } from "@/hooks/useAddToCart";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReviewList } from "@/components/review/ReviewList";
 import { toggleFavorite } from "@/services/userService";
+import { useNoAuthAlert } from "@/contexts/NoAuthAlertContext";
+
 
 
 const BookDetail = () => {
   const router = useRouter();
   const params = useParams();
   const { isAuthenticated, user, updateUser } = useAuth();
+  const { showAlert } = useNoAuthAlert();
   const [book, setBook] = useState<IBook | null>(null);
+
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,19 +34,20 @@ const BookDetail = () => {
 
   const handleToggleFavorite = async () => {
     if (!isAuthenticated || !user || !book?.id) {
-      if (!isAuthenticated) router.push("/login");
+      if (!isAuthenticated) showAlert("añadir libros a tus favoritos");
       return;
     }
+
 
     try {
       const result = await toggleFavorite(user.id, book.id);
       setIsFavorite(result.isFavorite);
-      
+
       // Actualizar el objeto usuario en el contexto
-      const updatedFavorites = result.isFavorite 
+      const updatedFavorites = result.isFavorite
         ? [...(user.favorites || []), book]
         : (user.favorites || []).filter(f => f.id !== book.id);
-      
+
       updateUser({ ...user, favorites: updatedFavorites });
     } catch (err) {
       console.error("Error updating favorite:", err);
@@ -76,9 +81,10 @@ const BookDetail = () => {
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      router.push("/login");
+      showAlert("añadir libros al carrito");
       return;
     }
+
     if (!book?.id) return;
     await addBookToCart({ bookId: book.id, quantity: 1 });
   };
@@ -149,7 +155,9 @@ const BookDetail = () => {
                     alt={book.title}
                     className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
                     onError={() => setImageError(true)}
+                    referrerPolicy="no-referrer"
                   />
+
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center">
                     <BookOpen className="w-24 h-24 text-[#f5efe1]/20" />

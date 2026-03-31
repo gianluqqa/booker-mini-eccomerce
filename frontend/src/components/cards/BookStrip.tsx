@@ -7,12 +7,16 @@ import { Eye, ShoppingCart, Loader2, Plus, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { toggleFavorite } from "@/services/userService";
+import { useNoAuthAlert } from "@/contexts/NoAuthAlertContext";
+
 
 
 const BookStrip: React.FC<IBookCardProps> = ({ book }) => {
     const router = useRouter();
     const { isAuthenticated, user, updateUser } = useAuth();
+    const { showAlert } = useNoAuthAlert();
     const { addBookToCart, loading, error, resetError } = useAddToCart();
+
 
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [isFavorite, setIsFavorite] = useState<boolean>(
@@ -24,9 +28,10 @@ const BookStrip: React.FC<IBookCardProps> = ({ book }) => {
         e.stopPropagation();
 
         if (!isAuthenticated || !user) {
-            router.push("/login");
+            showAlert("añadir libros a tus favoritos");
             return;
         }
+
 
         try {
             const result = await toggleFavorite(user.id, book.id!);
@@ -53,9 +58,10 @@ const BookStrip: React.FC<IBookCardProps> = ({ book }) => {
         setSuccessMessage(null);
 
         if (!isAuthenticated) {
-            router.push("/login");
+            showAlert("añadir libros al carrito");
             return;
         }
+
 
         if (!book.id) return;
 
