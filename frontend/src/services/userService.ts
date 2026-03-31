@@ -46,10 +46,10 @@ export const updateUserProfile = async (userId: string, payload: UpdateUserPaylo
  */
 export const deleteUser = async (userId: string): Promise<{ message: string; userId: string }> => {
   try {
-    const response = await apiClient.delete<{ success: boolean; data: { userId: string } }>(`/users/${userId}`)
+    const response = await apiClient.delete<{ success: boolean; data: { id: string } }>(`/users/${userId}`)
     return {
       message: 'Usuario eliminado exitosamente',
-      userId: response.data.data.userId
+      userId: response.data.data.id
     }
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'response' in error) {
@@ -73,10 +73,10 @@ export const deleteUser = async (userId: string): Promise<{ message: string; use
  */
 export const deleteAllUsersExceptAdmin = async (): Promise<{ message: string; deletedCount: number }> => {
   try {
-    const response = await apiClient.delete<{ success: boolean; data: { deletedCount: number; message?: string } }>('/users/')
+    const response = await apiClient.delete<{ success: boolean; data: { count: number; message?: string } }>('/users/')
     return {
       message: (response.data as any).message || 'Usuarios eliminados exitosamente',
-      deletedCount: response.data.data.deletedCount
+      deletedCount: response.data.data.count
     }
   } catch (error: unknown) {
     if (error && typeof error === 'object' && 'response' in error) {

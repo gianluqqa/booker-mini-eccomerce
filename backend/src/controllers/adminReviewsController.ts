@@ -5,8 +5,8 @@ export const getAllReviewsAdminController = async (req: Request, res: Response) 
   try {
     // Extraer filtros de query params
     const {
-      bookId,
-      userId,
+      book,
+      user,
       page = 1,
       limit = 10
     } = req.query;
@@ -29,18 +29,22 @@ export const getAllReviewsAdminController = async (req: Request, res: Response) 
       });
     }
 
-    // Llamar al servicio con filtros
+    // Llamar al servicio con filtros de nombre/título
     const result = await getAllReviewsAdminService({
-      bookId: bookId as string,
-      userId: userId as string,
+      book: book as string,
+      user: user as string,
       page: pageNum,
       limit: limitNum
     });
 
     return res.status(200).json({
       success: true,
-      message: "Reviews obtenidas exitosamente",
-      data: result
+      data: result.reviews,
+      meta: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit
+      }
     });
   } catch (error: any) {
     console.error("Error al obtener reviews de admin:", error);
@@ -62,18 +66,19 @@ export const deleteReviewAdminController = async (req: Request, res: Response) =
     if (!reviewId) {
       return res.status(400).json({
         success: false,
-        message: "ID de review es requerido"
+        message: "Error de validación",
+        errors: ["ID de reseña es requerido"]
       });
     }
 
     // Llamar al servicio para eliminar la review
-    const result = await deleteReviewAdminService(reviewId);
+    await deleteReviewAdminService(reviewId);
 
     return res.status(200).json({
       success: true,
-      message: result.message,
+      message: "Reseña eliminada exitosamente",
       data: {
-        reviewId: result.reviewId
+        id: reviewId
       }
     });
   } catch (error: any) {

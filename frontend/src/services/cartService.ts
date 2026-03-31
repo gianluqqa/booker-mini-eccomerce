@@ -22,16 +22,13 @@ export const getUserCart = async (): Promise<CartResponse> => {
   try {
     const response = await apiClient.get<ApiResponse>('/carts')
     
-    const responseData = response.data;
-    
-    // Extraer el carrito y mantener pendingOrder si existe (ahora viene dentro de data)
-    const cartData = responseData.success ? responseData.data : (responseData as unknown as ICartResponse);
+    const { data } = response.data;
     
     return {
-      items: cartData.items,
-      totalItems: cartData.totalItems,
-      totalPrice: cartData.totalPrice,
-      pendingOrder: cartData.pendingOrder
+      items: data.items,
+      totalItems: data.totalItems,
+      totalPrice: data.totalPrice,
+      pendingOrder: data.pendingOrder
     };
   } catch (error: unknown) {
     throw error // Re-lanzar para que el interceptor o el contexto manejen el status
@@ -61,8 +58,9 @@ export const addToCart = async (addToCartData: IAddToCart): Promise<ICartItem> =
  */
 export const removeFromCart = async (cartId: string): Promise<{ deletedItemId: string }> => {
   try {
-    const response = await apiClient.delete<{ success: boolean; data: { deletedItemId: string } }>(`/carts/${cartId}`);
-    return response.data.data;
+    const response = await apiClient.delete<{ success: boolean; data: { id: string } }>(`/carts/${cartId}`);
+    const data = extractData<{ id: string }>(response);
+    return { deletedItemId: data.id };
   } catch (error: unknown) {
     throw error;
   }
@@ -75,8 +73,9 @@ export const removeFromCart = async (cartId: string): Promise<{ deletedItemId: s
  */
 export const clearCart = async (): Promise<{ deletedItemsCount: number }> => {
   try {
-    const response = await apiClient.delete<{ success: boolean; data: { deletedItemsCount: number } }>('/carts');
-    return response.data.data;
+    const response = await apiClient.delete<{ success: boolean; data: { count: number } }>('/carts');
+    const data = extractData<{ count: number }>(response);
+    return { deletedItemsCount: data.count };
   } catch (error: unknown) {
     throw error;
   }

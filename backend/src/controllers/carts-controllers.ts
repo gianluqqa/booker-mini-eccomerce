@@ -21,14 +21,16 @@ export const addBookToCartController = async (req: Request, res: Response) => {
     if (!bookId) {
       return res.status(400).json({
         success: false,
-        message: "bookId es requerido",
+        message: "Error de validación",
+        errors: ["bookId es requerido"]
       });
     }
 
     if (quantity !== undefined && (quantity <= 0 || !Number.isInteger(quantity))) {
       return res.status(400).json({
         success: false,
-        message: "La cantidad debe ser un número entero positivo",
+        message: "Error de validación",
+        errors: ["La cantidad debe ser un número entero positivo"]
       });
     }
 
@@ -82,8 +84,7 @@ export const getUserCartController = async (req: Request, res: Response) => {
         total: pendingOrder.total,
         createdAt: pendingOrder.createdAt,
         expiresAt: pendingOrder.expiresAt,
-        itemsCount: pendingOrder.items?.length || 0,
-        message: "Tienes una orden pendiente. Debes confirmarla o cancelarla para poder modificar el carrito."
+        itemsCount: pendingOrder.items?.length || 0
       };
     }
 
@@ -125,7 +126,8 @@ export const updateCartItemQuantityController = async (req: Request, res: Respon
     if (!quantity || quantity <= 0 || !Number.isInteger(quantity)) {
       return res.status(400).json({
         success: false,
-        message: "La cantidad debe ser un número entero positivo",
+        message: "Error de validación",
+        errors: ["La cantidad debe ser un número entero positivo"]
       });
     }
 
@@ -179,7 +181,7 @@ export const removeBookFromCartController = async (req: Request, res: Response) 
       success: true,
       message: "Libro eliminado del carrito exitosamente",
       data: {
-        deletedItemId: cartId
+        id: cartId
       }
     });
   } catch (error: any) {
@@ -212,7 +214,7 @@ export const clearCartController = async (req: Request, res: Response) => {
       success: true,
       message: "Carrito vaciado exitosamente",
       data: {
-        deletedItemsCount: deletedCount
+        count: deletedCount
       }
     });
   } catch (error: any) {

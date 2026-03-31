@@ -6,19 +6,27 @@ export const createReview = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).authUser?.id;
     if (!userId) {
-      return res.status(401).json({ message: "Usuario no autenticado" });
+      return res.status(401).json({ 
+        success: false, 
+        message: "Usuario no autenticado" 
+      });
     }
 
     const reviewData: CreateReviewDto = req.body;
     const review = await createReviewService(reviewData, userId);
 
     res.status(201).json({
+      success: true,
       message: "Reseña creada exitosamente",
-      review
+      data: review
     });
   } catch (error: any) {
     console.error("Error al crear reseña:", error);
-    res.status(400).json({ message: error.message || "Error al crear la reseña" });
+    const status = error.status || 400;
+    res.status(status).json({ 
+      success: false, 
+      message: error.message || "Error al crear la reseña" 
+    });
   }
 };
 
@@ -30,13 +38,26 @@ export const getReviewsByBook = async (req: Request, res: Response) => {
 
     const result = await getReviewsByBookService(bookId, page, limit);
 
-    res.json({
-      message: "Reseñas obtenidas exitosamente",
-      ...result
+    res.status(200).json({
+      success: true,
+      data: result.reviews,
+      meta: {
+        total: result.total,
+        page,
+        limit
+      },
+      summary: {
+        averageRating: result.averageRating,
+        ratingDistribution: result.ratingDistribution
+      }
     });
   } catch (error: any) {
     console.error("Error al obtener reseñas del libro:", error);
-    res.status(400).json({ message: error.message || "Error al obtener las reseñas" });
+    const status = error.status || 400;
+    res.status(status).json({ 
+      success: false, 
+      message: error.message || "Error al obtener las reseñas" 
+    });
   }
 };
 
@@ -44,7 +65,10 @@ export const updateReview = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).authUser?.id;
     if (!userId) {
-      return res.status(401).json({ message: "Usuario no autenticado" });
+      return res.status(401).json({ 
+        success: false, 
+        message: "Usuario no autenticado" 
+      });
     }
 
     const { reviewId } = req.params;
@@ -52,13 +76,18 @@ export const updateReview = async (req: Request, res: Response) => {
 
     const review = await updateReviewService(reviewId, userId, updateData);
 
-    res.json({
+    res.status(200).json({
+      success: true,
       message: "Reseña actualizada exitosamente",
-      review
+      data: review
     });
   } catch (error: any) {
     console.error("Error al actualizar reseña:", error);
-    res.status(400).json({ message: error.message || "Error al actualizar la reseña" });
+    const status = error.status || 400;
+    res.status(status).json({ 
+      success: false, 
+      message: error.message || "Error al actualizar la reseña" 
+    });
   }
 };
 
@@ -66,18 +95,27 @@ export const deleteReview = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).authUser?.id;
     if (!userId) {
-      return res.status(401).json({ message: "Usuario no autenticado" });
+      return res.status(401).json({ 
+        success: false, 
+        message: "Usuario no autenticado" 
+      });
     }
 
     const { reviewId } = req.params;
     await deleteReviewService(reviewId, userId);
 
-    res.json({
-      message: "Reseña eliminada exitosamente"
+    res.status(200).json({
+      success: true,
+      message: "Reseña eliminada exitosamente",
+      data: null
     });
   } catch (error: any) {
     console.error("Error al eliminar reseña:", error);
-    res.status(400).json({ message: error.message || "Error al eliminar la reseña" });
+    const status = error.status || 400;
+    res.status(status).json({ 
+      success: false, 
+      message: error.message || "Error al eliminar la reseña" 
+    });
   }
 };
 
@@ -85,7 +123,10 @@ export const getUserReviews = async (req: Request, res: Response) => {
   try {
     const userId = (req as any).authUser?.id;
     if (!userId) {
-      return res.status(401).json({ message: "Usuario no autenticado" });
+      return res.status(401).json({ 
+        success: false, 
+        message: "Usuario no autenticado" 
+      });
     }
 
     const page = parseInt(req.query.page as string) || 1;
@@ -93,13 +134,26 @@ export const getUserReviews = async (req: Request, res: Response) => {
 
     const result = await getUserReviewsService(userId, page, limit);
 
-    res.json({
-      message: "Reseñas del usuario obtenidas exitosamente",
-      ...result
+    res.status(200).json({
+      success: true,
+      data: result.reviews,
+      meta: {
+        total: result.total,
+        page,
+        limit
+      },
+      summary: {
+        averageRating: result.averageRating,
+        ratingDistribution: result.ratingDistribution
+      }
     });
   } catch (error: any) {
     console.error("Error al obtener reseñas del usuario:", error);
-    res.status(400).json({ message: error.message || "Error al obtener las reseñas del usuario" });
+    const status = error.status || 400;
+    res.status(status).json({ 
+      success: false, 
+      message: error.message || "Error al obtener las reseñas del usuario" 
+    });
   }
 };
 export const getAllReviews = async (req: Request, res: Response) => {
@@ -109,12 +163,25 @@ export const getAllReviews = async (req: Request, res: Response) => {
 
     const result = await getAllReviewsService(page, limit);
 
-    res.json({
-      message: "Reseñas globales obtenidas exitosamente",
-      ...result
+    res.status(200).json({
+      success: true,
+      data: result.reviews,
+      meta: {
+        total: result.total,
+        page,
+        limit
+      },
+      summary: {
+        averageRating: result.averageRating,
+        ratingDistribution: result.ratingDistribution
+      }
     });
   } catch (error: any) {
     console.error("Error al obtener reseñas globales:", error);
-    res.status(400).json({ message: error.message || "Error al obtener las reseñas" });
+    const status = error.status || 400;
+    res.status(status).json({ 
+      success: false, 
+      message: error.message || "Error al obtener las reseñas" 
+    });
   }
 };

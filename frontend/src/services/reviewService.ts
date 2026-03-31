@@ -14,11 +14,12 @@ export const getAllReviews = async (
     const response = await apiClient.get("/reviews", {
       params: { page, limit }
     });
+    const { data, meta, summary } = response.data;
     return {
-      reviews: response.data.reviews,
-      total: response.data.total,
-      averageRating: response.data.averageRating,
-      ratingDistribution: response.data.ratingDistribution
+      reviews: data,
+      total: meta.total,
+      averageRating: summary.averageRating || 0,
+      ratingDistribution: summary.ratingDistribution || { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
     };
   } catch (error: unknown) {
     console.error("Error al obtener todas las reseñas:", error);
@@ -30,7 +31,7 @@ export const getAllReviews = async (
 export const createReview = async (reviewData: CreateReviewDto): Promise<Review> => {
   try {
     const response = await apiClient.post("/reviews", reviewData);
-    return response.data.review;
+    return response.data.data;
   } catch (error: unknown) {
     console.error("Error al crear reseña:", error);
     const errorMessage = error instanceof Error ? error.message : "Error al crear la reseña";
@@ -47,11 +48,12 @@ export const getReviewsByBook = async (
     const response = await apiClient.get(`/reviews/book/${bookId}`, {
       params: { page, limit }
     });
+    const { data, meta, summary } = response.data;
     return {
-      reviews: response.data.reviews,
-      total: response.data.total,
-      averageRating: response.data.averageRating,
-      ratingDistribution: response.data.ratingDistribution
+      reviews: data,
+      total: meta.total,
+      averageRating: summary.averageRating,
+      ratingDistribution: summary.ratingDistribution
     };
   } catch (error: unknown) {
     console.error("Error al obtener reseñas del libro:", error);
@@ -66,7 +68,7 @@ export const updateReview = async (
 ): Promise<Review> => {
   try {
     const response = await apiClient.put(`/reviews/${reviewId}`, updateData);
-    return response.data.review;
+    return response.data.data;
   } catch (error: unknown) {
     console.error("Error al actualizar reseña:", error);
     const errorMessage = error instanceof Error ? error.message : "Error al actualizar la reseña";
@@ -92,11 +94,12 @@ export const getUserReviews = async (
     const response = await apiClient.get("/reviews/user", {
       params: { page, limit }
     });
+    const { data, meta, summary } = response.data;
     return {
-      reviews: response.data.reviews,
-      total: response.data.total,
-      averageRating: response.data.averageRating,
-      ratingDistribution: response.data.ratingDistribution
+      reviews: data,
+      total: meta.total,
+      averageRating: summary.averageRating || 0,
+      ratingDistribution: summary.ratingDistribution || { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
     };
   } catch (error: unknown) {
     console.error("Error al obtener reseñas del usuario:", error);

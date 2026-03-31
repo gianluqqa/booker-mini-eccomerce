@@ -72,8 +72,8 @@ const ReviewsAdminTable: React.FC = () => {
     const newFilters: IAdminReviewsFilters = {
       ...filters,
       page: 1,
-      bookId: bookFilter.trim() || undefined,
-      userId: userFilter.trim() || undefined
+      book: bookFilter.trim() || undefined,
+      user: userFilter.trim() || undefined
     }
     setFilters(newFilters)
   }
@@ -106,11 +106,12 @@ const ReviewsAdminTable: React.FC = () => {
 
   const totalPages = Math.ceil(total / (filters.limit || 10))
 
-  if (loading) {
+  // Solo mostrar el loading de pantalla completa la primera vez
+  if (loading && reviews.length === 0) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2e4b30"></div>
-        <span className="ml-2 text-gray-600">Cargando reviews...</span>
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#2e4b30]"></div>
+        <span className="mt-4 text-[#2e4b30] font-medium">Cargando reviews...</span>
       </div>
     )
   }
@@ -155,35 +156,36 @@ const ReviewsAdminTable: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <Book className="w-4 h-4 inline mr-1" />
-                ID del Libro
+                Nombre del Libro
               </label>
               <input
                 type="text"
                 value={bookFilter}
                 onChange={(e) => setBookFilter(e.target.value)}
-                placeholder="UUID del libro..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e4b30]"
+                placeholder="Título del libro..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e4b30] text-gray-900 bg-white"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <User className="w-4 h-4 inline mr-1" />
-                ID del Usuario
+                Nombre del Usuario
               </label>
               <input
                 type="text"
                 value={userFilter}
                 onChange={(e) => setUserFilter(e.target.value)}
-                placeholder="UUID del usuario..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e4b30]"
+                placeholder="Nombre o apellido..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e4b30] text-gray-900 bg-white"
               />
             </div>
             <div className="flex items-end gap-2">
               <button
                 onClick={handleFilter}
-                className="flex-1 px-4 py-2 bg-[#2e4b30] text-white rounded-lg hover:bg-[#2e4b30]/90 transition-colors"
+                disabled={loading}
+                className="flex-1 px-4 py-2 bg-[#2e4b30] text-white rounded-lg hover:bg-[#2e4b30]/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                <Search className="w-4 h-4 inline mr-1" />
+                {loading ? <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div> : <Search className="w-4 h-4" />}
                 Filtrar
               </button>
               <button
@@ -198,8 +200,15 @@ const ReviewsAdminTable: React.FC = () => {
       )}
 
       {/* Reviews Table */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className={`bg-white border border-gray-200 rounded-lg overflow-hidden transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+        <div className="overflow-x-auto relative">
+          {loading && reviews.length > 0 && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/30 backdrop-blur-[1px]">
+              <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100">
+                <div className="w-6 h-6 animate-spin rounded-full border-2 border-[#2e4b30] border-t-transparent"></div>
+              </div>
+            </div>
+          )}
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>

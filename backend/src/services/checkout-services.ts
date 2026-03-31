@@ -60,7 +60,10 @@ export const createStockReservationForCheckoutService = async (userId: string): 
     // Validar stock de todos los items
     for (const cartItem of cartItems) {
       if (cartItem.book.stock < cartItem.quantity) {
-        throw { status: 400, message: `Stock insuficiente para: ${cartItem.book.title}` };
+        throw { 
+          status: 409, 
+          message: "Stock insuficiente para el libro solicitado" 
+        };
       }
     }
 
@@ -318,7 +321,10 @@ export const processCheckoutService = async (userId: string, paymentData?: { car
       }
 
       if (book.stock < cartItem.quantity) {
-        throw { status: 400, message: `Stock insuficiente para: ${book.title}` };
+        throw { 
+          status: 409, 
+          message: "Stock insuficiente para el libro solicitado" 
+        };
       }
 
       const itemTotal = Number(book.price) * cartItem.quantity;

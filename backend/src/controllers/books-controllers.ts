@@ -12,10 +12,12 @@ export const getBooksController = async (req: Request, res: Response) => {
       success: true,
       data: books,
     });
-  } catch (error) {
-    res.status(500).json({
+  } catch (error: any) {
+    const status = error.status || 500;
+    const message = error.message || "Error interno del servidor";
+    res.status(status).json({
       success: false,
-      message: (error as Error).message,
+      message,
     });
   }
 };
@@ -125,6 +127,14 @@ export const deleteBookController = async (req: Request, res: Response) => {
     // 🔹 Validar el rol de admin.
     const authUser = (req as any).authUser as { id: string; role: string } | undefined;
     
+    if (!bookId) {
+      return res.status(400).json({
+        success: false,
+        message: "Error de validación",
+        errors: ["bookId es requerido"]
+      });
+    }
+
     if (!authUser) {
       return res.status(401).json({
         success: false,
@@ -143,6 +153,9 @@ export const deleteBookController = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Libro eliminado exitosamente",
+      data: {
+        id: bookId
+      }
     });
   } catch (error: any) {
     const status = error.status || 500;

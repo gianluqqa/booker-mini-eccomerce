@@ -11,7 +11,8 @@ export const registerUserController = async (req: Request, res: Response) => {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"
+        message: "Error de validación",
+        errors: ["Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"]
       });
     }
 
@@ -47,7 +48,8 @@ export const loginUserController = async (req: Request, res: Response) => {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Los campos email y contraseña son obligatorios",
+        message: "Error de validación",
+        errors: ["Los campos email y contraseña son obligatorios"]
       });
     }
 
@@ -100,7 +102,8 @@ export const firebaseLoginController = async (req: Request, res: Response) => {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Email es requerido para el login con Firebase",
+        message: "Error de validación",
+        errors: ["Email es requerido para el login con Firebase"]
       });
     }
 

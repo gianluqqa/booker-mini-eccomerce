@@ -1,11 +1,12 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ICartItem } from "@/types/Cart";
 import { getUserCart, removeFromCart, clearCart, updateCartItemQuantity } from "@/services/cartService";
+import { cancelCheckout } from "@/services/checkoutService";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { usePendingOrderCheck } from "@/hooks/usePendingOrderCheck";
@@ -15,12 +16,31 @@ const Cart = () => {
   const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { refreshCart } = useCart();
-  const { pendingOrder, hasPendingOrder } = usePendingOrderCheck();
+  const { pendingOrder, hasPendingOrder: initialHasPendingOrder } = usePendingOrderCheck();
+  
+  // Determinar si la orden realmente está bloqueando (está pendiente y NO ha expirado)
+  const isOrderExpired = pendingOrder?.expiresAt ? new Date(pendingOrder.expiresAt) < new Date() : false;
+  const isCartBlocked = initialHasPendingOrder && !isOrderExpired;
+
   const [cartItems, setCartItems] = useState<ICartItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState<{ [key: string]: boolean }>({});
   const [isRemoving, setIsRemoving] = useState<{ [key: string]: boolean }>({});
+
+  // Refs para el auto-incremento (long press)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const quantityRef = useRef<{ [key: string]: number }>({});
+
+  // Sincronizar quantityRef con cartItems para el auto-incremento
+  useEffect(() => {
+    const qMap: { [key: string]: number } = {};
+    cartItems.forEach(item => {
+      qMap[item.id] = item.quantity;
+    });
+    quantityRef.current = qMap;
+  }, [cartItems]);
 
   const fetchCart = useCallback(async () => {
     setLoading(true);
@@ -52,13 +72,20 @@ const Cart = () => {
   }, [isAuthenticated, authLoading, fetchCart, router]);
 
   const updateQuantity = async (itemId: string, newQuantity: number) => {
-    if (hasPendingOrder) {
+    if (isCartBlocked) {
       alert("No puedes modificar el carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
       return;
     }
 
     if (newQuantity <= 0) {
       await removeItem(itemId);
+      return;
+    }
+
+    // Buscar el item para verificar su stock disponible antes de la petición
+    const item = cartItems.find(i => i.id === itemId);
+    if (item && newQuantity > item.book.stock) {
+      alert(`Lo sentimos, solo hay ${item.book.stock} unidades disponibles de este libro.`);
       return;
     }
 
@@ -76,18 +103,23 @@ const Cart = () => {
 
       // Actualizar el contexto del carrito para sincronizar el contador del Navbar
       await refreshCart();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Error al actualizar la cantidad";
-      setError(errorMessage);
-      // Recargar el carrito para mantener la consistencia
-      fetchCart();
+    } catch (error: any) {
+      // Manejar específicamente el error de stock (409 Conflict)
+      if (error.response?.status === 409) {
+        alert("Stock insuficiente: No podemos añadir más unidades de este libro en este momento.");
+      } else {
+        const errorMessage = error instanceof Error ? error.message : "Error al actualizar la cantidad";
+        setError(errorMessage);
+        // Recargar el carrito para mantener la consistencia
+        fetchCart();
+      }
     } finally {
       setIsUpdating((prev) => ({ ...prev, [itemId]: false }));
     }
   };
 
   const removeItem = async (itemId: string) => {
-    if (hasPendingOrder) {
+    if (isCartBlocked) {
       alert("No puedes eliminar productos del carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
       return;
     }
@@ -114,7 +146,7 @@ const Cart = () => {
   };
 
   const handleClearCart = async () => {
-    if (hasPendingOrder) {
+    if (isCartBlocked) {
       alert("No puedes vaciar el carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
       return;
     }
@@ -151,13 +183,65 @@ const Cart = () => {
       return;
     }
 
-    if (hasPendingOrder) {
+    if (isCartBlocked) {
       alert("Ya tienes una orden pendiente. Debes completarla o cancelarla antes de crear una nueva.");
       return;
     }
 
     router.push("/checkout");
   };
+
+  const handleCancelOrder = async () => {
+    if (window.confirm("¿Estás seguro de que quieres cancelar la orden pendiente? Esto liberará los libros reservados.")) {
+      try {
+        await cancelCheckout();
+        await refreshCart();
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Error al cancelar la orden";
+        setError(errorMessage);
+      }
+    }
+  };
+
+  const startChangingQuantity = (itemId: string, delta: number) => {
+    if (isCartBlocked || isUpdating[itemId]) return;
+
+    // Ejecutar el primer cambio inmediatamente
+    const currentQ = quantityRef.current[itemId] || 0;
+    const item = cartItems.find(i => i.id === itemId);
+    if (!item) return;
+
+    const nextQ = currentQ + delta;
+    if (nextQ >= 1 && nextQ <= item.book.stock) {
+      updateQuantity(itemId, nextQ);
+    }
+
+    // Esperar 500ms antes de empezar el auto-incremento rápido
+    timeoutRef.current = setTimeout(() => {
+      intervalRef.current = setInterval(() => {
+        const q = quantityRef.current[itemId] || 0;
+        const targetNextQ = q + delta;
+        
+        if (targetNextQ >= 1 && targetNextQ <= item.book.stock) {
+          updateQuantity(itemId, targetNextQ);
+        } else {
+          stopChangingQuantity();
+        }
+      }, 150); // Velocidad del auto-incremento (ms)
+    }, 500);
+  };
+
+  const stopChangingQuantity = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    timeoutRef.current = null;
+    intervalRef.current = null;
+  };
+
+  // Limpiar timers al desmontar
+  useEffect(() => {
+    return () => stopChangingQuantity();
+  }, []);
 
   if (loading) {
     return (
@@ -235,11 +319,12 @@ const Cart = () => {
         </div>
 
         {/* Alerta de orden pendiente */}
-        {hasPendingOrder && pendingOrder && (
+        {initialHasPendingOrder && pendingOrder && (
           <div className="mb-8">
             <PendingOrderAlert
               pendingOrder={pendingOrder}
               onGoToCheckout={() => router.push('/checkout')}
+              onCancelOrder={handleCancelOrder}
             />
           </div>
         )}
@@ -271,9 +356,13 @@ const Cart = () => {
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-2">
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                            disabled={isUpdating[item.id] || hasPendingOrder}
-                            className={`p-1.5 rounded-sm transition-all duration-200 ${isUpdating[item.id] || hasPendingOrder
+                            onMouseDown={() => startChangingQuantity(item.id, -1)}
+                            onMouseUp={stopChangingQuantity}
+                            onMouseLeave={stopChangingQuantity}
+                            onTouchStart={() => startChangingQuantity(item.id, -1)}
+                            onTouchEnd={stopChangingQuantity}
+                            disabled={isUpdating[item.id] || isCartBlocked}
+                            className={`p-1.5 rounded-sm transition-all duration-200 ${isUpdating[item.id] || isCartBlocked
                               ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
                               : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
                               }`}
@@ -282,21 +371,29 @@ const Cart = () => {
                           </button>
                           <span className="text-[#2e4b30] font-medium min-w-[2rem] text-center">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            disabled={isUpdating[item.id] || hasPendingOrder}
-                            className={`p-1.5 rounded-sm transition-all duration-200 ${isUpdating[item.id] || hasPendingOrder
-                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed opacity-50'
+                            onMouseDown={() => startChangingQuantity(item.id, 1)}
+                            onMouseUp={stopChangingQuantity}
+                            onMouseLeave={stopChangingQuantity}
+                            onTouchStart={() => startChangingQuantity(item.id, 1)}
+                            onTouchEnd={stopChangingQuantity}
+                            disabled={isUpdating[item.id] || isCartBlocked || item.quantity >= item.book.stock}
+                            className={`p-1.5 rounded-sm transition-all duration-200 ${isUpdating[item.id] || isCartBlocked || item.quantity >= item.book.stock
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
                               : 'bg-[#2e4b30]/10 hover:bg-[#2e4b30]/20 text-[#2e4b30]'
                               }`}
+                            title={item.quantity >= item.book.stock ? "Se ha alcanzado el límite de stock disponible" : "Aumentar cantidad"}
                           >
                             {isUpdating[item.id] ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                           </button>
                         </div>
+                        {item.quantity >= item.book.stock && (
+                          <span className="text-[10px] text-red-500 font-medium">Límite alcanzado</span>
+                        )}
 
                         <button
                           onClick={() => removeItem(item.id)}
-                          disabled={isRemoving[item.id] || hasPendingOrder}
-                          className={`p-2 rounded-sm transition-colors duration-200 ${isRemoving[item.id] || hasPendingOrder
+                          disabled={isRemoving[item.id] || isCartBlocked}
+                          className={`p-2 rounded-sm transition-colors duration-200 ${isRemoving[item.id] || isCartBlocked
                             ? 'text-gray-400 cursor-not-allowed bg-gray-100'
                             : 'text-red-500 hover:text-red-600 hover:bg-red-50'
                             }`}
@@ -312,8 +409,8 @@ const Cart = () => {
               <div className="p-6 bg-gray-50 border-t border-[#2e4b30]/10">
                 <button
                   onClick={handleClearCart}
-                  disabled={hasPendingOrder}
-                  className={`font-medium flex items-center ${hasPendingOrder
+                  disabled={isCartBlocked}
+                  className={`font-medium flex items-center ${isCartBlocked
                     ? 'text-gray-400 cursor-not-allowed'
                     : 'text-red-500 hover:text-red-600'
                     }`}
@@ -348,13 +445,13 @@ const Cart = () => {
 
               <button
                 onClick={handleCheckout}
-                disabled={hasPendingOrder}
-                className={`w-full py-3 px-6 rounded-sm font-medium transition-all duration-200 mb-4 ${hasPendingOrder
+                disabled={isCartBlocked}
+                className={`w-full py-3 px-6 rounded-sm font-medium transition-all duration-200 mb-4 ${isCartBlocked
                   ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
                   : 'bg-[#2e4b30] hover:bg-[#1a3a1c] text-[#f5efe1]'
                   }`}
               >
-                {hasPendingOrder ? 'Orden Pendiente en Proceso' : 'Proceder al Pago'}
+                {isCartBlocked ? 'Orden Pendiente en Proceso' : 'Proceder al Pago'}
               </button>
 
               <Link

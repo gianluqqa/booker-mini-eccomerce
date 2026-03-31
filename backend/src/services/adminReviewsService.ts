@@ -3,8 +3,8 @@ import { Review } from "../entities/Review";
 import { ReviewResponseDto } from "../dto/ReviewDto";
 
 interface AdminReviewsFilters {
-  bookId?: string;
-  userId?: string;
+  book?: string;
+  user?: string;
   page?: number;
   limit?: number;
 }
@@ -15,15 +15,15 @@ interface AdminReviewsResponse {
   page: number;
   limit: number;
   filters: {
-    bookId: string | null;
-    userId: string | null;
+    book: string | null;
+    user: string | null;
   };
 }
 
 export const getAllReviewsAdminService = async (
   filters: AdminReviewsFilters = {}
 ): Promise<AdminReviewsResponse> => {
-  const { bookId, userId, page = 1, limit = 10 } = filters;
+  const { book, user, page = 1, limit = 10 } = filters;
   const skip = (page - 1) * limit;
 
   const reviewRepository = AppDataSource.getRepository(Review);
@@ -35,13 +35,13 @@ export const getAllReviewsAdminService = async (
     .leftJoinAndSelect("review.book", "book")
     .orderBy("review.createdAt", "DESC");
 
-  // Aplicar filtros
-  if (bookId) {
-    queryBuilder.andWhere("review.bookId = :bookId", { bookId });
+  // Aplicar filtros por nombre/título (no por ID)
+  if (book) {
+    queryBuilder.andWhere("LOWER(book.title) LIKE :book", { book: `%${book.toLowerCase()}%` });
   }
 
-  if (userId) {
-    queryBuilder.andWhere("review.userId = :userId", { userId });
+  if (user) {
+    queryBuilder.andWhere("(LOWER(user.name) LIKE :user OR LOWER(user.surname) LIKE :user)", { user: `%${user.toLowerCase()}%` });
   }
 
   // Obtener total y resultados
@@ -77,8 +77,8 @@ export const getAllReviewsAdminService = async (
     page,
     limit,
     filters: {
-      bookId: bookId || null,
-      userId: userId || null
+      book: book || null,
+      user: user || null
     }
   };
 };

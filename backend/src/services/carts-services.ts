@@ -24,6 +24,15 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
       relations: ["book"],
     });
 
+    // 🔹 Validar stock disponible
+    const currentQuantityInCart = existingCartItem ? existingCartItem.quantity : 0;
+    if (book.stock < (currentQuantityInCart + requestedQuantity)) {
+      throw { 
+        status: 409, 
+        message: "Stock insuficiente para el libro solicitado" 
+      };
+    }
+
     let cartItem: Cart;
 
     if (existingCartItem) {
@@ -132,6 +141,14 @@ export const updateCartItemQuantityService = async (
 
     if (updateCartDto.quantity <= 0) {
       throw { status: 400, message: "La cantidad debe ser mayor que 0" };
+    }
+
+    // 🔹 Validar stock disponible antes de actualizar
+    if (cartItem.book.stock < updateCartDto.quantity) {
+      throw { 
+        status: 409, 
+        message: "Stock insuficiente para el libro solicitado" 
+      };
     }
 
     cartItem.quantity = updateCartDto.quantity;

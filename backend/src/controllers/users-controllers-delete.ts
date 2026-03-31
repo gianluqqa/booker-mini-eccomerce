@@ -6,6 +6,13 @@ import { UserRole } from "../enums/UserRole";
 export const deleteUserController = async (req: Request, res: Response) => {
   try {
     const userId = req.params.id;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "Error de validación",
+        errors: ["userId es requerido"]
+      });
+    }
     const authUser = (req as any).authUser as { id: string; role: string } | undefined;
 
     // 🔹 Verificar que el usuario esté autenticado
@@ -28,7 +35,7 @@ export const deleteUserController = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: result.message,
-      data: { userId: result.userId },
+      data: { id: result.userId }
     });
   } catch (error: any) {
     if (error.status && error.message) {
@@ -69,7 +76,7 @@ export const deleteAllUsersExceptAdminController = async (req: Request, res: Res
     res.status(200).json({
       success: true,
       message: result.message,
-      data: { deletedCount: result.deletedCount },
+      data: { count: result.deletedCount }
     });
   } catch (error: any) {
     if (error.status && error.message) {

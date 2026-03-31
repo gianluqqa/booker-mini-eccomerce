@@ -97,6 +97,8 @@ const Profile = () => {
 
 
       } catch (err) {
+        // Si es un error de autenticación (401), dejamos que el modal de sesión expirada lo maneje
+        if ((err as any).isAuthError) return;
 
         const errorMessage = err instanceof Error ? err.message : 'Error al cargar los datos del perfil'
         setError(errorMessage)

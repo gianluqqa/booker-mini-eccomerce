@@ -28,8 +28,8 @@ export interface IAdminReview {
 }
 
 export interface IAdminReviewsFilters {
-  bookId?: string;
-  userId?: string;
+  book?: string;
+  user?: string;
   page?: number;
   limit?: number;
 }
@@ -40,8 +40,8 @@ export interface IAdminReviewsResponse {
   page: number;
   limit: number;
   filters: {
-    bookId: string | null;
-    userId: string | null;
+    book: string | null;
+    user: string | null;
   };
 }
 
@@ -265,20 +265,23 @@ export const getAllReviewsAdmin = async (
   try {
     // Construir query params
     const params = new URLSearchParams();
-    if (filters.bookId) params.append('bookId', filters.bookId);
-    if (filters.userId) params.append('userId', filters.userId);
+    if (filters.book) params.append('book', filters.book);
+    if (filters.user) params.append('user', filters.user);
     if (filters.page) params.append('page', filters.page.toString());
     if (filters.limit) params.append('limit', filters.limit.toString());
 
-    const response = await apiClient.get<{ 
-      success: boolean; 
-      message: string; 
-      data: IAdminReviewsResponse 
-    }>(
+    const response = await apiClient.get(
       `/reviews/admin/all?${params.toString()}`
     );
     
-    return extractData<IAdminReviewsResponse>(response);
+    const { data, meta } = response.data;
+    return {
+      reviews: data,
+      total: meta.total,
+      page: meta.page,
+      limit: meta.limit,
+      filters: meta.filters || { book: null, user: null }
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Error al cargar las reviews";
@@ -307,12 +310,13 @@ export const deleteReviewAdmin = async (reviewId: string): Promise<{ message: st
     const response = await apiClient.delete<{ 
       success: boolean; 
       message: string; 
-      data: { message: string; reviewId: string }
+      data: { id: string }
     }>(
       `/reviews/admin/${reviewId}`
     );
     
-    return extractData<{ message: string; reviewId: string }>(response);
+    const data = extractData<{ id: string }>(response);
+    return { message: "Reseña eliminada exitosamente", reviewId: data.id };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Error al eliminar la review";
