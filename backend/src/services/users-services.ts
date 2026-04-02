@@ -13,8 +13,37 @@ import { excludeSensitiveData } from "../helpers/user-helpers";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-me";
 
+//? Funciones de sanitización de datos
+const sanitizeEmail = (email: string): string => {
+  if (!email) return email;
+  return email.toLowerCase().trim();
+};
+
+const sanitizeName = (name: string): string => {
+  if (!name) return name;
+  return name.trim().replace(/\s+/g, ' ');
+};
+
+const capitalizeName = (name: string): string => {
+  if (!name) return name;
+  return name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+const sanitizeUserName = (name: string): string => {
+  if (!name) return name;
+  return capitalizeName(sanitizeName(name));
+};
+
 //? Crear un nuevo usuario (POST).
 export const registerUserService = async (user: RegisterUserDTO) => {
+  // 0️⃣ Sanitizar datos de entrada
+  const sanitizedUser = {
+    ...user,
+    email: sanitizeEmail(user.email),
+    name: sanitizeUserName(user.name),
+    surname: sanitizeUserName(user.surname),
+  };
+
   // 1️⃣ Chequear campos obligatorios faltantes
   const requiredFields: (keyof RegisterUserDTO)[] = [
     "email",
@@ -24,7 +53,7 @@ export const registerUserService = async (user: RegisterUserDTO) => {
     "surname",
   ];
   const missingFields = requiredFields.filter(
-    (f) => !user[f] || (typeof user[f] === "string" && user[f].trim() === "")
+    (f) => !sanitizedUser[f] || (typeof sanitizedUser[f] === "string" && sanitizedUser[f].trim() === "")
   );
 
   if (missingFields.length > 0) {
@@ -34,24 +63,24 @@ export const registerUserService = async (user: RegisterUserDTO) => {
   }
 
   // 2️⃣ Validación de contenido (password, email format, name, surname)
-  const errors = validateRegisterUser(user);
+  const errors = validateRegisterUser(sanitizedUser);
   if (errors.length > 0) {
     // Lanzamos el primer error encontrado para mantener consistencia
     throw new Error(errors[0]);
   }
 
-  // 3️⃣ Check duplicado
+  // 3️⃣ Check duplicado (usando email sanitizado)
   const userRepo = AppDataSource.getRepository(User);
-  const existingUser = await userRepo.findOne({ where: { email: user.email } });
+  const existingUser = await userRepo.findOne({ where: { email: sanitizedUser.email } });
   if (existingUser) throw new Error("Ya existe un usuario con ese email");
 
-  // 4️⃣ Crear usuario
-  const hashedPassword = await bcrypt.hash(user.password, 10);
+  // 4️⃣ Crear usuario con datos sanitizados
+  const hashedPassword = await bcrypt.hash(sanitizedUser.password, 10);
   const newUser = userRepo.create({
-    email: user.email,
+    email: sanitizedUser.email,
     password: hashedPassword,
-    name: user.name,
-    surname: user.surname,
+    name: sanitizedUser.name,
+    surname: sanitizedUser.surname,
     address: user.address ?? null,
     country: user.country ?? null,
     city: user.city ?? null,
@@ -69,15 +98,21 @@ export const registerUserService = async (user: RegisterUserDTO) => {
 
 //? Iniciar sesión (POST).
 export const loginUserService = async (user: LoginUserDTO) => {
+  // 0️⃣ Sanitizar email para búsqueda consistente
+  const sanitizedLoginData = {
+    ...user,
+    email: sanitizeEmail(user.email)
+  };
+
   // 1️⃣ Validación del request
-  const errors = validateLoginUser(user);
+  const errors = validateLoginUser(sanitizedLoginData);
   if (errors.length > 0) {
     throw new Error(errors[0]); // Tomar solo el primer error para consistencia
   }
 
-  // 2️⃣ Verificar que el usuario exista
+  // 2️⃣ Verificar que el usuario exista (buscando con email sanitizado)
   const userRepo = AppDataSource.getRepository(User);
-  const existingUser = await userRepo.findOne({ where: { email: user.email } });
+  const existingUser = await userRepo.findOne({ where: { email: sanitizedLoginData.email } });
   if (!existingUser) throw new Error("Credenciales inválidas");
 
   // 3️⃣ Verificar password
@@ -303,4 +338,4 @@ export const getUserFavoritesService = async (userId: string) => {
   if (!user) throw { status: 404, message: "Usuario no encontrado" };
 
   return user.favorites;
-};
+};
