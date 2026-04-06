@@ -1,9 +1,9 @@
-// Importaciones necesarias para las pruebas
-import request from "supertest"; // Librería para hacer peticiones HTTP a la API
-import { app } from "../../../src/server"; // Aplicación Express que vamos a probar
-import { AppDataSource } from "../../../src/config/data-source"; // Conexión a la base de datos
+import request from "supertest";
+import { app } from "../../../src/server";
+import { AppDataSource } from "../../../src/config/data-source";
+import { createTestUser } from "../../helpers/createTestUser";
 
-describe("Authentication - Registro (Register)", () => {
+describe("Authentication - Registro", () => {
 
   beforeAll(async () => {
     if (!AppDataSource.isInitialized) {
@@ -17,435 +17,461 @@ describe("Authentication - Registro (Register)", () => {
     }
   });
 
-  // 1. Registro Exitoso
-  let registeredEmail: string;
+  describe("Casos Exitosos (201)", () => {
+    let registeredUserEmail: string;
 
-  it("1. Registro exitoso (201)", async () => {
-    registeredEmail = `success_${Date.now()}@test.com`;
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: registeredEmail,
-        password: "Password123!",
-        confirmPassword: "Password123!",
+    it("1. debe registrar usuario con datos básicos exitosamente", async () => {
+      registeredUserEmail = `success_${Date.now()}@test.com`;
+      
+      const registrationResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          email: registeredUserEmail,
+          password: "Password123!",
+          confirmPassword: "Password123!"
+        });
+
+      // Verificar el contrato API completo
+      expect(registrationResponse.status).toBe(201);
+      expect(registrationResponse.body.success).toBe(true);
+      expect(registrationResponse.body.message).toBe("Usuario creado exitosamente");
+      expect(registrationResponse.body).toHaveProperty("data");
+      
+      // Verificar datos del usuario
+      const newUser = registrationResponse.body.data; //Resumimos creando una variable que engloba todo el body de la response.
+      expect(newUser.email).toBe(registeredUserEmail);
+      expect(newUser.name).toBe("Juan");
+      expect(newUser.surname).toBe("Perez");
+      expect(newUser.role).toBe("customer");
+      expect(newUser).toHaveProperty("id");
+      expect(newUser).not.toHaveProperty("password");
+      expect(newUser).not.toHaveProperty("confirmPassword");
+    });
+
+    it("2. debe registrar usuario con campos opcionales correctamente", async () => {
+      const optionalFieldsResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Maria",
+          surname: "Garcia",
+          email: `maria_${Date.now()}@test.com`,
+          password: "Password123!",
+          confirmPassword: "Password123!",
+          address: "Calle Principal 123",
+          country: "Argentina",
+          city: "Buenos Aires",
+          phone: "+541112345678",
+          bio: "Usuario de prueba",
+          gender: "female"
+        });
+
+      // Verificar el contrato API completo
+      expect(optionalFieldsResponse.status).toBe(201);
+      expect(optionalFieldsResponse.body.success).toBe(true);
+      expect(optionalFieldsResponse.body.message).toBe("Usuario creado exitosamente");
+      expect(optionalFieldsResponse.body).toHaveProperty("data");
+      
+      // Verificar campos opcionales
+      const userWithOptionalFields = optionalFieldsResponse.body.data;
+      expect(userWithOptionalFields.address).toBe("Calle Principal 123");
+      expect(userWithOptionalFields.country).toBe("Argentina");
+      expect(userWithOptionalFields.city).toBe("Buenos Aires");
+      expect(userWithOptionalFields.phone).toBe("+541112345678");
+      expect(userWithOptionalFields.bio).toBe("Usuario de prueba");
+      expect(userWithOptionalFields.gender).toBe("female");
+      expect(userWithOptionalFields).toHaveProperty("id");
+      expect(userWithOptionalFields).not.toHaveProperty("password");
+    });
+
+    it("3. debe rechazar registro con email duplicado", async () => {
+      const duplicateResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Otro",
+          surname: "Usuario",
+          email: registeredUserEmail, // Usar el email del test #1
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
+
+      expect(duplicateResponse.status).toBe(409);
+      expect(duplicateResponse.body.success).toBe(false);
+      expect(duplicateResponse.body.message).toBe("Ya existe un usuario con ese email");
+    });
+
+    it("4. debe rechazar email duplicado sin importar mayúsculas/minúsculas", async () => {
+      const baseEmail = `consistency${Date.now()}@test.com`;
+      
+      // Primer registro con email en mayúsculas
+      const firstRegistration = await createTestUser({
+        email: baseEmail.toUpperCase(),
+        name: "Usuario",
+        surname: "Uno"
       });
 
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty("success", true);
-    expect(response.body).toHaveProperty("message", "Usuario creado exitosamente");
-    expect(response.body).toHaveProperty("data");
-    expect(response.body.data).toHaveProperty("email", registeredEmail);
-    expect(response.body.data).toHaveProperty("name", "Juan");
-    expect(response.body.data).toHaveProperty("surname", "Perez");
-    expect(response.body.data).toHaveProperty("id");
-    expect(response.body.data).toHaveProperty("role");
-    expect(response.body.data).not.toHaveProperty("password");
+      expect(firstRegistration.email).toBe(baseEmail.toLowerCase());
+
+      // Segundo intento con mismo email en minúsculas (debería fallar)
+      const secondAttempt = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Usuario",
+          surname: "Dos",
+          email: baseEmail.toLowerCase(),
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
+
+      expect(secondAttempt.status).toBe(409);
+      expect(secondAttempt.body.message).toContain("Ya existe un usuario con ese email");
+    });
   });
 
-  // 2. Email Duplicado
-  it("2. Email duplicado (409)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Otro",
-        surname: "Usuario",
-        email: registeredEmail,
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
+  describe("Errores de Validación (400)", () => {
+    it("5. debe rechazar registro con cuerpo vacío", async () => {
+      const emptyResponse = await request(app)
+        .post("/users/register")
+        .send({});
 
-    expect(response.status).toBe(409);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Ya existe un usuario con ese email");
+      expect(emptyResponse.status).toBe(400);
+      expect(emptyResponse.body.success).toBe(false);
+      expect(emptyResponse.body.message).toBe("Error de validación");
+      expect(emptyResponse.body).toHaveProperty("errors");
+      expect(emptyResponse.body.errors).toContain(
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"
+      );
+    });
+
+    it("6. debe rechazar registro sin email", async () => {
+      const noEmailResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          password: "Password123!",
+          confirmPassword: "Password123!"
+        });
+
+      expect(noEmailResponse.status).toBe(400);
+      expect(noEmailResponse.body.success).toBe(false);
+      expect(noEmailResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+    });
+
+    it("7. debe rechazar registro sin contraseña", async () => {
+      const noPasswordResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          email: "test@test.com",
+          confirmPassword: "Password123!"
+        });
+
+      expect(noPasswordResponse.status).toBe(400);
+      expect(noPasswordResponse.body.success).toBe(false);
+      expect(noPasswordResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+    });
+
+    it("8. debe rechazar registro sin confirmación de contraseña", async () => {
+      const noConfirmResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          email: "test@test.com",
+          password: "Password123!"
+        });
+
+      expect(noConfirmResponse.status).toBe(400);
+      expect(noConfirmResponse.body.success).toBe(false);
+      expect(noConfirmResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+    });
+
+    it("9. debe rechazar registro sin nombre", async () => {
+      const noNameResponse = await request(app)
+        .post("/users/register")
+        .send({
+          surname: "Perez",
+          email: "test@test.com",
+          password: "Password123!",
+          confirmPassword: "Password123!"
+        });
+
+      expect(noNameResponse.status).toBe(400);
+      expect(noNameResponse.body.success).toBe(false);
+      expect(noNameResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+    });
+
+    it("10. debe rechazar registro sin apellido", async () => {
+      const noSurnameResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          email: "test@test.com",
+          password: "Password123!",
+          confirmPassword: "Password123!"
+        });
+
+      expect(noSurnameResponse.status).toBe(400);
+      expect(noSurnameResponse.body.success).toBe(false);
+      expect(noSurnameResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+    });
+
+    it("11. debe rechazar registro con formato de email inválido", async () => {
+      const invalidEmails = [
+        "correo-sin-arroba",
+        "email@sin-punto",
+        "email con espacios@test.com",
+        "@sin-usuario.com",
+        "usuario@.com"
+      ];
+
+      for (const invalidEmail of invalidEmails) {
+        const invalidEmailResponse = await request(app)
+          .post("/users/register")
+          .send({
+            name: "Juan",
+            surname: "Perez",
+            email: invalidEmail,
+            password: "Password123!",
+            confirmPassword: "Password123!",
+          });
+
+        expect(invalidEmailResponse.status).toBe(400);
+        expect(invalidEmailResponse.body.success).toBe(false);
+        expect(invalidEmailResponse.body.message).toBe("El formato del email es inválido");
+      }
+    });
+
+    it("12. debe rechazar registro con email vacío", async () => {
+      const emptyEmailResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          email: "   ",
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
+
+      expect(emptyEmailResponse.status).toBe(400);
+      expect(emptyEmailResponse.body.success).toBe(false);
+      expect(emptyEmailResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+    });
+
+    it("13. debe rechazar registro con contraseña sin complejidad", async () => {
+      const simplePasswordResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          email: "pass@test.com",
+          password: "solo_minusculas",
+          confirmPassword: "solo_minusculas",
+        });
+
+      expect(simplePasswordResponse.status).toBe(400);
+      expect(simplePasswordResponse.body.success).toBe(false);
+      expect(simplePasswordResponse.body.message).toBe("La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número");
+    });
+
+    it("14. debe rechazar registro con contraseña demasiado corta", async () => {
+      const shortPasswordResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          email: "short@test.com",
+          password: "Corta1!",
+          confirmPassword: "Corta1!",
+        });
+
+      expect(shortPasswordResponse.status).toBe(400);
+      expect(shortPasswordResponse.body.success).toBe(false);
+      expect(shortPasswordResponse.body.message).toContain("al menos 8 caracteres");
+    });
+
+    it("15. debe rechazar registro con contraseñas que no coinciden", async () => {
+      const mismatchPasswordResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez",
+          email: "mismatch@test.com",
+          password: "Password123!",
+          confirmPassword: "Different123!",
+        });
+
+      expect(mismatchPasswordResponse.status).toBe(400);
+      expect(mismatchPasswordResponse.body.success).toBe(false);
+      expect(mismatchPasswordResponse.body.message).toBe("Las contraseñas no coinciden");
+    });
+
+    it("16. debe rechazar registro con nombre que contiene números", async () => {
+      const numericNameResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan123",
+          surname: "Perez",
+          email: "name@test.com",
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
+
+      expect(numericNameResponse.status).toBe(400);
+      expect(numericNameResponse.body.success).toBe(false);
+      expect(numericNameResponse.body.message).toBe("El nombre solo puede contener letras y espacios");
+    });
+
+    it("17. debe rechazar registro con apellido que contiene números", async () => {
+      const numericSurnameResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Juan",
+          surname: "Perez99",
+          email: "surname@test.com",
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
+
+      expect(numericSurnameResponse.status).toBe(400);
+      expect(numericSurnameResponse.body.success).toBe(false);
+      expect(numericSurnameResponse.body.message).toBe("El apellido solo puede contener letras y espacios");
+    });
   });
 
-  // 3. Body Vacío
-  it("3. Body vacío (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({});
+  describe("Estructura y Tipos de Datos", () => {
+    it("18. debe verificar estructura de respuesta exitosa", async () => {
+      const successStructureResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Test",
+          surname: "Structure",
+          email: `structure_${Date.now()}@test.com`,
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
 
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("success", false);
-    expect(response.body).toHaveProperty("message", "Error de validación");
-    expect(response.body).toHaveProperty("errors");
-    expect(response.body.errors).toContain(
-      "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"
-    );
-  });
+      expect(successStructureResponse.status).toBe(201);
+      expect(Object.keys(successStructureResponse.body)).toEqual(["success", "message", "data"]);
+      expect(typeof successStructureResponse.body.success).toBe("boolean");
+      expect(typeof successStructureResponse.body.message).toBe("string");
+      expect(typeof successStructureResponse.body.data).toBe("object");
+    });
 
-  // 4. Falta Email
-  it("4. Falta email (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        password: "Password123!",
-        confirmPassword: "Password123!"
-      });
+    it("19. debe verificar estructura de respuesta de error", async () => {
+      const errorStructureResponse = await request(app)
+        .post("/users/register")
+        .send({});
 
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
-  });
+      expect(errorStructureResponse.status).toBe(400);
+      expect(errorStructureResponse.body).toHaveProperty("success", false);
+      expect(errorStructureResponse.body).toHaveProperty("message");
+      expect(typeof errorStructureResponse.body.message).toBe("string");
 
-  // 5. Falta Contraseña
-  it("5. Falta contraseña (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: "test@test.com",
-        confirmPassword: "Password123!"
-      });
+      if (errorStructureResponse.body.message === "Error de validación") {
+        expect(errorStructureResponse.body).toHaveProperty("errors");
+        expect(Array.isArray(errorStructureResponse.body.errors)).toBe(true);
+      }
+    });
 
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
-  });
-
-  // 6. Falta Confirmación de Contraseña
-  it("6. Falta confirmación de contraseña (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: "test@test.com",
-        password: "Password123!"
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
-  });
-
-  // 7. Falta Nombre
-  it("7. Falta nombre (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        surname: "Perez",
-        email: "test@test.com",
-        password: "Password123!",
-        confirmPassword: "Password123!"
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
-  });
-
-  // 8. Falta Apellido
-  it("8. Falta apellido (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        email: "test@test.com",
-        password: "Password123!",
-        confirmPassword: "Password123!"
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
-  });
-
-  // 9. Email Inválido
-  it("9. Email inválido (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: "correo-invalido",
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("El formato del email es inválido");
-  });
-
-  // 10. Email Vacío
-  it("10. Email vacío (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: "   ",
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
-  });
-
-  // 11. Contraseña Sin Complejidad
-  it("11. Contraseña sin complejidad (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: "pass@test.com",
-        password: "solo_minusculas",
-        confirmPassword: "solo_minusculas",
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número");
-  });
-
-  // 12. Contraseña Demasiado Corta
-  it("12. Contraseña demasiado corta (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: "short@test.com",
-        password: "Corta1!",
-        confirmPassword: "Corta1!",
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toContain("al menos 8 caracteres");
-  });
-
-  // 13. Contraseñas No Coinciden
-  it("13. Contraseñas no coinciden (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez",
-        email: "mismatch@test.com",
-        password: "Password123!",
-        confirmPassword: "Different123!",
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("Las contraseñas no coinciden");
-  });
-
-  // 14. Nombre con Números
-  it("14. Nombre con números (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan123",
-        surname: "Perez",
-        email: "name@test.com",
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("El nombre solo puede contener letras y espacios");
-  });
-
-  // 15. Apellido con Números
-  it("15. Apellido con números (400)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Juan",
-        surname: "Perez99",
-        email: "surname@test.com",
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
-
-    expect(response.status).toBe(400);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toBe("El apellido solo puede contener letras y espacios");
-  });
-
-  // 16. Registro con Campos Opcionales
-  it("16. Registro con campos opcionales (201)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Maria",
-        surname: "Garcia",
-        email: `maria_${Date.now()}@test.com`,
-        password: "Password123!",
-        confirmPassword: "Password123!",
-        address: "Calle Principal 123",
-        country: "Argentina",
-        city: "Buenos Aires",
-        phone: "+541112345678",
-        bio: "Usuario de prueba",
-        gender: "female" // Corregido: usar valor del enum
-      });
-
-    expect(response.status).toBe(201);
-    expect(response.body.success).toBe(true);
-    expect(response.body.data).toHaveProperty("address", "Calle Principal 123");
-    expect(response.body.data).toHaveProperty("country", "Argentina");
-    expect(response.body.data).toHaveProperty("city", "Buenos Aires");
-    expect(response.body.data).toHaveProperty("phone", "+541112345678");
-    expect(response.body.data).toHaveProperty("bio", "Usuario de prueba");
-    expect(response.body.data).toHaveProperty("gender", "female");
-  });
-
-  // 17. Email Duplicado Case Insensitive
-  it("17. Email duplicado case insensitive (409)", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Otro",
-        surname: "Usuario",
-        email: registeredEmail.toLowerCase(), // Convertir a minúsculas para asegurar duplicado
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
-
-    expect(response.status).toBe(409);
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toContain("Ya existe un usuario");
-  });
-
-  // 18. Estructura de Respuesta Exitosa
-  it("18. Estructura de respuesta exitosa", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Test",
-        surname: "Structure",
-        email: `structure_${Date.now()}@test.com`,
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
-
-    expect(response.status).toBe(201);
-    expect(Object.keys(response.body)).toEqual(["success", "message", "data"]);
-    expect(typeof response.body.success).toBe("boolean");
-    expect(typeof response.body.message).toBe("string");
-    expect(typeof response.body.data).toBe("object");
-  });
-
-  // 19. Estructura de Respuesta de Error
-  it("19. Estructura de respuesta de error", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({});
-
-    expect(response.status).toBe(400);
-    expect(response.body).toHaveProperty("success", false);
-    expect(response.body).toHaveProperty("message");
-    expect(typeof response.body.message).toBe("string");
-
-    if (response.body.message === "Error de validación") {
-      expect(response.body).toHaveProperty("errors");
-      expect(Array.isArray(response.body.errors)).toBe(true);
-    }
-  });
-
-  // 20. Tipos de Datos Correctos
-  it("20. Tipos de datos correctos", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
+    it("20. debe verificar tipos de datos correctos en respuesta", async () => {
+      const userWithCorrectTypes = await createTestUser({
         name: "Types",
         surname: "Test",
-        email: `types_${Date.now()}@test.com`,
-        password: "Password123!",
-        confirmPassword: "Password123!",
+        email: `types_${Date.now()}@test.com`
       });
 
-    expect(response.status).toBe(201);
-    expect(typeof response.body.data.id).toBe("string"); // El ID viene como string desde la base de datos
-    expect(typeof response.body.data.name).toBe("string");
-    expect(typeof response.body.data.surname).toBe("string");
-    expect(typeof response.body.data.email).toBe("string");
-    expect(typeof response.body.data.role).toBe("string");
-    expect(response.body.data.address).toBe(null); // Los campos opcionales vienen como null, no undefined
-    expect(response.body.data.country).toBe(null);
-  });
+      expect(typeof userWithCorrectTypes.id).toBe("string");
+      expect(typeof userWithCorrectTypes.name).toBe("string");
+      expect(typeof userWithCorrectTypes.surname).toBe("string");
+      expect(typeof userWithCorrectTypes.email).toBe("string");
+      expect(typeof userWithCorrectTypes.role).toBe("string");
+      expect(userWithCorrectTypes.address).toBe(null);
+      expect(userWithCorrectTypes.country).toBe(null);
+    });
 
-  // 21. No Exponer Contraseña
-  it("21. No exponer contraseña", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
+    it("21. debe garantizar que las contraseñas no se expongan", async () => {
+      const userWithSecurityTest = await createTestUser({
         name: "Security",
         surname: "Test",
-        email: `security_${Date.now()}@test.com`,
-        password: "Password123!",
-        confirmPassword: "Password123!",
+        email: `security_${Date.now()}@test.com`
       });
 
-    expect(response.status).toBe(201);
-    const responseString = JSON.stringify(response.body);
-    expect(responseString).not.toContain("Password123!");
-    expect(response.body.data).not.toHaveProperty("password");
-    expect(response.body.data).not.toHaveProperty("confirmPassword");
+      // Verificar que el helper no expone contraseñas
+      expect(userWithSecurityTest).not.toHaveProperty("password");
+      expect(userWithSecurityTest).not.toHaveProperty("confirmPassword");
+      
+      // Verificación adicional con request directo para confirmar seguridad en respuesta HTTP
+      const securityResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "SecurityCheck",
+          surname: "Test",
+          email: `security_check_${Date.now()}@test.com`,
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
+
+      expect(securityResponse.status).toBe(201);
+      const responseString = JSON.stringify(securityResponse.body);
+      expect(responseString).not.toContain("Password123!");
+      expect(securityResponse.body.data).not.toHaveProperty("password");
+      expect(securityResponse.body.data).not.toHaveProperty("confirmPassword");
+    });
   });
 
-  // 22. Sanitización de Datos
-  it("22. Sanitización de datos", async () => {
-    const response = await request(app)
-      .post("/users/register")
-      .send({
-        name: "             JUAN             ",
-        surname: "    perez    ",
-        email: `TEST${Date.now()}@GMAIL.COM`,
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
+  describe("Sanitización y Consistencia", () => {
+    it("22. debe sanitizar datos correctamente", async () => {
+      const sanitizationResponse = await request(app)
+        .post("/users/register")
+        .send({
+          name: "             JUAN             ",
+          surname: "    perez    ",
+          email: `TEST${Date.now()}@GMAIL.COM`,
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
 
-    expect(response.status).toBe(201);
+      expect(sanitizationResponse.status).toBe(201);
 
-    // Verifica que los datos se sanitizan correctamente
-    expect(response.body.data.name).toBe("Juan");        // Espacios eliminados y capitalizado
-    expect(response.body.data.surname).toBe("Perez");     // Espacios eliminados y capitalizado
-    expect(response.body.data.email).toMatch(/test\d+@gmail\.com$/); // Minúsculas
-  });
+      // Verifica que los datos se sanitizan correctamente
+      expect(sanitizationResponse.body.data.name).toBe("Juan");
+      expect(sanitizationResponse.body.data.surname).toBe("Perez");
+      expect(sanitizationResponse.body.data.email).toMatch(/test\d+@gmail\.com$/);
+    });
 
-  // 23. Consistencia de Email - Evitar Duplicados
-  it("23. Consistencia de Email - Evitar Duplicados", async () => {
-    const baseEmail = `consistency${Date.now()}@test.com`;
-    
-    // Primer registro con email en mayúsculas
-    const response1 = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Usuario",
-        surname: "Uno",
-        email: baseEmail.toUpperCase(), // "CONSISTENCY...@TEST.COM"
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
+    it("23. debe mantener consistencia de email y evitar duplicados", async () => {
+      const baseEmail = `consistency${Date.now()}@test.com`;
+      
+      // Primer registro con email en mayúsculas
+      const firstRegistration = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Usuario",
+          surname: "Uno",
+          email: baseEmail.toUpperCase(),
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
 
-    expect(response1.status).toBe(201);
+      expect(firstRegistration.status).toBe(201);
 
-    // Segundo intento con mismo email en minúsculas (debería fallar)
-    const response2 = await request(app)
-      .post("/users/register")
-      .send({
-        name: "Usuario",
-        surname: "Dos",
-        email: baseEmail.toLowerCase(), // "consistency...@test.com"
-        password: "Password123!",
-        confirmPassword: "Password123!",
-      });
+      // Segundo intento con mismo email en minúsculas (debería fallar)
+      const secondAttempt = await request(app)
+        .post("/users/register")
+        .send({
+          name: "Usuario",
+          surname: "Dos",
+          email: baseEmail.toLowerCase(),
+          password: "Password123!",
+          confirmPassword: "Password123!",
+        });
 
-    expect(response2.status).toBe(409);
-    expect(response2.body.message).toContain("Ya existe un usuario con ese email");
+      expect(secondAttempt.status).toBe(409);
+      expect(secondAttempt.body.message).toContain("Ya existe un usuario con ese email");
+    });
   });
 });
