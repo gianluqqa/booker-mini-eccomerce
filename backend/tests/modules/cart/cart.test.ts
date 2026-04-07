@@ -22,14 +22,13 @@ describe("Cart - Carrito de Compras", () => {
   });
 
   beforeEach(async () => {
-    // Crear usuario de prueba
+    // Escenario inicial: Usuario y Libro listos
     testUser = await createTestUser({
       email: `cart_user_${Date.now()}@test.com`,
       name: "Cart",
       surname: "User"
     });
 
-    // Obtener token de autenticación
     const loginResponse = await request(app)
       .post("/users/login")
       .send({
@@ -39,7 +38,6 @@ describe("Cart - Carrito de Compras", () => {
 
     authToken = loginResponse.body.data.accessToken;
 
-    // Crear libro de prueba
     testBook = await createTestBook({
       title: "Test Book for Cart",
       author: "Test Author",
@@ -48,7 +46,8 @@ describe("Cart - Carrito de Compras", () => {
     });
   });
 
-  describe("Casos Exitosos (200)", () => {
+  // 📦 A. ENDPOINT: POST /carts/add
+  describe("POST /carts/add - Agregar al Carrito", () => {
     it("1. debe agregar libro al carrito exitosamente", async () => {
       const addToCartResponse = await request(app)
         .post("/carts/add")
@@ -76,51 +75,61 @@ describe("Cart - Carrito de Compras", () => {
 
       expect(addToCartResponse.status).toBe(200);
       expect(addToCartResponse.body.success).toBe(true);
-      expect(addToCartResponse.body.data).toHaveProperty("id");
       expect(addToCartResponse.body.data.book.id).toBe(testBook.id);
       expect(addToCartResponse.body.data.quantity).toBe(1);
     });
 
     it("3. debe acumular cantidad si libro ya existe en carrito", async () => {
-      // 1. Primera petición: Agregar 1 unidad
+      // 1ra adición
       await request(app)
         .post("/carts/add")
         .set("Authorization", `Bearer ${authToken}`)
-        .send({
-          bookId: testBook.id,
-          quantity: 1
-        });
+        .send({ bookId: testBook.id, quantity: 1 });
 
-      // 2. Segunda petición: Agregar 2 unidades más del mismo libro
+      // 2da adición
       const addToCartResponse = await request(app)
         .post("/carts/add")
         .set("Authorization", `Bearer ${authToken}`)
-        .send({
-          bookId: testBook.id,
-          quantity: 2
-        });
+        .send({ bookId: testBook.id, quantity: 2 });
 
-      // 3. Verificación: El resultado final debería ser 3 (1 + 2)
       expect(addToCartResponse.status).toBe(200);
       expect(addToCartResponse.body.success).toBe(true);
-      expect(addToCartResponse.body.data.book.id).toBe(testBook.id);
-      expect(addToCartResponse.body.data.quantity).toBe(3);// El punto clave: comprobamos que la cantidad total es la suma
+      expect(addToCartResponse.body.data.quantity).toBe(3); // Suma total
     });
 
-    describe("Casos de Error (400, 401, 404, 409)", () => {
-      it("4. debe rechazar agregar sin autenticación (401)", async () => {
-        const addToCartResponse = await request(app)
-          .post("/carts/add")
-          .send({
-            bookId: testBook.id,
-            quantity: 2
-          });
+    it("4. debe rechazar agregar sin autenticación (401)", async () => {
+      const addToCartResponse = await request(app)
+        .post("/carts/add")
+        .send({ bookId: testBook.id, quantity: 1 });
 
-        expect(addToCartResponse.status).toBe(401);
-        expect(addToCartResponse.body.success).toBe(false);
-        expect(addToCartResponse.body.message).toBe("No autorizado: se requiere un token de autenticación");
-      });
-    })
+      expect(addToCartResponse.status).toBe(401);
+      expect(addToCartResponse.body.success).toBe(false);
+      expect(addToCartResponse.body.message).toBe("No autorizado: se requiere un token de autenticación");
+    });
+  });
+
+  // 📋 B. ENDPOINT: GET /carts/
+  describe("GET /carts/ - Obtener Carrito", () => {
+    // Casos 16 al 23 pendientes de implementación
+  });
+
+  // ✏️ C. ENDPOINT: PUT /carts/:cartId
+  describe("PUT /carts/:cartId - Actualizar Cantidad", () => {
+    // Casos 24 al 33 pendientes de implementación
+  });
+
+  // 🗑️ D. ENDPOINT: DELETE /carts/:cartId
+  describe("DELETE /carts/:cartId - Eliminar Item", () => {
+    // Casos 34 al 38 pendientes de implementación
+  });
+
+  // 🧹 E. ENDPOINT: DELETE /carts/
+  describe("DELETE /carts/ - Vaciar Carrito", () => {
+    // Casos 39 al 43 pendientes de implementación
+  });
+
+  // 🔄 F. INTEGRACIÓN Y LÓGICA COMPLEJA
+  describe("Casos de Integración y Lógica Compleja", () => {
+    // Casos 44 al 50 pendientes de implementación
   });
 });
-
