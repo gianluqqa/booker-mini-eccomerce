@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { addBookToCartService, getUserCartService, updateCartItemQuantityService, removeBookFromCartService, clearCartService } from "../services/carts-services";
 import { AddToCartDto, UpdateCartDto } from "../dto/CartDto";
+import { validateAddToCart, validateCartId, validateUpdateCart } from "../middlewares/validateCart";
 
 //? Añadir un libro al carrito (POST).
 export const addBookToCartController = async (req: Request, res: Response) => {
@@ -17,20 +18,14 @@ export const addBookToCartController = async (req: Request, res: Response) => {
 
     const { bookId, quantity } = req.body as AddToCartDto;
 
-    // Validaciones básicas
-    if (!bookId) {
-      return res.status(400).json({
-        success: false,
-        message: "Error de validación",
-        errors: ["bookId es requerido"]
-      });
-    }
+    // 🔹 Validar los campos del Carrito.
+    const errors = validateAddToCart(req.body);
 
-    if (quantity !== undefined && (quantity <= 0 || !Number.isInteger(quantity))) {
+    if (errors.length > 0) {
       return res.status(400).json({
         success: false,
         message: "Error de validación",
-        errors: ["La cantidad debe ser un número entero positivo"]
+        errors,
       });
     }
 
@@ -116,18 +111,14 @@ export const updateCartItemQuantityController = async (req: Request, res: Respon
     const cartId = req.params.cartId;
     const { quantity } = req.body as UpdateCartDto;
 
-    if (!cartId) {
-      return res.status(400).json({
-        success: false,
-        message: "cartId es requerido",
-      });
-    }
+    // 🔹 Validar los campos de actualización.
+    const errors = validateUpdateCart(cartId, req.body);
 
-    if (!quantity || quantity <= 0 || !Number.isInteger(quantity)) {
+    if (errors.length > 0) {
       return res.status(400).json({
         success: false,
         message: "Error de validación",
-        errors: ["La cantidad debe ser un número entero positivo"]
+        errors,
       });
     }
 
@@ -168,10 +159,14 @@ export const removeBookFromCartController = async (req: Request, res: Response) 
 
     const cartId = req.params.cartId;
 
-    if (!cartId) {
+    // 🔹 Validar cartId.
+    const errors = validateCartId(cartId);
+
+    if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: "cartId es requerido",
+        message: "Error de validación",
+        errors,
       });
     }
 

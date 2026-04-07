@@ -71,8 +71,10 @@ export const addBookToCartService = async (userId: string, addToCartDto: AddToCa
       createdAt: savedCartItem.createdAt,
       updatedAt: savedCartItem.updatedAt,
     };
-  } catch (error: any) {
-    console.error("Error adding book to cart:", error);
+    } catch (error: any) {
+    if (!error.status || error.status >= 500) {
+      console.error("Error adding book to cart:", error);
+    }
     if (error.status && error.message) throw error;
     throw { status: 500, message: "No se pudo agregar el libro al carrito" };
   }
@@ -115,8 +117,11 @@ export const getUserCartService = async (userId: string): Promise<CartResponseDt
       totalItems,
       totalPrice: Number(totalPrice.toFixed(2)),
     };
-  } catch (error) {
-    console.error("Error getting user cart:", error);
+  } catch (error: any) {
+    if (!error.status || error.status >= 500) {
+      console.error("Error getting user cart:", error);
+    }
+    if (error.status && error.message) throw error;
     throw { status: 500, message: "No se pudo obtener el carrito del usuario" };
   }
 };
@@ -169,7 +174,9 @@ export const updateCartItemQuantityService = async (
       updatedAt: updatedCartItem.updatedAt,
     };
   } catch (error: any) {
-    console.error("Error updating cart item:", error);
+    if (!error.status || error.status >= 500) {
+      console.error("Error updating cart item:", error);
+    }
     if (error.status && error.message) throw error;
     throw { status: 500, message: "No se pudo actualizar el item del carrito" };
   }
@@ -194,7 +201,9 @@ export const removeBookFromCartService = async (
 
     await cartRepository.remove(cartItem);
   } catch (error: any) {
-    console.error("Error removing book from cart:", error);
+    if (!error.status || error.status >= 500) {
+      console.error("Error removing book from cart:", error);
+    }
     if (error.status && error.message) throw error;
     throw { status: 500, message: "No se pudo eliminar el libro del carrito" };
   }
@@ -216,8 +225,11 @@ export const clearCartService = async (userId: string): Promise<number> => {
     }
 
     return deletedCount;
-  } catch (error) {
-    console.error("Error clearing cart:", error);
+  } catch (error: any) {
+    if (!error.status || error.status >= 500) {
+      console.error("Error clearing cart:", error);
+    }
+    if (error.status && error.message) throw error;
     throw { status: 500, message: "No se pudo vaciar el carrito" };
   }
 };

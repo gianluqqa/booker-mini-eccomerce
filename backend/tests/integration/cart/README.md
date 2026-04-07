@@ -21,7 +21,7 @@
    - Response: `200`, `{ "success": true, "data": { "quantity": 3 } }`
 4. **debe rechazar agregar sin autenticación (401)**
    - Response: `401`, `{ "success": false, "message": "No autorizado: se requiere un token de autenticación" }`
-5. **debe rechazar agregar con token inválido**
+5. **debe rechazar agregar libro con token inválido**
    - Response: `401`, `{ "success": false, "message": "No autorizado: token inválido o expirado" }`
 6. **debe rechazar si falta el bookId**
    - Response: `400`, `{ "success": false, "message": "Error de validación", "errors": ["bookId es requerido"] }`
@@ -29,7 +29,7 @@
    - Response: `400`, `{ "success": false, "message": "Error de validación", "errors": ["bookId debe ser un UUID válido"] }`
 8. **debe rechazar si el libro no existe en la base de datos**
    - Response: `404`, `{ "success": false, "message": "Libro no encontrado" }`
-9. **debe rechazar si la cantidad es menor a 1**
+9. **debe rechazar si la cantidad de un libro es menor a 1**
    - Response: `400`, `{ "success": false, "message": "Error de validación", "errors": ["La cantidad debe ser un número entero positivo"] }`
 10. **debe rechazar si la cantidad no es un número entero**
     - Response: `400`, `{ "success": false, "message": "Error de validación", "errors": ["La cantidad debe ser un número entero positivo"] }`
