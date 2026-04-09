@@ -5,16 +5,38 @@ import { createTestUser } from "../../helpers/createTestUser";
 import { createTestBook } from "../../helpers/createTestBook";
 import { addToCart } from "../../helpers/addToCart";
 import { getCart } from "../../helpers/getCart";
+import { updateCart } from "../../helpers/updateCart";
+import { deleteCartItem } from "../../helpers/deleteCartItem";
+import { clearCart } from "../../helpers/clearCart";
+import { loginUser } from "../../helpers/loginUser";
 import { validateCartItemContract, validateFullCartContract, validateErrorResponse } from "../../helpers/cartValidationHelpers";
-
 import { Order } from "../../../src/entities/Order";
-
-
 import { OrderStatus } from "../../../src/enums/OrderStatus";
 
-
+/**
+ * ================================================================================================
+ * 🚀 GUÍA DE ARQUITECTURA DE PRUEBAS - "ESTADO GLOBAL AUTOMÁTICO"
+ * ================================================================================================
+ * IMPORTANTE: No necesitas repetir el flujo de creación de usuario o libro en cada test.
+ * Gracias al bloque 'beforeEach' (línea 46), cada vez que comienza un test ("it"), 
+ * el sistema ejecuta automáticamente lo siguiente por ti:
+ *
+ * 1️⃣  USUARIO FRESCO (testUser): Se crea un usuario único en la base de datos.
+ * 2️⃣  LOGIN EXITOSO (authToken): Se obtiene el token de acceso para ese usuario. 
+ *     Usa 'authToken' como segundo argumento en tus helpers (addToCart, getCart, etc).
+ * 3️⃣  LIBRO DISPONIBLE (testBook): Se crea un libro con Title: "Test Book...", Price: 29.99 
+ *     y STOCK: 10. ¡Ideal para pruebas de stock!
+ * 4️⃣  AISLAMIENTO TOTAL: La base de datos es independiente para cada test. Lo que hagas 
+ *     en un "it" no afecta al siguiente.
+ *
+ * 💡 REGLA DE ORO: 
+ * Solo crea un nuevo usuario o libro manualmente SI tu prueba requiere comparar 
+ * dos entidades distintas (ej. el Test 27 de seguridad).
+ * ================================================================================================
+ */
 
 describe("Cart - Carrito de Compras", () => {
+
   let testUser: any;
   let authToken: string;
   let testBook: any;
@@ -69,7 +91,6 @@ describe("Cart - Carrito de Compras", () => {
       expect(addToCartResponse.body.success).toBe(true);
       validateCartItemContract(addToCartResponse.body.data); // 🛡️ Validación de Contrato
       expect(addToCartResponse.body.data.book.id).toBe(testBook.id);
-
       expect(addToCartResponse.body.data.quantity).toBe(2);
     });
 
@@ -406,57 +427,240 @@ describe("Cart - Carrito de Compras", () => {
 
   // ✏️ C. ENDPOINT: PUT /carts/:cartId
   describe("PUT /carts/:cartId - Actualizar Cantidad", () => {
-    /*
+
     it("24. debe incrementar la cantidad exitosamente", async () => {
+      // 1. Agregamos un libro y CAPTURAMOS el ID que nos devuelva el backend
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addResponse.body.data.id;
+
+      // 2. Usamos el nuevo helper mandando ese ID real
+      const updateResponse = await updateCart(app, authToken, cartId, 3);
+
+      // 3. Validamos contrato y lógica
+      expect(updateResponse.status).toBe(200);
+      validateCartItemContract(updateResponse.body.data);
+      expect(updateResponse.body.data.quantity).toBe(3);
     });
-  
+
+
     it("25. debe decrementar la cantidad exitosamente", async () => {
+      // 1. Agregamos un libro y CAPTURAMOS el ID que nos devuelva el backend
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
+      const cartId = addResponse.body.data.id;
+
+      // 2. Bajamos la cantidad a 3 el nuevo helper mandando ese ID real
+      const updateResponse = await updateCart(app, authToken, cartId, 3);
+
+      // 3. Validamos contrato y lógica
+      expect(updateResponse.status).toBe(200);
+      validateCartItemContract(updateResponse.body.data);
+      expect(updateResponse.body.data.quantity).toBe(3);
     });
-  
+
     it("26. debe rechazar si el cartId es inválido", async () => {
+      const invalidCartId = "esto-no-es-un-uuid"
+
+      const updateResponse = await updateCart(app, authToken, invalidCartId, 5);
+
+      validateErrorResponse(updateResponse, 400, "Error de validación");
+
+      expect(updateResponse.body.errors).toContain("cartId debe ser un UUID válido");
     });
-  
+
     it("27. debe rechazar si el item no existe o no pertenece al usuario", async () => {
+      //No es necesario crear dos users ya que al principio del archivo ejecuto functiones que crea un usuario, añade un libro, etc.
+
+      // ESCENARIO A: El item tiene formato válido pero no existe en la BD
+      const nonExistentId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+      const responseNotFound = await updateCart(app, authToken, nonExistentId, 5);
+
+      // Usamos tu helper de contrato de error
+      validateErrorResponse(responseNotFound, 404, "Item del carrito no encontrado");
+
+      // ESCENARIO B: El item existe pero le pertenece a otro usuario (Prueba de Seguridad)
+      // 1. Creamos otro usuario rápido con tu helper
+      const otherUser = await createTestUser({ email: `other${Date.now()}@test.com` });
+
+      // 2. Necesitamos el token de ese otro usuario para que pueda agregar algo a su carrito
+      // (Aquí usamos el login para obtener su authToken)
+      const loginRes = await request(app).post("/users/login").send({
+        email: otherUser.email,
+        password: "Password123!"
+      });
+      const otherToken = loginRes.body.data.accessToken;
+
+      // 3. Ese otro usuario agrega un libro y obtenemos SU cartId
+      const addResponse = await addToCart(app, otherToken, { bookId: testBook.id, quantity: 1 });
+      const otherCartId = addResponse.body.data.id;
+
+      // 4. EL TEST CLAVE: Intentamos actualizar con el TOKEN del usuario principal (authToken)
+      // el item que le pertenece al otro (otherCartId)
+      const hackResponse = await updateCart(app, authToken, otherCartId, 10);
+
+      // 5. Según tu contrato, debe dar 404 "no encontrado" para proteger la privacidad
+      validateErrorResponse(hackResponse, 404, "Item del carrito no encontrado");
     });
-  
+
+
     it("28. debe rechazar si la nueva cantidad supera el stock", async () => {
+      // 1. Agregamos un libro y CAPTURAMOS el ID que nos devuelva el backend
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addResponse.body.data.id;
+
+      // 2. Intentamos subir a una cantidad mayor al stock (testBook.stock es 10)
+      const updateResponse = await updateCart(app, authToken, cartId, 11);
+
+      // 3. Validamos que rechace con 409 según el contrato
+      validateErrorResponse(updateResponse, 409, "Stock insuficiente para el libro solicitado");
     });
-  
+
     it("29. debe rechazar si la cantidad es 0 o negativa", async () => {
+      // 1. Usamos el 'testBook' que ya existe y lo añadimos al carrito
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
+      const cartId = addResponse.body.data.id;
+
+      // 2. Intentamos actualizar a 0 y a un número negativo
+      const responseZero = await updateCart(app, authToken, cartId, 0);
+      const responseNegative = await updateCart(app, authToken, cartId, -5);
+
+      // 3. Validamos rechazo de cantidad 0
+      validateErrorResponse(responseZero, 400, "Error de validación");
+      expect(responseZero.body.errors).toContain("La cantidad debe ser un número entero positivo");
+
+      // 4. Validamos rechazo de cantidad negativa
+      validateErrorResponse(responseNegative, 400, "Error de validación");
+      expect(responseNegative.body.errors).toContain("La cantidad debe ser un número entero positivo");
     });
-  
+
+
     it("30. debe rechazar si hay una orden pendiente", async () => {
+      // 1. Primero agregamos el libro (mientras el carrito está libre, osea hay que llenar el cart de algo para poder rechazar otra orden)
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addResponse.body.data.id;
+
+      // 2. Ahora creamos la orden pendiente para BLOQUEAR el carrito
+      const orderRepository = AppDataSource.getRepository(Order);
+      const pendingOrder = orderRepository.create({
+        user: { id: testUser.id },
+        status: OrderStatus.PENDING,
+        total: 100.0,
+      });
+      await orderRepository.save(pendingOrder); // la guardamos en la base de datos del user.
+
+      // 3. INTENTO DE ACTUALIZACIÓN (PUT): Aquí es donde el test se vuelve diferente al 12
+      const updateResponse = await updateCart(app, authToken, cartId, 5);
+
+      // 4. Validamos que el bloqueo funcione para el PUT también
+      validateErrorResponse(updateResponse, 409, "Tienes una orden pendiente en proceso");
     });
-  
+
+
     it("31. debe confirmar la actualización con un mensaje de éxito", async () => {
+      const addRes = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addRes.body.data.id;
+
+      const updateRes = await updateCart(app, authToken, cartId, 3);
+
+      expect(updateRes.status).toBe(200);
+      expect(updateRes.body.message).toBe("Item del carrito actualizado exitosamente");
     });
-  
-    it("32. debe actualizar el precio total del item en la respuesta", async () => {
+
+
+    it("32. debe actualizar el precio total del carrito tras el cambio", async () => {
+      // 1. Agregamos el libro (1 unidad = 29.99)
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addResponse.body.data.id; // ID del Item del Carrito.
+
+      // 2. Actualizamos a 3 unidades (Total debería ser 29.99 * 3 = 89.97)
+      const updateResponse = await updateCart(app, authToken, cartId, 3);
+
+      // 3. Validamos el contrato del ITEM (lo que devuelve el PUT)
+      // Usamos validateCartItemContract porque el PUT devuelve UN item, no el carrito.
+      validateCartItemContract(updateResponse.body.data);
+
+      // 4. LLAVE DEL TEST: Obtenemos el carrito completo para ver el total calculado
+      const cartRes = await getCart(app, authToken);
+      validateFullCartContract(cartRes.body.data);
+
+      // 5. Verificamos la matemática
+      const expectedTotal = Number((testBook.price * 3).toFixed(2));
+      expect(cartRes.body.data.totalPrice).toBe(expectedTotal);
     });
-  
+
+
     it("33. debe retornar 401 si no hay autenticación", async () => {
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addResponse.body.data.id; // ID del Item del Carrito.
+
+      const updateResponse = await updateCart(app, null, cartId, 3);
+
+      validateErrorResponse(updateResponse, 401, "No autorizado: se requiere un token de autenticación")
     });
-    */
+
   });
 
   // 🗑️ D. ENDPOINT: DELETE /carts/:cartId
   describe("DELETE /carts/:cartId - Eliminar Item", () => {
-    /*
+
     it("34. debe eliminar un item específico exitosamente", async () => {
+      // 1. Agregamos 
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addResponse.body.data.id;
+
+      // 2. Ejecutamos usando el nuevo helper
+      const deleteResponse = await deleteCartItem(app, authToken, cartId);
+
+      // 3. Validamos 
+      expect(deleteResponse.status).toBe(200);
+      expect(deleteResponse.body.success).toBe(true);
+      expect(deleteResponse.body.message).toBe("Libro eliminado del carrito exitosamente");
     });
-  
+
+
     it("35. debe retornar el ID del item eliminado en el data", async () => {
+      // 1. Agregamos 
+      const addResponse = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const cartId = addResponse.body.data.id;
+
+      // 2. Ejecutamos 
+      const deleteResponse = await deleteCartItem(app, authToken, cartId);
+
+      // 3. Validamos 
+      expect(deleteResponse.status).toBe(200);
+      expect(deleteResponse.body.success).toBe(true);
+      expect(deleteResponse.body.message).toBe("Libro eliminado del carrito exitosamente");
+
+      // 4.Verificar que el ID devuelto es el que borramos
+      expect(deleteResponse.body.data.id).toBe(cartId);
+
     });
-  
+
     it("36. debe rechazar si el item no existe", async () => {
+      const nonExistentId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+      const deleteResponse = await deleteCartItem(app, authToken, nonExistentId);
+
+      validateErrorResponse(deleteResponse, 404, "Item del carrito no encontrado");
     });
-  
+
     it("37. debe rechazar si no pertenece al usuario autenticado", async () => {
+      // 1. Creamos y logueamos al otro usuario con los nuevos helpers
+      const wrongUser = await createTestUser({ email: `other${Date.now()}@test.com` });
+      const loginRes = await loginUser(app, { email: wrongUser.email });
+      const wrongToken = loginRes.body.data.accessToken;
+
+      // 2. Agregamos el libro a SU carrito
+      const addResponse = await addToCart(app, wrongToken, { bookId: testBook.id, quantity: 1 });
+      const wrongCartId = addResponse.body.data.id;
+
+      // 3. INTENTO DE BORRADO: Usamos el helper deleteCart con el token del usuario principal
+      const wrongDeleteResponse = await deleteCartItem(app, authToken, wrongCartId);
+
+      validateErrorResponse(wrongDeleteResponse, 404, "Item del carrito no encontrado");
     });
-  
-    it("38. debe rechazar si hay una orden pendiente", async () => {
-    });
-    */
+
+    // it("38. debe rechazar si hay una orden pendiente", async () => {
+    // });
+
   });
 
   // 🧹 E. ENDPOINT: DELETE /carts/
