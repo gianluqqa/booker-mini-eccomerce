@@ -34,13 +34,17 @@ app.use("/reviews", reviewRoutes);
 const PORT = process.env.PORT || 5000;
 
 // Inicializar TypeORM antes de levantar el servidor
-AppDataSource.initialize()
-  .then(() => {
-    console.log("✅ DB conectada y sincronizada");
+if (process.env.NODE_ENV !== "test") {
+  AppDataSource.initialize()
+    .then(() => {
+      console.log("✅ DB conectada y sincronizada");
 
-    // Solo levanta el servidor si la DB se conectó
-    app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
-  })
-  .catch((err) => {
-    console.error("❌ Error al conectar DB", err);
-  });
+      // Solo levanta el servidor si la DB se conectó
+      app.listen(PORT, () =>
+        console.log(`Servidor corriendo en puerto ${PORT}`)
+      );
+    })
+    .catch((err) => {
+      console.error("❌ Error al conectar DB", err);
+    });
+}
