@@ -10,6 +10,7 @@ import { reserveStock, cancelCheckout, processCheckout, payOrder } from "../../h
 import { validateStockReservationContract, validateOrderContract } from "../../helpers/checkoutValidationHelpers";
 import { validateErrorResponse } from "../../helpers/validateErrorResponse";
 import { OrderStatus } from "../../../src/enums/OrderStatus";
+import { ErrorCodes } from "../../../src/enums/ErrorCodes";
 import { User } from "../../../src/entities/User";
 import { Book } from "../../../src/entities/Book";
 import { Order } from "../../../src/entities/Order";
@@ -106,13 +107,23 @@ describe("Checkout - Proceso de Compra", () => {
 
       const reserveStockResponse = await reserveStock(app, authToken);
 
-      validateErrorResponse(reserveStockResponse, 409, "Tienes una orden pendiente en proceso");
+      validateErrorResponse(
+        reserveStockResponse, 
+        409, 
+        "Ya tienes una orden pendiente en proceso",
+        ErrorCodes.PENDING_ORDER_EXISTS
+      );
       expect(reserveStockResponse.body.data).toHaveProperty("id", pendingOrder.id);
     });
 
     it("4. debe fallar si carrito está vacío", async () => {
       const reserveStockResponse = await reserveStock(app, authToken);
-      validateErrorResponse(reserveStockResponse, 400, "El carrito está vacío");
+      validateErrorResponse(
+        reserveStockResponse, 
+        400, 
+        "Tu carrito está vacío. Agrega libros antes de iniciar el checkout.",
+        ErrorCodes.CART_EMPTY
+      );
     });
 
 
@@ -127,7 +138,11 @@ describe("Checkout - Proceso de Compra", () => {
       // 3. Intentar reservar stock
       const reserveStockResponse = await reserveStock(app, authToken);
 
-      validateErrorResponse(reserveStockResponse, 409, "Stock insuficiente para el libro solicitado");
+      validateErrorResponse(
+        reserveStockResponse, 
+        409, 
+        "Stock insuficiente para el libro solicitado"
+      );
     });
   });
 
@@ -144,10 +159,10 @@ describe("Checkout - Proceso de Compra", () => {
       expect(checkoutNoPayResponse.status).toBe(201);
       expect(checkoutNoPayResponse.body.success).toBe(true);
       expect(checkoutNoPayResponse.body.message).toBe("Orden pendiente creada exitosamente");
-      
+
       // Según el servicio, la orden queda en PENDING si no hay paymentData
       expect(checkoutNoPayResponse.body.data.status).toBe(OrderStatus.PENDING);
-      
+
       validateOrderContract(checkoutNoPayResponse.body.data);
     });
 
@@ -155,91 +170,152 @@ describe("Checkout - Proceso de Compra", () => {
       // 1. Setup
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
       await reserveStock(app, authToken);
-      
+
       const paymentData = {
         cardNumber: "1234567890123456",
         cardName: "Test User",
-        expiryDate: "12/25",
+        expiryDate: "12/30",
         cvc: "123"
       };
 
       // 2. Acción: Procesar checkout en dos pasos
       // Paso 1: Crear la orden pendiente
       await processCheckout(app, authToken);
-      
+
       // Paso 2: Procesar pago sobre la orden existente usando el endpoint /pay
       const checkoutPayResponse = await payOrder(app, authToken, paymentData);
 
       // 3. Validaciones
-      expect(checkoutPayResponse.status).toBe(201);
+      expect(checkoutPayResponse.status).toBe(200);
       expect(checkoutPayResponse.body.success).toBe(true);
       expect(checkoutPayResponse.body.message).toBe("Pago procesado exitosamente");
-      
-      // El sistema marca la orden como PAID tras el pago simulado
       expect(checkoutPayResponse.body.data.status).toBe(OrderStatus.PAID);
-      
       validateOrderContract(checkoutPayResponse.body.data);
     });
 
-    // it("8. debe fallar con datos de pago inválidos", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Agregar al carrito + reservar stock
-    //   // Action: POST /checkout/ con datos inválidos
-    //   // Expected: 400, success false
-    //   expect(true).toBe(true); // Placeholder
-    // });
+    it("8. debe fallar con datos de pago inválidos", async () => {
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
+      await reserveStock(app, authToken);
 
-    // it("9. debe fallar si no hay reserva activa", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Sin reserva previa
-    //   // Action: POST /checkout/ con datos de pago
-    //   // Expected: 400, success false
-    //   expect(true).toBe(true); // Placeholder
-    // });
+      const paymentData = {
+        cardNumber: "123-456-789-235-", // Formato inválido
+        cardName: "Valid Name",
+        expiryDate: "12/30",
+        cvc: "123"
+      };
+
+      await processCheckout(app, authToken);
+
+      const checkoutPayResponse = await payOrder(app, authToken, paymentData);
+
+      validateErrorResponse(
+        checkoutPayResponse, 
+        400, 
+        "Datos de pago inválidos",
+        ErrorCodes.PAYMENT_DATA_INVALID
+      );
+    });
+
+    it("9. debe fallar si no hay reserva activa", async () => {
+      // 1. Setup: Agregar al carrito pero NO llamar a reserveStock
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
+
+      // 2. Acción: Intentar procesar checkout directamente
+      const checkoutResponse = await processCheckout(app, authToken);
+
+      // 3. Validación
+      validateErrorResponse(
+        checkoutResponse, 
+        400, 
+        "No tienes una reserva de stock activa. Por favor, inicia el proceso de nuevo.",
+        ErrorCodes.NO_ACTIVE_RESERVATION
+      );
+    });
   });
 
   describe("Procesamiento de Pago (POST /checkout/pay)", () => {
-    // it("10. debe procesar pago de orden pendiente existente", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Crear orden PENDING previamente
-    //   // Action: POST /checkout/pay
-    //   // Expected: 201, success, status PAID
-    //   expect(true).toBe(true); // Placeholder
-    // });
+    it("10. debe procesar pago de orden pendiente existente", async () => {
+      // 1. Setup: Agregar al carrito + Reservar + Crear Orden PENDING
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
+      await reserveStock(app, authToken);
+      await processCheckout(app, authToken);
 
-    // it("11. debe fallar si no hay orden pendiente", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Sin orden PENDING
-    //   // Action: POST /checkout/pay
-    //   // Expected: 400, success false
-    //   expect(true).toBe(true); // Placeholder
-    // });
+      const paymentData = {
+        cardNumber: "1234567812345678",
+        cardName: "Test User",
+        expiryDate: "12/30",
+        cvc: "123"
+      };
+
+      // 2. Acción: Pagar la orden usando /pay
+      const payResponse = await payOrder(app, authToken, paymentData);
+
+      // 3. Validación
+      expect(payResponse.status).toBe(200);
+      expect(payResponse.body.success).toBe(true);
+      expect(payResponse.body.message).toBe("Pago procesado exitosamente");
+      expect(payResponse.body.data.status).toBe(OrderStatus.PAID);
+      validateOrderContract(payResponse.body.data);
+    });
+
+    it("11. debe fallar si no hay orden pendiente", async () => {
+      // 1. Setup: Sin crear orden previa (y opcionalmente sin reserva)
+      const paymentData = {
+        cardNumber: "1234567812345678",
+        cardName: "Test User",
+        expiryDate: "12/30",
+        cvc: "123"
+      };
+
+      // 2. Acción: Intentar pagar por /pay
+      const payResponse = await payOrder(app, authToken, paymentData);
+
+      // 3. Validación: El contrato exige 404
+      validateErrorResponse(
+        payResponse, 
+        404, 
+        "No se encontró ninguna orden pendiente para procesar el pago.",
+        ErrorCodes.ORDER_NOT_FOUND
+      );
+    });
   });
 
   describe("Cancelación de Checkout (DELETE /checkout/cancel)", () => {
-    // it("12. debe cancelar checkout y liberar stock", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Agregar al carrito + reservar stock
-    //   // Action: DELETE /checkout/cancel
-    //   // Expected: 200, success, data con orderId y reservationId
-    //   expect(true).toBe(true); // Placeholder
+    // it("12. debe cancelar checkout exitosamente (reserva y orden)", async () => {
+    //   // 1. Setup: Crear orden PENDING
+    //   await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
+    //   await reserveStock(app, authToken);
+    //   await processCheckout(app, authToken);
+
+    //   // 2. Acción: Cancelar
+    //   const cancelResponse = await cancelCheckout(app, authToken);
+
+    //   // 3. Validación
+    //   expect(cancelResponse.status).toBe(200);
+    //   expect(cancelResponse.body.success).toBe(true);
+    //   expect(cancelResponse.body.message).toContain("cancelada exitosamente");
+      
+    //   // Verificar que no se puede pagar ahora (404)
+    //   const payResponse = await payOrder(app, authToken, {
+    //     cardNumber: "1234567812345678",
+    //     cardName: "Test User",
+    //     expiryDate: "12/30",
+    //     cvc: "123"
+    //   });
+    //   expect(payResponse.status).toBe(404);
+    //   expect(payResponse.body.code).toBe(ErrorCodes.ORDER_NOT_FOUND);
     // });
 
-    // it("13. debe fallar si no hay checkout activo", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Sin checkout activo
-    //   // Action: DELETE /checkout/cancel
-    //   // Expected: 400, success false
-    //   expect(true).toBe(true); // Placeholder
-    // });
+    it("13. debe fallar si no hay nada que cancelar", async () => {
+      const cancelResponse = await cancelCheckout(app, authToken);
 
-    // it("14. debe fallar si usuario no está autenticado", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Sin JWT
-    //   // Action: DELETE /checkout/cancel
-    //   // Expected: 401, success false, "No autorizado"
-    //   expect(true).toBe(true); // Placeholder
-    // });
+      validateErrorResponse(
+        cancelResponse, 
+        404, 
+        "No tienes ninguna reserva o pedido pendiente para cancelar.",
+        ErrorCodes.NOTHING_TO_CANCEL
+      );
+    });
   });
 
   describe("Integración y Edge Cases", () => {

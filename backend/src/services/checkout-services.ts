@@ -6,6 +6,7 @@ import { Book } from "../entities/Book";
 import { User } from "../entities/User";
 import { StockReservation } from "../entities/StockReservation";
 import { OrderStatus } from "../enums/OrderStatus";
+import { ErrorCodes } from "../enums/ErrorCodes";
 import { OrderResponseDto } from "../dto/OrderDto";
 import { setupOrderExpiration, cancelOrderExpiration } from "./order-expiration-service";
 
@@ -32,7 +33,8 @@ export const createStockReservationForCheckoutService = async (userId: string): 
     if (existingPendingOrder) {
       throw {
         status: 409,
-        message: "Ya tienes una orden pendiente. No se puede crear otra reserva."
+        message: "Ya tienes una orden pendiente en proceso",
+        code: ErrorCodes.PENDING_ORDER_EXISTS
       };
     }
     const cartItems = await cartRepository.find({
@@ -41,7 +43,11 @@ export const createStockReservationForCheckoutService = async (userId: string): 
     });
 
     if (cartItems.length === 0) {
-      throw { status: 400, message: "El carrito está vacío" };
+      throw { 
+        status: 400, 
+        message: "Tu carrito está vacío. Agrega libros antes de iniciar el checkout.",
+        code: ErrorCodes.CART_EMPTY
+      };
     }
 
     const user = await userRepository.findOne({ where: { id: userId } });
@@ -49,12 +55,18 @@ export const createStockReservationForCheckoutService = async (userId: string): 
       throw { status: 404, message: "Usuario no encontrado" };
     }
 
-    // Eliminar reserva anterior si existe
+    // [IDEMPOTENCIA] Si ya tiene una reserva activa, la retornamos en lugar de crear otra
     const existingReservation = await stockReservationRepository.findOne({
       where: { userId: userId },
     });
     if (existingReservation) {
-      await stockReservationRepository.remove(existingReservation);
+      return {
+        id: existingReservation.id,
+        items: JSON.parse(existingReservation.itemsJson),
+        totalAmount: existingReservation.totalAmount,
+        expiresAt: existingReservation.expiresAt,
+        totalMinutes: RESERVATION_MINUTES
+      };
     }
 
     // Validar stock de todos los items
@@ -100,7 +112,11 @@ export const createStockReservationForCheckoutService = async (userId: string): 
       totalMinutes: RESERVATION_MINUTES
     };
   } catch (error: any) {
-    if (error.status && error.message) throw error;
+    if (error.status && error.message) {
+      if (error.status >= 500) console.error('❌ Error en createStockReservationForCheckoutService:', error);
+      throw error;
+    }
+    console.error('❌ Error no controlado en createStockReservationForCheckoutService:', error);
     throw { status: 500, message: "No se pudo crear la reserva de stock" };
   }
 };
@@ -175,6 +191,15 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
       await stockReservationRepository.remove(reservation);
     }
 
+    // Verificar si existe algo que cancelar
+    if (!pendingOrder && !reservation) {
+      throw { 
+        status: 404, 
+        message: "No tienes ninguna reserva o pedido pendiente para cancelar.",
+        code: ErrorCodes.NOTHING_TO_CANCEL 
+      };
+    }
+
     await queryRunner.commitTransaction();
 
     return {
@@ -186,8 +211,11 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
     };
   } catch (error: any) {
     await queryRunner.rollbackTransaction();
-    console.error('❌ Error en cancelCheckoutService:', error);
-    if (error.status && error.message) throw error;
+    if (error.status && error.message) {
+      if (error.status >= 500) console.error('❌ Error en cancelCheckoutService:', error);
+      throw error;
+    }
+    console.error('❌ Error no controlado en cancelCheckoutService:', error);
     throw { status: 500, message: "No se pudo cancelar el checkout" };
   } finally {
     await queryRunner.release();
@@ -195,7 +223,11 @@ export const cancelCheckoutService = async (userId: string): Promise<any> => {
 };
 
 //? Procesar checkout - Crear orden PENDING o procesar pago (POST).
-export const processCheckoutService = async (userId: string, paymentData?: { cardNumber: string; cardName: string; expiryDate: string; cvc: string; }): Promise<OrderResponseDto> => {
+export const processCheckoutService = async (
+  userId: string, 
+  paymentData?: { cardNumber: string; cardName: string; expiryDate: string; cvc: string; },
+  isPaymentOnly: boolean = false
+): Promise<OrderResponseDto> => {
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
   await queryRunner.startTransaction();
@@ -225,76 +257,110 @@ export const processCheckoutService = async (userId: string, paymentData?: { car
     });
 
 
+    if (isPaymentOnly && !existingPendingOrder) {
+      throw { 
+        status: 404, 
+        message: "No se encontró ninguna orden pendiente para procesar el pago.",
+        code: ErrorCodes.ORDER_NOT_FOUND 
+      };
+    }
+
     // CASO 1: YA EXISTE ORDEN PENDING - Procesar pago
     if (existingPendingOrder) {
-
-      // Si no hay datos de pago completos, ERROR - no se debe crear otra orden
-      if (!paymentData || !paymentData.cardNumber || !paymentData.cardName || !paymentData.expiryDate || !paymentData.cvc) {
-        throw {
-          status: 409,
-          message: "Ya tienes una orden pendiente. Completa el pago o cancela antes de continuar."
+      // [IDEMPOTENCIA] Si la orden ya está pagada, la retornamos exitosamente
+      if (existingPendingOrder.status === OrderStatus.PAID) {
+        return {
+          id: existingPendingOrder.id,
+          total: Number(existingPendingOrder.total),
+          status: existingPendingOrder.status,
+          createdAt: existingPendingOrder.createdAt,
+          items: existingPendingOrder.items.map(item => ({
+            id: item.id,
+            book: { id: item.book.id, title: item.book.title, author: item.book.author, price: Number(item.book.price) },
+            quantity: item.quantity,
+            price: Number(item.price)
+          }))
         };
       }
 
-      // Procesar pago y cambiar estado a PAID
-
-      // Simulación de procesamiento de pago
-      const paymentSuccessful = true; // Simulación exitosa
-
-      if (!paymentSuccessful) {
-        throw { status: 400, message: "El pago fue rechazado" };
+      if (existingPendingOrder.status === OrderStatus.EXPIRED || (existingPendingOrder.expiresAt && new Date() > existingPendingOrder.expiresAt)) {
+        throw { 
+          status: 410, 
+          message: "La orden ha expirado. Por favor, inicia el proceso de nuevo.",
+          code: ErrorCodes.ORDER_EXPIRED 
+        };
       }
 
-      // Cambiar estado a PAID y eliminar expiración
-      existingPendingOrder.status = OrderStatus.PAID;
-      existingPendingOrder.expiresAt = undefined;
-      await orderRepository.save(existingPendingOrder);
-
-
-      // Cancelar expiración automática
-      cancelOrderExpiration(existingPendingOrder.id);
-
-      // Eliminar cualquier reserva de stock existente
-      const reservation = await stockReservationRepository.findOne({
-        where: { userId: userId },
-      });
-      if (reservation) {
-        await stockReservationRepository.remove(reservation);
+      if (!paymentData || !paymentData.cardNumber || !paymentData.cardName || !paymentData.expiryDate || !paymentData.cvc) {
+        throw { 
+          status: 400, 
+          message: "Datos de pago incompletos para procesar la orden pendiente",
+          code: ErrorCodes.PAYMENT_DATA_INVALID 
+        };
       }
 
-      // Limpiar el carrito
-      const cartItems = await cartRepository.find({
-        where: { user: { id: userId } },
-      });
-      if (cartItems.length > 0) {
-        await cartRepository.remove(cartItems);
-      }
+      // Proceso de pago para orden existente
+      const paymentSuccessful = true; // Simulación
 
-      await queryRunner.commitTransaction();
+      if (paymentSuccessful) {
+        // [CONCURRENCIA] Reducir stock real con validación final antes de marcar como PAID
+        for (const item of existingPendingOrder.items) {
+          const book = await bookRepository.findOne({ where: { id: item.book.id } });
+          if (!book || book.stock < item.quantity) {
+            throw { 
+              status: 409, 
+              message: "No hay stock suficiente para completar el pago de esta orden.",
+              code: ErrorCodes.INSUFFICIENT_STOCK_FINAL 
+            };
+          }
+          book.stock -= item.quantity;
+          await bookRepository.save(book);
+        }
 
-      return {
-        id: existingPendingOrder.id,
-        total: existingPendingOrder.total,
-        status: existingPendingOrder.status,
-        createdAt: existingPendingOrder.createdAt,
-        items: existingPendingOrder.items.map((item) => {
-          const unitPrice = Number(item.book.price);
-          const totalPrice = Number(item.price);
-          return {
+        existingPendingOrder.status = OrderStatus.PAID;
+        existingPendingOrder.expiresAt = undefined;
+        await orderRepository.save(existingPendingOrder);
+
+        // Cancelar expiración automática
+        cancelOrderExpiration(existingPendingOrder.id);
+
+        // Eliminar cualquier reserva de stock existente
+        const reservation = await stockReservationRepository.findOne({
+          where: { userId: userId },
+        });
+        if (reservation) {
+          await stockReservationRepository.remove(reservation);
+        }
+
+        // Limpiar el carrito
+        const cartItems = await cartRepository.find({
+          where: { user: { id: userId } },
+        });
+        if (cartItems.length > 0) {
+          await cartRepository.remove(cartItems);
+        }
+
+        await queryRunner.commitTransaction();
+
+        return {
+          id: existingPendingOrder.id,
+          total: Number(existingPendingOrder.total),
+          status: existingPendingOrder.status,
+          createdAt: existingPendingOrder.createdAt,
+          items: existingPendingOrder.items.map(item => ({
             id: item.id,
-            book: {
-              id: item.book.id,
-              title: item.book.title,
-              author: item.book.author,
-              price: unitPrice,
-            },
+            book: { id: item.book.id, title: item.book.title, author: item.book.author, price: Number(item.book.price) },
             quantity: item.quantity,
-            price: unitPrice,
-            unitPrice: unitPrice,
-            totalPrice: totalPrice,
-          };
-        }),
-      };
+            price: Number(item.price)
+          }))
+        };
+      } else {
+        throw { 
+          status: 400, 
+          message: "El pago fue rechazado",
+          code: ErrorCodes.PAYMENT_FAILED 
+        };
+      }
     }
 
     // CASO 2: NO EXISTE ORDEN PENDING - Crear nueva orden PENDING
@@ -307,6 +373,28 @@ export const processCheckoutService = async (userId: string, paymentData?: { car
 
     if (cartItems.length === 0) {
       throw { status: 400, message: "El carrito está vacío" };
+    }
+
+    // [NUEVO CONTRATO] Verificar si existe reserva de stock obligatoria
+    const reservation = await stockReservationRepository.findOne({
+      where: { userId: userId },
+    });
+
+    if (!reservation) {
+      throw { 
+        status: 400, 
+        message: "No tienes una reserva de stock activa. Por favor, inicia el proceso de nuevo.",
+        code: ErrorCodes.NO_ACTIVE_RESERVATION 
+      };
+    }
+
+    // [EXPIRACIÓN] Verificar si la reserva ha expirado
+    if (reservation.expiresAt && new Date() > reservation.expiresAt) {
+      throw { 
+        status: 410, 
+        message: "Tu reserva de stock ha expirado. Por favor, inicia el proceso de nuevo.",
+        code: ErrorCodes.RESERVATION_EXPIRED 
+      };
     }
 
     // Validar stock y crear items
@@ -352,51 +440,33 @@ export const processCheckoutService = async (userId: string, paymentData?: { car
       if (paymentSuccessful) {
         orderStatus = OrderStatus.PAID;
 
-        // Reducir stock real solo si el pago es exitoso
+        // [CONCURRENCIA] Reducir stock real con validación final
         for (const cartItem of cartItems) {
           const book = await bookRepository.findOne({ where: { id: cartItem.book.id } });
-          if (book) {
-            book.stock -= cartItem.quantity;
-            await bookRepository.save(book);
+          if (!book || book.stock < cartItem.quantity) {
+            throw { 
+              status: 409, 
+              message: "Stock insuficiente en el momento final de la compra. Por favor, revisa tu carrito.",
+              code: ErrorCodes.INSUFFICIENT_STOCK_FINAL 
+            };
           }
+          book.stock -= cartItem.quantity;
+          await bookRepository.save(book);
         }
 
         // Limpiar carrito solo si el pago es exitoso
         await cartRepository.remove(cartItems);
       } else {
-        throw { status: 400, message: "El pago fue rechazado" };
+        throw { 
+          status: 400, 
+          message: "El pago fue rechazado",
+          code: ErrorCodes.PAYMENT_FAILED 
+        };
       }
     } else {
-      // Si no hay datos de pago, crear expiración de 5 minutos y reservar stock
-      expiresAt = new Date();
-      expiresAt.setMinutes(expiresAt.getMinutes() + RESERVATION_MINUTES);
-      // Reservar stock temporalmente para orden PENDING
-      for (const cartItem of cartItems) {
-        const book = await bookRepository.findOne({ where: { id: cartItem.book.id } });
-        if (book) {
-          book.stock -= cartItem.quantity;
-          await bookRepository.save(book);
-        }
-      }
-
-      // Crear registro de reserva de stock en la base de datos
-      const reservationItems = cartItems.map(item => ({
-        bookId: item.book.id,
-        bookTitle: item.book.title,
-        quantity: item.quantity,
-        price: Number(item.book.price),
-      }));
-
-      const reservationTotal = reservationItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-      const stockReservation = stockReservationRepository.create({
-        userId: userId,
-        itemsJson: JSON.stringify(reservationItems),
-        totalAmount: reservationTotal,
-        expiresAt: expiresAt,
-      });
-
-      await stockReservationRepository.save(stockReservation);
+      // Si no hay datos de pago, la orden queda en PENDING.
+      // La reserva ya existe (se validó al inicio del Caso 2), simplemente asignamos la expiración.
+      expiresAt = reservation.expiresAt;
     }
 
     // Crear la orden
@@ -458,8 +528,11 @@ export const processCheckoutService = async (userId: string, paymentData?: { car
     };
   } catch (error: any) {
     await queryRunner.rollbackTransaction();
-    console.error('❌ Error en processCheckoutService:', error);
-    if (error.status && error.message) throw error;
+    if (error.status && error.message) {
+      if (error.status >= 500) console.error('❌ Error en processCheckoutService:', error);
+      throw error;
+    }
+    console.error('❌ Error no controlado en processCheckoutService:', error);
     throw { status: 500, message: "No se pudo procesar el checkout" };
   } finally {
     await queryRunner.release();

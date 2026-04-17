@@ -2,6 +2,7 @@ import { Router } from "express";
 import { processCheckoutController, createStockReservationForCheckoutController, cancelCheckoutController } from "../controllers/checkout-controllers";
 import { authenticateJWT } from "../middlewares/auth";
 import { validateNoPendingOrder } from "../middlewares/validatePendingOrder";
+import { validateCheckout } from "../middlewares/validateCheckout";
 
 const router = Router();
 
@@ -12,9 +13,9 @@ router.post("/reserve", authenticateJWT, validateNoPendingOrder, createStockRese
 router.delete("/cancel", authenticateJWT, cancelCheckoutController);
 
 // Crear nueva orden PENDING (solo si no existe una orden pendiente)
-router.post("/", authenticateJWT, validateNoPendingOrder, processCheckoutController);
+router.post("/", authenticateJWT, validateNoPendingOrder, validateCheckout, processCheckoutController);
 
 // Procesar pago de orden PENDING existente
-router.post("/pay", authenticateJWT, processCheckoutController);
+router.post("/pay", authenticateJWT, validateCheckout, processCheckoutController);
 
 export default router;

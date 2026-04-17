@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../config/data-source";
 import { Order } from "../entities/Order";
 import { OrderStatus } from "../enums/OrderStatus";
+import { ErrorCodes } from "../enums/ErrorCodes";
 import { PendingOrderResponse } from "../dto/PendingOrderDto";
 
 export const validateNoPendingOrder = async (req: Request, res: Response, next: NextFunction) => {
@@ -34,13 +35,14 @@ export const validateNoPendingOrder = async (req: Request, res: Response, next: 
         createdAt: pendingOrder.createdAt,
         expiresAt: pendingOrder.expiresAt || undefined,
         itemsCount: pendingOrder.items?.length || 0,
-        message: "Tienes una orden pendiente en proceso",
+        message: "Ya tienes una orden pendiente en proceso",
         actionRequired: "Debes confirmar o cancelar tu orden pendiente antes de poder modificar el carrito"
       };
 
       return res.status(409).json({
         success: false,
-        message: "Tienes una orden pendiente en proceso",
+        message: "Ya tienes una orden pendiente en proceso",
+        code: ErrorCodes.PENDING_ORDER_EXISTS,
         data: pendingOrderData
       });
     }

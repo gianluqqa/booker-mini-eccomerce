@@ -28,6 +28,7 @@ export const createStockReservationForCheckoutController = async (req: Request, 
     return res.status(status).json({
       success: false,
       message,
+      code: error.code || "INTERNAL_ERROR",
     });
   }
 };
@@ -62,6 +63,7 @@ export const cancelCheckoutController = async (req: Request, res: Response) => {
     return res.status(status).json({
       success: false,
       message,
+      code: error.code || "INTERNAL_ERROR",
     });
   }
 };
@@ -82,14 +84,19 @@ export const processCheckoutController = async (req: Request, res: Response) => 
     // Recibir datos de pago del frontend
     const paymentData = req.body;
 
-    const order = await processCheckoutService(authUser.id, paymentData);
+    // [NUEVO CONTRATO] Determinar si la intención es solo pago (/pay)
+    const isPaymentOnly = req.path.includes("pay");
+
+    const order = await processCheckoutService(authUser.id, paymentData, isPaymentOnly);
 
     // Diferenciar mensaje según la acción realizada
     const message = paymentData && paymentData.cardNumber 
       ? "Pago procesado exitosamente" 
       : "Orden pendiente creada exitosamente";
 
-    return res.status(201).json({
+    const successStatus = isPaymentOnly ? 200 : 201;
+
+    return res.status(successStatus).json({
       success: true,
       message,
       data: order,
@@ -101,6 +108,7 @@ export const processCheckoutController = async (req: Request, res: Response) => 
     return res.status(status).json({
       success: false,
       message,
+      code: error.code || "INTERNAL_ERROR",
     });
   }
 };
