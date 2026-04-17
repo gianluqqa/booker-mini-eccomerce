@@ -93,12 +93,11 @@ export const createStockReservationForCheckoutService = async (userId: string): 
     const savedReservation = await stockReservationRepository.save(reservation);
 
     return {
-      reservationId: savedReservation.id,
+      id: savedReservation.id,
       items: reservationItems,
       totalAmount: totalAmount,
       expiresAt: expiresAt,
-      totalMinutes: RESERVATION_MINUTES,
-      message: "Reserva creada. Tienes 5 minutos para completar la compra."
+      totalMinutes: RESERVATION_MINUTES
     };
   } catch (error: any) {
     if (error.status && error.message) throw error;

@@ -1,15 +1,12 @@
 import request from "supertest";
 import { app } from "../../../src/server";
 import { AppDataSource } from "../../../src/config/data-source";
-import { createTestUser } from "../../helpers/createTestUser";
-import { createTestBook } from "../../helpers/createTestBook";
-import { addToCart } from "../../helpers/addToCart";
-import { getCart } from "../../helpers/getCart";
-import { updateCart } from "../../helpers/updateCart";
-import { deleteCartItem } from "../../helpers/deleteCartItem";
-import { clearCart } from "../../helpers/clearCart";
-import { loginUser } from "../../helpers/loginUser";
-import { validateCartItemContract, validateFullCartContract, validateErrorResponse } from "../../helpers/cartValidationHelpers";
+import { createTestUser } from "../../helpers/userActions";
+import { createTestBook } from "../../helpers/bookActions";
+import { loginUser } from "../../helpers/authActions";
+import { addToCart, getCart, updateCart, deleteCartItem, clearCart } from "../../helpers/cartActions";
+import { validateCartItemContract, validateFullCartContract } from "../../helpers/cartValidationHelpers";
+import { validateErrorResponse } from "../../helpers/validateErrorResponse";
 import { Order } from "../../../src/entities/Order";
 import { OrderStatus } from "../../../src/enums/OrderStatus";
 import { User } from "../../../src/entities/User";
@@ -92,12 +89,7 @@ describe("Cart - Carrito de Compras", () => {
       surname: "User"
     });
 
-    const loginResponse = await request(app)
-      .post("/users/login")
-      .send({
-        email: testUser.email,
-        password: "Password123!"
-      });
+    const loginResponse = await loginUser(app, { email: testUser.email });
 
     authToken = loginResponse.body.data.accessToken;
 
@@ -719,7 +711,6 @@ describe("Cart - Carrito de Compras", () => {
 
   // 🧹 E. ENDPOINT: DELETE /carts/
   describe("DELETE /carts/ - Vaciar Carrito", () => {
-
     it("39. debe eliminar todos los items del carrito satisfactoriamente", async () => {
 
       const bookForClear2 = await createTestBook({ title: "Second Book", price: 15.00, stock: 5 });
