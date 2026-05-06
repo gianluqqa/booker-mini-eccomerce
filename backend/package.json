@@ -11,7 +11,7 @@
     "build": "tsc",
     "prestart": "npm run seed:all",
     "start": "node dist/server.ts",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",

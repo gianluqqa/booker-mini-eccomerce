@@ -1,7 +1,7 @@
 import request from "supertest";
 import { app } from "../../../src/server";
 import { AppDataSource } from "../../../src/config/data-source";
-import { createTestUser } from "../../helpers/createTestUser";
+import { createTestUser } from "../../helpers/userActions";
 
 describe("Authentication - Login", () => {
   beforeAll(async () => {

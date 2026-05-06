@@ -249,7 +249,7 @@ describe("Cart - Carrito de Compras", () => {
         quantity: 1
       });
 
-      validateErrorResponse(addToCartResponse, 409, "Tienes una orden pendiente en proceso");
+      validateErrorResponse(addToCartResponse, 409, "Ya tienes una orden pendiente en proceso");
       expect(addToCartResponse.body.data).toHaveProperty("id", pendingOrder.id);
     });
 
@@ -580,7 +580,7 @@ describe("Cart - Carrito de Compras", () => {
       const updateResponse = await updateCart(app, authToken, cartId, 5);
 
       // 4. Validamos que el bloqueo funcione para el PUT también
-      validateErrorResponse(updateResponse, 409, "Tienes una orden pendiente en proceso");
+      validateErrorResponse(updateResponse, 409, "Ya tienes una orden pendiente en proceso");
     });
 
 
@@ -704,7 +704,7 @@ describe("Cart - Carrito de Compras", () => {
 
       const deleteResponse = await deleteCartItem(app, authToken, cartId)
 
-      validateErrorResponse(deleteResponse, 409, "Tienes una orden pendiente en proceso");
+      validateErrorResponse(deleteResponse, 409, "Ya tienes una orden pendiente en proceso");
     });
 
   });
@@ -787,7 +787,7 @@ describe("Cart - Carrito de Compras", () => {
       // 3. Intentamos vaciar el carrito completo
       const response = await clearCart(app, authToken);
 
-      validateErrorResponse(response, 409, "Tienes una orden pendiente en proceso");
+      validateErrorResponse(response, 409, "Ya tienes una orden pendiente en proceso");
     });
 
     it("43. debe dejar el carrito vacío al consultar con GET tras el vaciado", async () => {
@@ -877,9 +877,9 @@ describe("Cart - Carrito de Compras", () => {
       const resPut = await updateCart(app, authToken, cartId, 2);
       const resDel = await deleteCartItem(app, authToken, cartId);
 
-      validateErrorResponse(resPost, 409, "Tienes una orden pendiente en proceso");
-      validateErrorResponse(resPut, 409, "Tienes una orden pendiente en proceso");
-      validateErrorResponse(resDel, 409, "Tienes una orden pendiente en proceso");
+      validateErrorResponse(resPost, 409, "Ya tienes una orden pendiente en proceso");
+      validateErrorResponse(resPut, 409, "Ya tienes una orden pendiente en proceso");
+      validateErrorResponse(resDel, 409, "Ya tienes una orden pendiente en proceso");
     });
   
     it("49. debe permitir re-agregar un libro después de haber vaciado el carrito", async () => {

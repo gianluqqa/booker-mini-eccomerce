@@ -11,6 +11,7 @@ export const createTestUser = async (userData: {
   email: string;
   name?: string;
   surname?: string;
+  role?: string;
 }) => {
   const userRepository = AppDataSource.getRepository(User);
   
@@ -23,8 +24,13 @@ export const createTestUser = async (userData: {
     ...userData,
     email: userData.email.toLowerCase().trim(), // Sanitización igual que el backend
     password: hashedPassword,
-    role: "customer" as any
+    role: (userData.role || "customer") as any
   });
   
-  return await userRepository.save(user);
+  const savedUser = await userRepository.save(user);
+  
+  // No exponer la contraseña en el resultado del helper
+  delete (savedUser as any).password;
+  
+  return savedUser;
 };
