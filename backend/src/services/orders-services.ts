@@ -48,7 +48,7 @@ export const getOrderByIdService = async (orderId: string, userId: string): Prom
       }),
     };
   } catch (error: any) {
-    console.error("Error al obtener la orden:", error);
+    // console.error("Error al obtener la orden:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al obtener la orden" };
   }
@@ -94,7 +94,7 @@ export const getUserOrdersService = async (userId: string): Promise<OrderRespons
       }),
     }));
   } catch (error: any) {
-    console.error("Error al obtener las órdenes del usuario:", error);
+    // console.error("Error al obtener las órdenes del usuario:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al obtener las órdenes del usuario" };
   }
@@ -140,7 +140,7 @@ export const getUserPendingOrdersService = async (userId: string): Promise<Order
       }),
     }));
   } catch (error: any) {
-    console.error("Error al obtener las órdenes pendientes del usuario:", error);
+    // console.error("Error al obtener las órdenes pendientes del usuario:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al obtener las órdenes pendientes del usuario" };
   }
@@ -188,7 +188,7 @@ export const getAllOrdersService = async (): Promise<OrderResponseDto[]> => {
       }),
     }));
   } catch (error: any) {
-    console.error("Error al obtener todas las órdenes:", error);
+    // console.error("Error al obtener todas las órdenes:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al obtener todas las órdenes" };
   }
@@ -266,7 +266,7 @@ export const cancelPaidOrderService = async (orderId: string): Promise<OrderResp
       }),
     };
   } catch (error: any) {
-    console.error("Error al cancelar la orden:", error);
+    // console.error("Error al cancelar la orden:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al cancelar la orden" };
   }
@@ -327,7 +327,7 @@ export const clearAllOrdersService = async (): Promise<{ deletedOrders: number; 
       restoredStock,
     };
   } catch (error: any) {
-    console.error("Error al limpiar todas las órdenes:", error);
+    // console.error("Error al limpiar todas las órdenes:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al limpiar todas las órdenes" };
   }
@@ -388,7 +388,7 @@ export const clearCancelledOrdersService = async (): Promise<{ deletedOrders: nu
 
     return { deletedOrders: 0, restoredStock: 0 }; // Estandarizar estructura
   } catch (error: any) {
-    console.error("Error al limpiar órdenes canceladas:", error);
+    // console.error("Error al limpiar órdenes canceladas:", error);
     if (error.status && error.message) throw error;
     throw { status: 500, message: "Error al limpiar órdenes canceladas" };
   }

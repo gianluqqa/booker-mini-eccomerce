@@ -1,3 +1,4 @@
+import request from "supertest";
 import { AppDataSource } from "../../src/config/data-source";
 import { Order } from "../../src/entities/Order";
 import { OrderStatus } from "../../src/enums/OrderStatus";
@@ -20,4 +21,34 @@ export const cleanUserPendingOrders = async (userId: string) => {
     console.error(`❌ Error limpiando órdenes pendientes para el usuario ${userId}:`, error);
     throw error;
   }
+};
+
+export const getUserOrders = async (app: any, token: string | null) => {
+  const req = request(app).get("/orders");
+  if (token) req.set("Authorization", `Bearer ${token}`);
+  return await req.send();
+};
+
+export const getUserPendingOrders = async (app: any, token: string | null) => {
+  const req = request(app).get("/orders/pending");
+  if (token) req.set("Authorization", `Bearer ${token}`);
+  return await req.send();
+};
+
+export const getOrderById = async (app: any, token: string | null, orderId: string) => {
+  const req = request(app).get(`/orders/${orderId}`);
+  if (token) req.set("Authorization", `Bearer ${token}`);
+  return await req.send();
+};
+
+export const getAllOrdersAdmin = async (app: any, token: string | null) => {
+  const req = request(app).get("/orders/admin/all");
+  if (token) req.set("Authorization", `Bearer ${token}`);
+  return await req.send();
+};
+
+export const cancelOrderAdmin = async (app: any, token: string | null, orderId: string) => {
+  const req = request(app).patch(`/orders/admin/${orderId}/cancel`);
+  if (token) req.set("Authorization", `Bearer ${token}`);
+  return await req.send();
 };
