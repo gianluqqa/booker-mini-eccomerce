@@ -21,7 +21,6 @@ export const createReview = async (req: Request, res: Response) => {
       data: review
     });
   } catch (error: any) {
-    console.error("Error al crear reseña:", error);
     const status = error.status || 400;
     res.status(status).json({ 
       success: false, 
@@ -52,7 +51,6 @@ export const getReviewsByBook = async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
-    console.error("Error al obtener reseñas del libro:", error);
     const status = error.status || 400;
     res.status(status).json({ 
       success: false, 
@@ -82,7 +80,6 @@ export const updateReview = async (req: Request, res: Response) => {
       data: review
     });
   } catch (error: any) {
-    console.error("Error al actualizar reseña:", error);
     const status = error.status || 400;
     res.status(status).json({ 
       success: false, 
@@ -110,7 +107,6 @@ export const deleteReview = async (req: Request, res: Response) => {
       data: null
     });
   } catch (error: any) {
-    console.error("Error al eliminar reseña:", error);
     const status = error.status || 400;
     res.status(status).json({ 
       success: false, 
@@ -148,7 +144,6 @@ export const getUserReviews = async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
-    console.error("Error al obtener reseñas del usuario:", error);
     const status = error.status || 400;
     res.status(status).json({ 
       success: false, 
@@ -177,7 +172,6 @@ export const getAllReviews = async (req: Request, res: Response) => {
       }
     });
   } catch (error: any) {
-    console.error("Error al obtener reseñas globales:", error);
     const status = error.status || 400;
     res.status(status).json({ 
       success: false, 

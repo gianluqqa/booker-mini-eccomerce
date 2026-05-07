@@ -32,10 +32,10 @@ export const deleteAllUsersAdmin = async (app: any, token: string | null) => {
 // ADMINISTRACIÓN: REVIEWS
 // =======================
 
-export const getAllReviewsAdmin = async (app: any, token: string | null) => {
+export const getAllReviewsAdmin = async (app: any, token: string | null, params: any = {}) => {
   const req = request(app).get("/reviews/admin/all");
   if (token) req.set("Authorization", `Bearer ${token}`);
-  return await req.send();
+  return await req.query(params).send();
 };
 
 export const deleteReviewAdmin = async (app: any, token: string | null, reviewId: string) => {

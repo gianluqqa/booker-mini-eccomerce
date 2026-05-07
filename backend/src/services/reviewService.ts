@@ -14,13 +14,13 @@ export const createReviewService = async (reviewData: CreateReviewDto, userId: s
   // Verificar que el libro existe
   const book = await bookRepository.findOne({ where: { id: bookId } });
   if (!book) {
-    throw new Error("Libro no encontrado");
+    throw { status: 404, message: "Libro no encontrado" };
   }
 
   // Verificar que el usuario existe
   const user = await userRepository.findOne({ where: { id: userId } });
   if (!user) {
-    throw new Error("Usuario no encontrado");
+    throw { status: 404, message: "Usuario no encontrado" };
   }
 
   // Verificar si el usuario ya ha reseñado este libro
@@ -29,12 +29,12 @@ export const createReviewService = async (reviewData: CreateReviewDto, userId: s
   });
 
   if (existingReview) {
-    throw new Error("Ya has reseñado este libro. Puedes editar tu reseña existente si deseas actualizarla.");
+    throw { status: 400, message: "Ya has reseñado este libro. Puedes editar tu reseña existente si deseas actualizarla." };
   }
 
   // Validar rating
   if (rating < 1 || rating > 5) {
-    throw new Error("La calificación debe estar entre 1 y 5");
+    throw { status: 400, message: "La calificación debe estar entre 1 y 5" };
   }
 
   const review = reviewRepository.create({
@@ -70,7 +70,7 @@ export const getReviewsByBookService = async (bookId: string, page: number = 1, 
   // Verificar que el libro existe
   const book = await bookRepository.findOne({ where: { id: bookId } });
   if (!book) {
-    throw new Error("Libro no encontrado");
+    throw { status: 404, message: "Libro no encontrado" };
   }
 
   const skip = (page - 1) * limit;
@@ -136,12 +136,12 @@ export const updateReviewService = async (reviewId: string, userId: string, upda
   });
 
   if (!review) {
-    throw new Error("Reseña no encontrada o no tienes permiso para editarla");
+    throw { status: 404, message: "Reseña no encontrada o no tienes permiso para editarla" };
   }
 
   // Validar rating si se proporciona
   if (updateData.rating && (updateData.rating < 1 || updateData.rating > 5)) {
-    throw new Error("La calificación debe estar entre 1 y 5");
+    throw { status: 400, message: "La calificación debe estar entre 1 y 5" };
   }
 
   // Actualizar campos
@@ -174,7 +174,7 @@ export const deleteReviewService = async (reviewId: string, userId: string): Pro
   });
 
   if (!review) {
-    throw new Error("Reseña no encontrada o no tienes permiso para eliminarla");
+    throw { status: 404, message: "Reseña no encontrada o no tienes permiso para eliminarla" };
   }
 
   await reviewRepository.remove(review);

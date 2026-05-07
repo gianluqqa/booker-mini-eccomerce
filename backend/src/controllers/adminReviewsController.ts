@@ -47,7 +47,6 @@ export const getAllReviewsAdminController = async (req: Request, res: Response) 
       }
     });
   } catch (error: any) {
-    console.error("Error al obtener reviews de admin:", error);
     
     const status = error.status || 500;
     const message = error.message || "Error interno del servidor";
@@ -82,7 +81,6 @@ export const deleteReviewAdminController = async (req: Request, res: Response) =
       }
     });
   } catch (error: any) {
-    console.error("Error al eliminar review de admin:", error);
     
     const status = error.status || 500;
     const message = error.message || "Error interno del servidor";

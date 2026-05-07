@@ -272,21 +272,22 @@ describe("Admin Panel - Módulo de Administración", () => {
   describe("Reviews - Administración", () => {
     let adminToken: string;
     let review: Review;
+    let testBook: Book;
 
     beforeEach(async () => {
       const adminUser = await createTestUser({ email: `admin_reviews_${Date.now()}@test.com`, role: "admin" });
       const adminRes = await loginUser(app, { email: adminUser.email });
       adminToken = adminRes.body.data.accessToken;
 
-      const book = await createTestBook({ title: "Review Test Book", price: 10, stock: 10 });
+      testBook = await createTestBook({ title: "Admin Review Book", price: 10, stock: 10 });
       const reviewRepository = AppDataSource.getRepository(Review);
       review = await reviewRepository.save(reviewRepository.create({
         user: testUser,
-        book: book,
-        comment: "Test comment",
-        rating: 5,
-        title: "Test Title",
-        bookId: book.id,
+        book: testBook,
+        comment: "Comentario para borrar",
+        rating: 1,
+        title: "Mal libro",
+        bookId: testBook.id,
         userId: testUser.id
       }));
     });
@@ -297,11 +298,20 @@ describe("Admin Panel - Módulo de Administración", () => {
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
       });
 
-      it("debe retornar la lista de reseñas para un administrador", async () => {
+      it("debe retornar la lista de reseñas con metadatos para un administrador", async () => {
         const res = await getAllReviewsAdmin(app, adminToken);
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
         expect(Array.isArray(res.body.data)).toBe(true);
+        expect(res.body.meta).toBeDefined();
+        expect(res.body.meta.total).toBeGreaterThanOrEqual(1);
+      });
+
+      it("debe permitir filtrar reseñas por título de libro", async () => {
+        const res = await getAllReviewsAdmin(app, adminToken, { book: "Admin Review" });
+        expect(res.status).toBe(200);
+        expect(res.body.data.length).toBeGreaterThanOrEqual(1);
+        expect(res.body.data[0].book.title).toContain("Admin Review");
       });
     });
 
@@ -311,11 +321,16 @@ describe("Admin Panel - Módulo de Administración", () => {
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
       });
 
-      it("debe eliminar la reseña y retornar 200", async () => {
+      it("debe eliminar cualquier reseña y retornar 200", async () => {
         const res = await deleteReviewAdmin(app, adminToken, review.id);
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
-        expect(res.body.data.id).toBe(review.id);
+        expect(res.body.message).toBe("Reseña eliminada exitosamente");
+        
+        // Verificar que ya no existe
+        const reviewRepository = AppDataSource.getRepository(Review);
+        const deletedReview = await reviewRepository.findOne({ where: { id: review.id } });
+        expect(deletedReview).toBeNull();
       });
     });
   });
