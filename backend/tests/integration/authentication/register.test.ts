@@ -17,7 +17,16 @@ describe("Authentication - Registro", () => {
     }
   });
 
-  describe("Casos Exitosos (201)", () => {
+  afterEach(async () => {
+    const userRepository = AppDataSource.getRepository("User");
+    const { ILike } = require("typeorm");
+    try {
+      await userRepository.delete({ email: ILike("%@test.com") });
+      await userRepository.delete({ email: ILike("%@gmail.com") });
+    } catch (error) { }
+  });
+
+  describe("POST /users/register - Casos Exitosos (201)", () => {
     let registeredUserEmail: string;
 
     it("1. debe registrar usuario con datos básicos exitosamente", async () => {
@@ -86,12 +95,15 @@ describe("Authentication - Registro", () => {
     });
 
     it("3. debe rechazar registro con email duplicado", async () => {
+      const email = `duplicate_${Date.now()}@test.com`;
+      await createTestUser({ email });
+
       const duplicateResponse = await request(app)
         .post("/users/register")
         .send({
           name: "Otro",
           surname: "Usuario",
-          email: registeredUserEmail, // Usar el email del test #1
+          email: email,
           password: "Password123!",
           confirmPassword: "Password123!",
         });
@@ -129,7 +141,7 @@ describe("Authentication - Registro", () => {
     });
   });
 
-  describe("Errores de Validación (400)", () => {
+  describe("POST /users/register - Errores de Validación (400)", () => {
     it("5. debe rechazar registro con cuerpo vacío", async () => {
       const emptyResponse = await request(app)
         .post("/users/register")
@@ -342,7 +354,7 @@ describe("Authentication - Registro", () => {
     });
   });
 
-  describe("Estructura y Tipos de Datos", () => {
+  describe("POST /users/register - Estructura y Tipos de Datos", () => {
     it("18. debe verificar estructura de respuesta exitosa", async () => {
       const successStructureResponse = await request(app)
         .post("/users/register")
@@ -423,14 +435,14 @@ describe("Authentication - Registro", () => {
     });
   });
 
-  describe("Sanitización y Consistencia", () => {
+  describe("POST /users/register - Sanitización y Consistencia", () => {
     it("22. debe sanitizar datos correctamente", async () => {
       const sanitizationResponse = await request(app)
         .post("/users/register")
         .send({
           name: "             JUAN             ",
           surname: "    perez    ",
-          email: `TEST${Date.now()}@GMAIL.COM`,
+          email: `TEST${Date.now()}@TEST.COM`,
           password: "Password123!",
           confirmPassword: "Password123!",
         });
@@ -440,7 +452,7 @@ describe("Authentication - Registro", () => {
       // Verifica que los datos se sanitizan correctamente
       expect(sanitizationResponse.body.data.name).toBe("Juan");
       expect(sanitizationResponse.body.data.surname).toBe("Perez");
-      expect(sanitizationResponse.body.data.email).toMatch(/test\d+@gmail\.com$/);
+      expect(sanitizationResponse.body.data.email).toMatch(/test\d+@test\.com$/);
     });
 
     it("23. debe mantener consistencia de email y evitar duplicados", async () => {

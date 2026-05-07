@@ -14,6 +14,7 @@ import { ErrorCodes } from "../../../src/enums/ErrorCodes";
 import { User } from "../../../src/entities/User";
 import { Book } from "../../../src/entities/Book";
 import { Order } from "../../../src/entities/Order";
+import { StockReservation } from "../../../src/entities/StockReservation";
 
 describe("Checkout - Proceso de Compra", () => {
   let testUser: any;
@@ -46,9 +47,9 @@ describe("Checkout - Proceso de Compra", () => {
       await bookRepository.delete({ title: ILike("%Book%") });
       await bookRepository.delete({ title: ILike("Test%") });
       await bookRepository.delete({ title: ILike("Another%") });
-      await cartRepository.delete({ user: { email: ILike("%@test.com") } });
-      await orderRepository.delete({ user: { email: ILike("%@test.com") } });
-      await stockReservationRepository.delete({ userId: ILike("%") });
+      await cartRepository.createQueryBuilder().delete().execute();
+      await orderRepository.createQueryBuilder().delete().execute();
+      await stockReservationRepository.createQueryBuilder().delete().execute();
     } catch (error) { }
   });
 
@@ -79,7 +80,7 @@ describe("Checkout - Proceso de Compra", () => {
     });
   });
 
-  describe("Reserva de Stock (POST /checkout/reserve)", () => {
+  describe("POST /checkout/reserve - Reserva de Stock", () => {
     it("1. debe crear reserva de stock exitosamente", async () => {
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
 
@@ -146,7 +147,7 @@ describe("Checkout - Proceso de Compra", () => {
     });
   });
 
-  describe("Procesamiento de Checkout (POST /checkout)", () => {
+  describe("POST /checkout - Procesamiento de Checkout", () => {
     it("6. debe crear orden pendiente sin pago", async () => {
       // 1. Preparación: Carrito con productos y stock reservado
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
@@ -233,7 +234,7 @@ describe("Checkout - Proceso de Compra", () => {
     });
   });
 
-  describe("Procesamiento de Pago (POST /checkout/pay)", () => {
+  describe("POST /checkout/pay - Procesamiento de Pago", () => {
     it("10. debe procesar pago de orden pendiente existente", async () => {
       // 1. Setup: Agregar al carrito + Reservar + Crear Orden PENDING
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
@@ -280,31 +281,38 @@ describe("Checkout - Proceso de Compra", () => {
     });
   });
 
-  describe("Cancelación de Checkout (DELETE /checkout/cancel)", () => {
-    // it("12. debe cancelar checkout exitosamente (reserva y orden)", async () => {
-    //   // 1. Setup: Crear orden PENDING
-    //   await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
-    //   await reserveStock(app, authToken);
-    //   await processCheckout(app, authToken);
+  describe("DELETE /checkout/cancel - Cancelación de Checkout", () => {
+    it("12. debe cancelar checkout exitosamente (reserva y orden)", async () => {
+      // 1. Setup: Crear carrito + reserva + orden PENDING
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
+      await reserveStock(app, authToken);
+      await processCheckout(app, authToken);
 
-    //   // 2. Acción: Cancelar
-    //   const cancelResponse = await cancelCheckout(app, authToken);
-
-    //   // 3. Validación
-    //   expect(cancelResponse.status).toBe(200);
-    //   expect(cancelResponse.body.success).toBe(true);
-    //   expect(cancelResponse.body.message).toContain("cancelada exitosamente");
+      // Verificar que existen en BD
+      const orderRepo = AppDataSource.getRepository(Order);
+      const reservationRepo = AppDataSource.getRepository(StockReservation);
       
-    //   // Verificar que no se puede pagar ahora (404)
-    //   const payResponse = await payOrder(app, authToken, {
-    //     cardNumber: "1234567812345678",
-    //     cardName: "Test User",
-    //     expiryDate: "12/30",
-    //     cvc: "123"
-    //   });
-    //   expect(payResponse.status).toBe(404);
-    //   expect(payResponse.body.code).toBe(ErrorCodes.ORDER_NOT_FOUND);
-    // });
+      const orderBefore = await orderRepo.findOne({ where: { user: { id: testUser.id }, status: OrderStatus.PENDING } });
+      const reservationBefore = await reservationRepo.findOne({ where: { userId: testUser.id } });
+      
+      expect(orderBefore).toBeDefined();
+      expect(reservationBefore).toBeDefined();
+
+      // 2. Acción: Cancelar
+      const cancelResponse = await cancelCheckout(app, authToken);
+
+      // 3. Validación
+      expect(cancelResponse.status).toBe(200);
+      expect(cancelResponse.body.success).toBe(true);
+      expect(cancelResponse.body.message).toContain("cancelada");
+      
+      // Verificar limpieza en BD
+      const orderAfter = await orderRepo.findOne({ where: { id: orderBefore?.id } });
+      const reservationAfter = await reservationRepo.findOne({ where: { userId: testUser.id } });
+      
+      expect(orderAfter).toBeNull();
+      expect(reservationAfter).toBeNull();
+    });
 
     it("13. debe fallar si no hay nada que cancelar", async () => {
       const cancelResponse = await cancelCheckout(app, authToken);
@@ -319,36 +327,114 @@ describe("Checkout - Proceso de Compra", () => {
   });
 
   describe("Integración y Edge Cases", () => {
-    // it("15. debe manejar reserva expirada", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Crear reserva + simular expiración
-    //   // Action: POST /checkout/
-    //   // Expected: 400, success false, message contiene "expiración"
-    //   expect(true).toBe(true); // Placeholder
-    // });
+    it("15. debe manejar reserva expirada", async () => {
+      // 1. Setup: Crear reserva
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
+      await reserveStock(app, authToken);
 
-    // it("16. debe manejar concurrencia de reservas", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Simular múltiples usuarios reservando mismo stock
-    //   // Action: Operaciones concurrentes
-    //   // Expected: Manejo correcto de concurrencia
-    //   expect(true).toBe(true); // Placeholder
-    // });
+      // 2. Simular expiración en BD
+      const reservationRepo = AppDataSource.getRepository(StockReservation);
+      const reservation = await reservationRepo.findOne({ where: { userId: testUser.id } });
+      if (reservation) {
+        reservation.expiresAt = new Date(Date.now() - 10000); // 10 segundos en el pasado
+        await reservationRepo.save(reservation);
+      }
 
-    // it("17. debe calcular total correctamente con múltiples items", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Agregar múltiples libros con diferentes precios
-    //   // Action: POST /checkout/reserve
-    //   // Expected: totalAmount calculado correctamente
-    //   expect(true).toBe(true); // Placeholder
-    // });
+      // 3. Acción: Intentar procesar checkout
+      const checkoutResponse = await processCheckout(app, authToken);
 
-    // it("18. debe actualizar stock después de pago exitoso", async () => {
-    //   // TODO: Implementar este test
-    //   // Setup: Proceso completo de compra
-    //   // Action: Verificar stock en BD después del pago
-    //   // Expected: Stock actualizado correctamente
-    //   expect(true).toBe(true); // Placeholder
-    // });
+      // 4. Validación
+      validateErrorResponse(
+        checkoutResponse, 
+        410, 
+        "Tu reserva de stock ha expirado. Por favor, inicia el proceso de nuevo.",
+        ErrorCodes.RESERVATION_EXPIRED
+      );
+    });
+
+    it("16. debe manejar concurrencia de reservas (stock insuficiente final)", async () => {
+      // 1. Setup: Usuario A reserva stock
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 8 }); // Quedan 2 en stock (total 10)
+      await reserveStock(app, authToken);
+      await processCheckout(app, authToken); // Orden PENDING creada
+
+      // 2. Simular que otro proceso/admin agota el stock antes del pago
+      const bookRepo = AppDataSource.getRepository(Book);
+      await bookRepo.update(testBook.id, { stock: 0 });
+
+      // 3. Acción: Usuario A intenta pagar
+      const paymentData = {
+        cardNumber: "1234567890123456",
+        cardName: "Test User",
+        expiryDate: "12/30",
+        cvc: "123"
+      };
+      const payResponse = await payOrder(app, authToken, paymentData);
+
+      // 4. Validación: El sistema debe detectar que ya no hay stock real
+      validateErrorResponse(
+        payResponse,
+        409,
+        "No hay stock suficiente para completar el pago de esta orden.",
+        ErrorCodes.INSUFFICIENT_STOCK_FINAL
+      );
+    });
+
+    it("17. debe calcular total correctamente con múltiples items", async () => {
+      // 1. Setup: Agregar dos tipos de libros
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 }); // 29.99 * 2 = 59.98
+      await addToCart(app, authToken, { bookId: anotherBook.id, quantity: 1 }); // 19.99 * 1 = 19.99
+      // Total esperado: 79.97
+
+      // 2. Acción: Reservar stock
+      const reserveResponse = await reserveStock(app, authToken);
+
+      // 3. Validación
+      expect(reserveResponse.status).toBe(201);
+      expect(Number(reserveResponse.body.data.totalAmount)).toBeCloseTo(79.97, 2);
+    });
+
+    it("18. debe actualizar stock después de pago exitoso", async () => {
+      // 1. Setup: Proceso completo hasta pago
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 3 });
+      await reserveStock(app, authToken);
+      await processCheckout(app, authToken);
+
+      const paymentData = {
+        cardNumber: "1234567890123456",
+        cardName: "Test User",
+        expiryDate: "12/30",
+        cvc: "123"
+      };
+
+      // 2. Acción: Pagar
+      const payResponse = await payOrder(app, authToken, paymentData);
+      expect(payResponse.status).toBe(200);
+
+      // 3. Validación: Stock debe haber bajado de 10 a 7
+      const bookRepo = AppDataSource.getRepository(Book);
+      const updatedBook = await bookRepo.findOne({ where: { id: testBook.id } });
+      expect(updatedBook?.stock).toBe(7);
+    });
+
+    it("19. debe mantener la reserva original aunque el carrito cambie (Idempotencia)", async () => {
+      // 1. Setup: Agregar un libro y reservar
+      await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
+      const firstReserve = await reserveStock(app, authToken);
+      expect(firstReserve.body.data.items).toHaveLength(1);
+
+      // 2. Acción: Agregar otro libro diferente al carrito
+      await addToCart(app, authToken, { bookId: anotherBook.id, quantity: 1 });
+
+      // 3. Re-intentar reservar sin cancelar la anterior
+      const secondReserve = await reserveStock(app, authToken);
+
+      // 4. Validación: El sistema devuelve la misma reserva (idéntica a la primera)
+      // ignorando los cambios recientes en el carrito hasta que se cancele la actual.
+      expect(secondReserve.status).toBe(201);
+      expect(secondReserve.body.data.id).toBe(firstReserve.body.data.id);
+      expect(secondReserve.body.data.items).toHaveLength(1); 
+      expect(secondReserve.body.data.items[0].bookId).toBe(testBook.id);
+    });
   });
 });

@@ -10,7 +10,7 @@ import { StockReservation } from "../entities/StockReservation";
 import { Review } from "../entities/Review";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const AppDataSource = new DataSource({
   type: "postgres",

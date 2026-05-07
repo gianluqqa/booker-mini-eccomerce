@@ -11,6 +11,7 @@ import { OrderItem } from "../../../src/entities/OrderItem";
 import { OrderStatus } from "../../../src/enums/OrderStatus";
 import { User } from "../../../src/entities/User";
 import { Book } from "../../../src/entities/Book";
+import { StockReservation } from "../../../src/entities/StockReservation";
 
 describe("Orders - Módulo de Órdenes", () => {
   let testUser: any;
@@ -34,12 +35,14 @@ describe("Orders - Módulo de Órdenes", () => {
     const orderItemRepository = AppDataSource.getRepository(OrderItem);
     const bookRepository = AppDataSource.getRepository(Book);
     const userRepository = AppDataSource.getRepository(User);
+    const stockReservationRepository = AppDataSource.getRepository(StockReservation);
     const { ILike } = require("typeorm");
 
     try {
       // Limpieza profunda usando query builder para evitar errores de restricción
       await orderItemRepository.createQueryBuilder().delete().execute();
       await orderRepository.createQueryBuilder().delete().execute();
+      await stockReservationRepository.createQueryBuilder().delete().execute();
       await userRepository.delete({ email: ILike("%@test.com") });
       await bookRepository.delete({ title: ILike("%Book%") });
     } catch (error) {

@@ -16,7 +16,15 @@ describe("Authentication - Login", () => {
     }
   });
 
-  describe("Casos Exitosos (200)", () => {
+  afterEach(async () => {
+    const userRepository = AppDataSource.getRepository("User");
+    const { ILike } = require("typeorm");
+    try {
+      await userRepository.delete({ email: ILike("%@test.com") });
+    } catch (error) { }
+  });
+
+  describe("POST /users/login - Casos Exitosos (200)", () => {
     it("1. debe permitir login de cliente con credenciales válidas", async () => {
       const testUser = await createTestUser({
         email: `client_${Date.now()}@test.com`,
@@ -65,7 +73,7 @@ describe("Authentication - Login", () => {
     });
   });
 
-  describe("Errores de Validación (400)", () => {
+  describe("POST /users/login - Errores de Validación (400)", () => {
     it("3. debe rechazar formulario vacío", async () => {
       const response = await request(app)
         .post("/users/login")
@@ -130,7 +138,7 @@ describe("Authentication - Login", () => {
     });
   });
 
-  describe("Errores de Credenciales (401)", () => {
+  describe("POST /users/login - Errores de Credenciales (401)", () => {
     it("7. debe rechazar email inexistente", async () => {
       const response = await request(app)
         .post("/users/login")
@@ -190,7 +198,7 @@ describe("Authentication - Login", () => {
     });
   });
 
-  describe("Casos Especiales y Edge Cases", () => {
+  describe("POST /users/login - Casos Especiales y Edge Cases", () => {
     it("10. debe rechazar email con caracteres especiales inválidos", async () => {
       // Emails que realmente fallan la validación de regex (400)
       const invalidEmails = [
@@ -279,7 +287,7 @@ describe("Authentication - Login", () => {
     });
   });
 
-  describe("Login con Firebase", () => {
+  describe("POST /users/login - Login con Firebase", () => {
     it("14. debe permitir login con Firebase de usuario existente", async () => {
       // Primero creamos un usuario normal
       const existingUser = await createTestUser({
@@ -427,7 +435,7 @@ describe("Authentication - Login", () => {
     });
   });
 
-  describe("Sanitización y Consistencia", () => {
+  describe("POST /users/login - Sanitización y Consistencia", () => {
     it("23. debe permitir login con email en mayúsculas (case-insensitive)", async () => {
       const testUser = await createTestUser({
         email: `case_${Date.now()}@test.com`

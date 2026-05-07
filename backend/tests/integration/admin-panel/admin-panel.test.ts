@@ -26,6 +26,7 @@ import {
 import { Order } from "../../../src/entities/Order";
 import { OrderItem } from "../../../src/entities/OrderItem";
 import { OrderStatus } from "../../../src/enums/OrderStatus";
+import { StockReservation } from "../../../src/entities/StockReservation";
 
 describe("Admin Panel - Módulo de Administración", () => {
   let testUser: User;
@@ -50,12 +51,14 @@ describe("Admin Panel - Módulo de Administración", () => {
     const userRepository = AppDataSource.getRepository(User);
     const reviewRepository = AppDataSource.getRepository(Review);
     const genreRepository = AppDataSource.getRepository(Genre);
+    const stockReservationRepository = AppDataSource.getRepository(StockReservation);
     const { ILike } = require("typeorm");
 
     try {
       await orderItemRepository.createQueryBuilder().delete().execute();
       await orderRepository.createQueryBuilder().delete().execute();
       await reviewRepository.createQueryBuilder().delete().execute();
+      await stockReservationRepository.createQueryBuilder().delete().execute();
       await userRepository.delete({ email: ILike("%@test.com") });
       await bookRepository.delete({ title: ILike("%Book%") });
       await genreRepository.delete({ name: ILike("%TestGenre%") });
@@ -207,7 +210,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       adminToken = adminRes.body.data.accessToken;
     });
 
-    describe("GET /users/", () => {
+    describe("GET /users/ - Listar Usuarios", () => {
       it("debe rechazar con 403 si un usuario normal intenta acceder", async () => {
         const res = await getAllUsersAdmin(app, authToken);
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
@@ -221,7 +224,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       });
     });
 
-    describe("GET /users/:id", () => {
+    describe("GET /users/:id - Obtener Usuario por ID", () => {
       it("debe rechazar con 403 si un usuario normal intenta acceder", async () => {
         const res = await getUserByIdAdmin(app, authToken, testUser.id);
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
@@ -235,7 +238,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       });
     });
 
-    describe("DELETE /users/:id", () => {
+    describe("DELETE /users/:id - Eliminar Usuario", () => {
       it("debe rechazar con 403 si un usuario normal intenta eliminar", async () => {
         const res = await deleteUserAdmin(app, authToken, testUser.id);
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
@@ -250,7 +253,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       });
     });
 
-    describe("DELETE /users/", () => {
+    describe("DELETE /users/ - Limpieza Masiva de Usuarios", () => {
       it("debe rechazar con 403 si un usuario normal intenta limpiar usuarios", async () => {
         const res = await deleteAllUsersAdmin(app, authToken);
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
@@ -288,7 +291,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       }));
     });
 
-    describe("GET /reviews/admin/all", () => {
+    describe("GET /reviews/admin/all - Listar todas las Reseñas", () => {
       it("debe rechazar con 403 si un usuario normal intenta acceder", async () => {
         const res = await getAllReviewsAdmin(app, authToken);
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
@@ -302,7 +305,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       });
     });
 
-    describe("DELETE /reviews/admin/:reviewId", () => {
+    describe("DELETE /reviews/admin/:reviewId - Eliminar Reseña", () => {
       it("debe rechazar con 403 si un usuario normal intenta eliminar", async () => {
         const res = await deleteReviewAdmin(app, authToken, review.id);
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
@@ -326,7 +329,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       adminToken = adminRes.body.data.accessToken;
     });
 
-    describe("POST /books/", () => {
+    describe("POST /books/ - Crear Libro", () => {
       it("debe rechazar con 403 si un usuario normal intenta crear", async () => {
         const res = await createBookAdmin(app, authToken, {});
         validateErrorResponse(res, 403, "Prohibido: se requiere rol de administrador");
@@ -352,7 +355,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       });
     });
 
-    describe("PUT /books/:id", () => {
+    describe("PUT /books/:id - Actualizar Libro", () => {
       it("debe rechazar con 403 si un usuario normal intenta actualizar", async () => {
         const book = await createTestBook({ title: "To Update Book", price: 10, stock: 10 });
         const res = await updateBookAdmin(app, authToken, book.id, { price: 20 });
@@ -368,7 +371,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       });
     });
 
-    describe("DELETE /books/:id", () => {
+    describe("DELETE /books/:id - Eliminar Libro", () => {
       it("debe rechazar con 403 si un usuario normal intenta eliminar", async () => {
         const book = await createTestBook({ title: "To Delete Book", price: 10, stock: 10 });
         const res = await deleteBookAdmin(app, authToken, book.id);

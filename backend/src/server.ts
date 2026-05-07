@@ -10,12 +10,14 @@ import orderRoutes from "./routes/orders-routes";
 import checkoutRoutes from "./routes/checkout-routes";
 import reviewRoutes from "./routes/reviews-routes";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 export const app = express();
 
 app.use(cors());
-app.use(morgan("dev"));
+if (process.env.NODE_ENV !== "test") {
+  app.use(morgan("dev"));
+}
 app.use(express.json());
 
 // Endpoint raíz
