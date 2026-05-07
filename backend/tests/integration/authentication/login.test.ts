@@ -3,25 +3,19 @@ import { app } from "../../../src/server";
 import { AppDataSource } from "../../../src/config/data-source";
 import { createTestUser } from "../../helpers/userActions";
 
+import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
+
 describe("Authentication - Login", () => {
   beforeAll(async () => {
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
-    }
+    await initializeTestDb();
   });
 
   afterAll(async () => {
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-    }
+    await closeTestDb();
   });
 
   afterEach(async () => {
-    const userRepository = AppDataSource.getRepository("User");
-    const { ILike } = require("typeorm");
-    try {
-      await userRepository.delete({ email: ILike("%@test.com") });
-    } catch (error) { }
+    await clearDatabase();
   });
 
   describe("POST /users/login - Casos Exitosos (200)", () => {

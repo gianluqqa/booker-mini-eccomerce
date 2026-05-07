@@ -13,9 +13,8 @@ import {
   deleteReview
 } from "../../helpers/reviewActions";
 import { validateReviewContract, validateReviewListContract } from "../../helpers/reviewValidationHelpers";
+import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
 import { Review } from "../../../src/entities/Review";
-import { User } from "../../../src/entities/User";
-import { Book } from "../../../src/entities/Book";
 
 describe("Reviews - Módulo de Reseñas", () => {
   let testUser: any;
@@ -23,31 +22,15 @@ describe("Reviews - Módulo de Reseñas", () => {
   let testBook: any;
 
   beforeAll(async () => {
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
-    }
+    await initializeTestDb();
   });
 
   afterAll(async () => {
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-    }
+    await closeTestDb();
   });
 
   afterEach(async () => {
-    const reviewRepository = AppDataSource.getRepository(Review);
-    const bookRepository = AppDataSource.getRepository(Book);
-    const userRepository = AppDataSource.getRepository(User);
-    const { ILike } = require("typeorm");
-
-    try {
-      // Limpieza profunda usando query builder
-      await reviewRepository.createQueryBuilder().delete().execute();
-      await userRepository.delete({ email: ILike("%@test.com") });
-      await bookRepository.delete({ title: ILike("%Book%") });
-    } catch (error) {
-      // Silenciamos errores de limpieza
-    }
+    await clearDatabase();
   });
 
   beforeEach(async () => {

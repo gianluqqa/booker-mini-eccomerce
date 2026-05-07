@@ -26,45 +26,22 @@ import {
 import { Order } from "../../../src/entities/Order";
 import { OrderItem } from "../../../src/entities/OrderItem";
 import { OrderStatus } from "../../../src/enums/OrderStatus";
-import { StockReservation } from "../../../src/entities/StockReservation";
+import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
 
 describe("Admin Panel - Módulo de Administración", () => {
   let testUser: User;
   let authToken: string;
 
   beforeAll(async () => {
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
-    }
+    await initializeTestDb();
   });
 
   afterAll(async () => {
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-    }
+    await closeTestDb();
   });
 
   afterEach(async () => {
-    const orderRepository = AppDataSource.getRepository(Order);
-    const orderItemRepository = AppDataSource.getRepository(OrderItem);
-    const bookRepository = AppDataSource.getRepository(Book);
-    const userRepository = AppDataSource.getRepository(User);
-    const reviewRepository = AppDataSource.getRepository(Review);
-    const genreRepository = AppDataSource.getRepository(Genre);
-    const stockReservationRepository = AppDataSource.getRepository(StockReservation);
-    const { ILike } = require("typeorm");
-
-    try {
-      await orderItemRepository.createQueryBuilder().delete().execute();
-      await orderRepository.createQueryBuilder().delete().execute();
-      await reviewRepository.createQueryBuilder().delete().execute();
-      await stockReservationRepository.createQueryBuilder().delete().execute();
-      await userRepository.delete({ email: ILike("%@test.com") });
-      await bookRepository.delete({ title: ILike("%Book%") });
-      await genreRepository.delete({ name: ILike("%TestGenre%") });
-    } catch (error) {
-      // Silenciamos errores de limpieza
-    }
+    await clearDatabase();
   });
 
   beforeEach(async () => {

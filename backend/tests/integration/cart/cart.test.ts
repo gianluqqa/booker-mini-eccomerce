@@ -11,6 +11,7 @@ import { Order } from "../../../src/entities/Order";
 import { OrderStatus } from "../../../src/enums/OrderStatus";
 import { User } from "../../../src/entities/User";
 import { Book } from "../../../src/entities/Book";
+import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
 
 /**
  * ================================================================================================
@@ -43,42 +44,15 @@ describe("Cart - Carrito de Compras", () => {
   let extraBooks: any[] = [];
 
   beforeAll(async () => {
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
-    }
+    await initializeTestDb();
   });
 
   afterAll(async () => {
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-    }
+    await closeTestDb();
   });
 
   afterEach(async () => {
-    const userRepository = AppDataSource.getRepository(User);
-    const bookRepository = AppDataSource.getRepository(Book);
-    const { ILike } = require("typeorm");
-
-    try {
-      // 1. Borrar todos los usuarios de prueba
-      await userRepository.delete({
-        email: ILike("%@test.com")
-      });
-
-      // 2. Borrar todos los libros que parezcan de prueba
-      await bookRepository.delete({
-        title: ILike("%Book%")
-      });
-      await bookRepository.delete({
-        title: ILike("Test%")
-      });
-      await bookRepository.delete({
-        title: ILike("Fech%")
-      });
-
-    } catch (error) {
-      // Silenciamos errores menores de limpieza
-    }
+    await clearDatabase();
   });
 
   beforeEach(async () => {

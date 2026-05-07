@@ -11,6 +11,7 @@ import { validateStockReservationContract, validateOrderContract } from "../../h
 import { validateErrorResponse } from "../../helpers/validateErrorResponse";
 import { OrderStatus } from "../../../src/enums/OrderStatus";
 import { ErrorCodes } from "../../../src/enums/ErrorCodes";
+import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
 import { User } from "../../../src/entities/User";
 import { Book } from "../../../src/entities/Book";
 import { Order } from "../../../src/entities/Order";
@@ -23,34 +24,15 @@ describe("Checkout - Proceso de Compra", () => {
   let anotherBook: any;
 
   beforeAll(async () => {
-    if (!AppDataSource.isInitialized) {
-      await AppDataSource.initialize();
-    }
+    await initializeTestDb();
   });
 
   afterAll(async () => {
-    if (AppDataSource.isInitialized) {
-      await AppDataSource.destroy();
-    }
+    await closeTestDb();
   });
 
   afterEach(async () => {
-    const userRepository = AppDataSource.getRepository(User);
-    const bookRepository = AppDataSource.getRepository(Book);
-    const cartRepository = AppDataSource.getRepository("Cart");
-    const orderRepository = AppDataSource.getRepository("Order");
-    const stockReservationRepository = AppDataSource.getRepository("StockReservation");
-    const { ILike } = require("typeorm");
-
-    try {
-      await userRepository.delete({ email: ILike("%@test.com") });
-      await bookRepository.delete({ title: ILike("%Book%") });
-      await bookRepository.delete({ title: ILike("Test%") });
-      await bookRepository.delete({ title: ILike("Another%") });
-      await cartRepository.createQueryBuilder().delete().execute();
-      await orderRepository.createQueryBuilder().delete().execute();
-      await stockReservationRepository.createQueryBuilder().delete().execute();
-    } catch (error) { }
+    await clearDatabase();
   });
 
   beforeEach(async () => {
