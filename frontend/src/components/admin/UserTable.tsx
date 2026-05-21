@@ -7,15 +7,17 @@ import { getAllUsers } from "@/services/adminService";
 import { deleteUser, deleteAllUsersExceptAdmin } from "@/services/userService";
 import { IUser } from "@/types/User";
 import Image from "next/image";
-import { Users, Loader2, AlertCircle, Mail, Calendar, Shield, User as UserIcon, Trash2, AlertTriangle } from "lucide-react";
+import { Users, Loader2, Mail, Calendar, Shield, User as UserIcon, Trash2, AlertTriangle } from "lucide-react";
 import { getRoleDisplay, getRoleColor, formatDate } from "@/utils/helpers";
+import { AdminToast } from "../alerts/AdminToast";
 
 const UsersTable = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
   const [users, setUsers] = useState<IUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | string[] | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
   const [deleteAllLoading, setDeleteAllLoading] = useState(false);
   const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
@@ -76,7 +78,8 @@ const UsersTable = () => {
       setUsers(users.filter(u => u.role === 'admin'));
       setError(null);
       setShowDeleteAllConfirm(false);
-      alert(`${result.message} (${result.deletedCount} usuarios eliminados)`);
+      setSuccessMessage(`${result.message} (${result.deletedCount} usuarios eliminados)`);
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Error al eliminar los usuarios";
       setError(errorMessage);
@@ -94,7 +97,7 @@ const UsersTable = () => {
   // Estado de carga
   if (loading) {
     return (
-      <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 flex items-center justify-center min-h-[400px]">
+      <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-100 flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Loader2 className="w-10 h-10 text-[#2e4b30] animate-spin mx-auto mb-3" />
           <p className="text-[#2e4b30] text-base">Cargando usuarios...</p>
@@ -103,18 +106,19 @@ const UsersTable = () => {
     );
   }
 
-  // Estado de error
-  if (error) {
+  // Estado de error crítico al cargar
+  if (error && loading) {
     return (
-      <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-        <div className="flex items-center gap-3 text-red-600 mb-3">
-          <AlertCircle className="w-5 h-5" />
-          <h3 className="text-base font-semibold">Error al cargar usuarios</h3>
-        </div>
-        <p className="text-gray-700 mb-3 text-sm">{error}</p>
+      <div className="bg-white rounded-sm p-8 shadow-sm border border-gray-100">
+        <AdminToast 
+          type="error"
+          title="Error al cargar usuarios" 
+          message={error} 
+          onClose={() => setError(null)}
+        />
         <button
           onClick={() => window.location.reload()}
-          className="bg-[#2e4b30] text-[#f5efe1] px-5 py-1.5 rounded-sm text-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
+          className="mt-4 bg-[#2e4b30] text-[#f5efe1] px-5 py-1.5 rounded-sm text-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
         >
           Reintentar
         </button>
@@ -124,6 +128,24 @@ const UsersTable = () => {
 
   return (
     <div>
+      {/* Alertas Globales Flotantes */}
+      {error && !loading && (
+        <AdminToast 
+          type="error"
+          title="Error" 
+          message={error} 
+          onClose={() => setError(null)}
+        />
+      )}
+
+      {successMessage && (
+        <AdminToast 
+          type="success"
+          title="¡Éxito!" 
+          message={successMessage} 
+          onClose={() => setSuccessMessage(null)}
+        />
+      )}
       {/* Encabezado */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">

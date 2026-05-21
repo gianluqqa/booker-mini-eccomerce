@@ -276,7 +276,13 @@ export const processCheckoutService = async (
           createdAt: existingPendingOrder.createdAt,
           items: existingPendingOrder.items.map(item => ({
             id: item.id,
-            book: { id: item.book.id, title: item.book.title, author: item.book.author, price: Number(item.book.price) },
+            book: { 
+              id: item.book.id, 
+              title: item.book.title, 
+              author: item.book.author, 
+              price: Number(item.book.price),
+              image: item.book.image
+            },
             quantity: item.quantity,
             price: Number(item.price)
           }))
@@ -349,7 +355,13 @@ export const processCheckoutService = async (
           createdAt: existingPendingOrder.createdAt,
           items: existingPendingOrder.items.map(item => ({
             id: item.id,
-            book: { id: item.book.id, title: item.book.title, author: item.book.author, price: Number(item.book.price) },
+            book: { 
+              id: item.book.id, 
+              title: item.book.title, 
+              author: item.book.author, 
+              price: Number(item.book.price),
+              image: item.book.image
+            },
             quantity: item.quantity,
             price: Number(item.price)
           }))
@@ -518,6 +530,7 @@ export const processCheckoutService = async (
             title: item.book.title,
             author: item.book.author,
             price: unitPrice,
+            image: item.book.image,
           },
           quantity: item.quantity,
           price: unitPrice,

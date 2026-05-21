@@ -11,19 +11,19 @@ import { OrderConfirmation } from "@/components/checkout/OrderConfirmation";
 
 // Componente principal
 const CheckoutPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
   const checkoutLogic = useCheckoutLogic();
 
-  // Redirección si no está autenticado
+  // Redirección si no está autenticado (esperando a que termine de cargar la sesión)
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, authLoading, router]);
 
-  // Estados de carga
-  if (checkoutLogic.loading) {
+  // Estados de carga (tanto de auth como de lógica de checkout)
+  if (authLoading || checkoutLogic.loading) {
     return <LoadingState />;
   }
 

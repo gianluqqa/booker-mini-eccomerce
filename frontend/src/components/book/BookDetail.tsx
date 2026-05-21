@@ -164,14 +164,6 @@ const BookDetail = () => {
                     <span className="text-[#f5efe1] font-black uppercase tracking-tighter mt-4 opacity-50">Imagen No Disponible</span>
                   </div>
                 )}
-                <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end text-[#f5efe1]">
-                  <div className="bg-[#2e4b30] p-4 rounded-none shadow-xl border border-white/10">
-                    <p className="text-[10px] uppercase font-black tracking-widest mb-1 opacity-70">En Almacén</p>
-                    <p className="text-xl font-bold flex items-center gap-2">
-                      <Package className="w-5 h-5" /> {book.stock} Unidades
-                    </p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -229,6 +221,10 @@ const BookDetail = () => {
                   </div>
 
                   <div className="space-y-4 border-y border-white/10 py-6">
+                    <div className="flex items-center gap-3 text-xs font-bold">
+                      <Package className="w-4 h-4 text-[#f5efe1]" />
+                      <span>En Almacén: {book.stock} Unidades</span>
+                    </div>
                     <div className="flex items-center gap-3 text-xs font-bold">
                       <ShieldCheck className="w-4 h-4 text-[#f5efe1]" />
                       <span>Seguridad Total</span>

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useReservation } from "@/contexts/ReservationContext";
 import { useCart } from "@/contexts/CartContext";
-import { startCheckout, processPayment, checkPendingOrder, cancelCheckout, getUserCart } from "@/services/checkoutService";
+import { startCheckout, processPayment, checkPendingOrder, cancelCheckout, getUserCart, createStockReservation } from "@/services/checkoutService";
 import { getOrderById } from "@/services/orderService";
 import { IOrder } from "@/types/Order";
 import { ICartItem, ICartResponse } from "@/types/Cart";
@@ -12,7 +12,7 @@ import { calculateSubtotalFromCart, calculateSubtotalFromOrder, calculateTax, ca
 export const useCheckoutLogic = () => {
   const router = useRouter();
   const params = useParams();
-  const { clearReservation } = useReservation();
+  const { setReservation, clearReservation } = useReservation();
   const { refreshCart } = useCart();
   const orderId = params.orderId as string | undefined;
 
@@ -20,7 +20,7 @@ export const useCheckoutLogic = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [cartItems, setCartItems] = useState<ICartItem[]>([]);
   const [order, setOrder] = useState<IOrder | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | string[] | null>(null);
   const [processing, setProcessing] = useState<boolean>(false);
   const [orderExpired, setOrderExpired] = useState<boolean>(false);
   const [cardData, setCardData] = useState({
@@ -29,6 +29,7 @@ export const useCheckoutLogic = () => {
     expiryDate: "",
     cvc: "",
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // 🔒 useRef para bloqueo real (persiste entre re-renders)
   const isInitializingRef = useRef<boolean>(false);
@@ -88,20 +89,29 @@ export const useCheckoutLogic = () => {
           return;
         }
 
-        // Flujo normal: Obtener carrito primero
-        const cartData: ICartResponse = await getUserCart();
-        setCartItems(cartData.items || []);
-
-        if (cartData.items.length === 0) {
-          router.push("/cart");
-          return;
-        }
-
-        // Verificar si ya existe una orden PENDING
+        // 1. Verificar primero si ya existe una orden PENDING activa
         const existingOrder = await checkPendingOrder();
 
         if (existingOrder) {
           setOrder(existingOrder);
+          
+          // Sincronizar items del carrito con los de la orden existente
+          if (existingOrder.items && existingOrder.items.length > 0) {
+            setCartItems(existingOrder.items.map(item => ({
+              id: item.id,
+              book: {
+                id: item.book.id,
+                title: item.book.title,
+                author: item.book.author || '',
+                price: item.book.price,
+                stock: 0,
+                image: item.book.image
+              },
+              quantity: item.quantity,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            })));
+          }
 
           // Verificar si la orden ha expirado
           if (existingOrder.expiresAt) {
@@ -112,41 +122,61 @@ export const useCheckoutLogic = () => {
               setOrderExpired(true);
               setError("Tu orden ha expirado. Por favor, inicia un nuevo checkout.");
             } else {
-              setOrderExpired(false); // Asegurar que el estado sea correcto
+              setOrderExpired(false);
             }
           } else {
             setOrderExpired(false);
           }
-        } else {
-          // Verificar si hay items en el carrito antes de crear nueva orden
-          if (cartData.items.length === 0) {
-            router.push("/cart");
-            return;
-          }
+          return; // Finalizar inicialización si ya hay orden
+        }
 
-          // Crear nueva orden PENDING solo si no hay error de expiración
-          if (!orderExpired) {
-            try {
-              const newOrder = await startCheckout();
-              setOrder(newOrder);
-              await refreshCart(); // 🔔 Notificar al contexto global
-            } catch (orderError: unknown) {
-              // Si el error es por orden pendiente existente, es normal en Strict Mode
-              const errorMessage = orderError instanceof Error ? orderError.message : '';
-              if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
-                
-                // Verificar si ya existe una orden (puede ser la que acabamos de crear)
-                const existingOrder = await checkPendingOrder();
-                if (existingOrder) {
-                  setOrder(existingOrder);
-                }
-              } else {
-                // Para otros errores, lanzar la excepción
-                throw orderError;
-              }
+        // 2. Si no hay orden, proceder con el flujo de carrito normal
+        const cartData: ICartResponse = await getUserCart();
+        setCartItems(cartData.items || []);
+
+        if (cartData.items.length === 0) {
+          router.push("/cart");
+          return;
+        }
+
+        // 3. Flujo de nueva orden: Reserva -> Orden
+        if (!orderExpired) {
+          try {
+            // A. Crear reserva de stock
+            const reservation = await createStockReservation();
+            setReservation(reservation);
+            
+            // B. Crear orden PENDING
+            const newOrder = await startCheckout();
+            setOrder(newOrder);
+            
+            // C. Sincronizar items
+            if (newOrder.items && newOrder.items.length > 0) {
+              setCartItems(newOrder.items.map(item => ({
+                id: item.id,
+                book: {
+                  id: item.book.id,
+                  title: item.book.title,
+                  author: item.book.author || '',
+                  price: item.book.price,
+                  stock: 0,
+                  image: item.book.image
+                },
+                quantity: item.quantity,
+                createdAt: new Date(),
+                updatedAt: new Date()
+              })));
             }
-          } else {
-            // Orden expirada, no se crea nueva
+            
+            await refreshCart();
+          } catch (orderError: unknown) {
+            const errorMessage = orderError instanceof Error ? orderError.message : '';
+            if (errorMessage.includes('orden pendiente') || errorMessage.includes('409')) {
+              const retryOrder = await checkPendingOrder();
+              if (retryOrder) setOrder(retryOrder);
+            } else {
+              throw orderError;
+            }
           }
         }
       } catch (error: unknown) {
@@ -174,14 +204,16 @@ export const useCheckoutLogic = () => {
     }
 
     // Validar datos de pago
-    const validationError = validatePaymentData(cardData);
-    if (validationError) {
-      setError(validationError);
+    const validationErrors = validatePaymentData(cardData);
+    if (Object.keys(validationErrors).length > 0) {
+      setFieldErrors(validationErrors);
+      setError("Por favor, corrige los errores en el formulario.");
       return;
     }
 
     setProcessing(true);
     setError(null);
+    setFieldErrors({});
 
     try {
       const cleanData = cleanPaymentData(cardData);
@@ -190,9 +222,31 @@ export const useCheckoutLogic = () => {
       setProcessing(false);
       clearReservation();
       await refreshCart(); // 🔔 Notificar que ya no hay pendiente
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Error al procesar el pago";
-      setError(errorMessage);
+    } catch (error: any) {
+      // Priorizar la lista detallada de errores de validación para el componente CheckoutErrorState
+      const validationErrors = error.validationErrors || [];
+      
+      if (validationErrors.length > 0) {
+        const mappedErrors: Record<string, string> = {};
+        
+        validationErrors.forEach((err: string) => {
+          if (err.toLowerCase().includes("número") || err.toLowerCase().includes("tarjeta")) {
+            mappedErrors.cardNumber = err;
+          } else if (err.toLowerCase().includes("nombre")) {
+            mappedErrors.cardName = err;
+          } else if (err.toLowerCase().includes("vencimiento") || err.toLowerCase().includes("vencida") || err.toLowerCase().includes("mes")) {
+            mappedErrors.expiryDate = err;
+          } else if (err.toLowerCase().includes("cvc")) {
+            mappedErrors.cvc = err;
+          }
+        });
+        
+        setFieldErrors(mappedErrors);
+        setError("Por favor, corrige los errores en el formulario.");
+      } else {
+        setError(error.message || "Error al procesar el pago");
+      }
+      
       setProcessing(false);
     }
   };
@@ -241,9 +295,13 @@ export const useCheckoutLogic = () => {
     return order ? calculateSubtotalFromOrder(order) : calculateSubtotalFromCart(cartItems);
   };
 
+  const calculateTotalVal = () => {
+    return order ? Number(order.total) : calculateTotal(subtotal);
+  };
+
   const subtotal = calculateSubtotal();
   const tax = calculateTax(subtotal);
-  const total = calculateTotal(subtotal);
+  const total = calculateTotalVal();
 
   return {
     // Estados
@@ -254,6 +312,7 @@ export const useCheckoutLogic = () => {
     processing,
     orderExpired,
     cardData,
+    fieldErrors,
 
     // Cálculos
     subtotal,
@@ -265,7 +324,10 @@ export const useCheckoutLogic = () => {
     handleCancelCheckout,
     handleOrderExpired,
     handleRestartCheckout,
-    setCardData,
+    setCardData: (data: any) => {
+      setCardData(data);
+      setFieldErrors({}); // Limpiar errores al interactuar
+    },
 
     // Utilidades
     router,

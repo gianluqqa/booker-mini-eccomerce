@@ -2,14 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { BookOpen, Clock, Gift, Sparkles, Award, Star, ArrowRight, Loader2, ShoppingCart } from 'lucide-react';
+import { BookOpen, Clock, Sparkles, Award, Star, ArrowRight, Loader2, ShoppingCart } from 'lucide-react';
 import { IBook } from '@/types/Book';
 import { useBooks } from '@/hooks/useBooks';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNoAuthAlert } from '@/contexts/NoAuthAlertContext';
 import { useAddToCart } from '@/hooks/useAddToCart';
-
 
 const WeeklyRecommendation = () => {
   const { books, loading } = useBooks();
@@ -117,7 +116,7 @@ const WeeklyRecommendation = () => {
             <div className="bg-[#1a3a1c] p-8 border border-[#f5efe1]/10 shadow-2xl relative">
               <Sparkles className="absolute -top-4 -right-4 w-10 h-10 text-[#f5efe1]/20" />
               <p className="text-[#f5efe1]/90 leading-relaxed text-lg font-medium italic">
-                "{recommendation.description || 'Una obra que captura la esencia de la literatura contemporánea con prosas poéticas y personajes inolvidables. Perfecta para quienes buscan historias que resuenan profundamente en el alma.'}"
+                &ldquo;{recommendation.description || 'Una obra que captura la esencia de la literatura contemporánea con prosas poéticas y personajes inolvidables. Perfecta para quienes buscan historias que resuenan profundamente en el alma.'}&rdquo;
               </p>
             </div>
 
@@ -185,12 +184,14 @@ const WeeklyRecommendation = () => {
               {/* Contenedor Principal de Imagen */}
               <div className="w-72 md:w-96 aspect-[3/4.5] bg-[#1a3a1c] shadow-[30px_30px_60px_rgba(0,0,0,0.4)] relative overflow-hidden border-2 border-[#f5efe1]/10">
                 {recommendation.image && !imageError ? (
-                  <img
+                  <Image
                     src={recommendation.image}
                     alt={recommendation.title}
                     className="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000"
                     onError={() => setImageError(true)}
-                    referrerPolicy="no-referrer"
+                    width={384}
+                    height={512}
+                    style={{ objectFit: 'cover' }}
                   />
                 ) : (
 

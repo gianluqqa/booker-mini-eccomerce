@@ -1,7 +1,7 @@
 //! Servicios exclusivos para ADMINISTRADORES
 //! Todas las funciones aquí requieren autenticación y rol de admin
 
-import { apiClient, extractData } from "@/config/api";
+import { apiClient, extractData, extractMessage } from "@/config/api";
 import { IUser } from "@/types/User";
 import { IBook, ICreateBook, IUpdateBook } from "@/types/Book";
 import { IOrder } from "@/types/Order";
@@ -78,13 +78,16 @@ export const getAllUsers = async (): Promise<IUser[]> => {
  * Endpoint: POST /books
  * Requiere: Autenticación JWT + rol admin
  */
-export const createBookAdmin = async (payload: ICreateBook): Promise<IBook> => {
+export const createBookAdmin = async (payload: ICreateBook): Promise<{ data: IBook, message: string }> => {
   try {
-    const response = await apiClient.post<{ success: boolean; data: IBook }>(
+    const response = await apiClient.post<{ success: boolean; data: IBook; message: string }>(
       "/books",
       payload
     );
-    return extractData<IBook>(response);
+    return {
+      data: extractData<IBook>(response),
+      message: extractMessage(response)
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudo crear el libro";
@@ -96,13 +99,16 @@ export const createBookAdmin = async (payload: ICreateBook): Promise<IBook> => {
  * Actualiza un libro existente (solo administradores)
  * Endpoint: PUT /books/:id
  */
-export const updateBookAdmin = async (id: string,payload: IUpdateBook): Promise<IBook> => {
+export const updateBookAdmin = async (id: string,payload: IUpdateBook): Promise<{ data: IBook, message: string }> => {
   try {
-    const response = await apiClient.put<{ success: boolean; data: IBook }>(
+    const response = await apiClient.put<{ success: boolean; data: IBook; message: string }>(
       `/books/${id}`,
       payload
     );
-    return extractData<IBook>(response);
+    return {
+      data: extractData<IBook>(response),
+      message: extractMessage(response)
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudo actualizar el libro";
@@ -114,9 +120,10 @@ export const updateBookAdmin = async (id: string,payload: IUpdateBook): Promise<
  * Elimina un libro (solo administradores)
  * Endpoint: DELETE /books/:id
  */
-export const deleteBookAdmin = async (id: string): Promise<void> => {
+export const deleteBookAdmin = async (id: string): Promise<{ message: string }> => {
   try {
-    await apiClient.delete(`/books/${id}`);
+    const response = await apiClient.delete<{ success: boolean; message: string }>(`/books/${id}`);
+    return { message: extractMessage(response) };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudo eliminar el libro";
@@ -160,13 +167,16 @@ export const getAllOrders = async (): Promise<IOrder[]> => {
  * @returns Orden actualizada con estado CANCELLED
  * @throws Error si no se puede cancelar la orden o si no es admin
  */
-export const cancelPaidOrder = async (orderId: string): Promise<IOrder> => {
+export const cancelPaidOrder = async (orderId: string): Promise<{ data: IOrder, message: string }> => {
   try {
     const response = await apiClient.patch<{ success: boolean; message: string; data: IOrder }>(
       `/orders/admin/${orderId}/cancel`
     );
     
-    return extractData<IOrder>(response);
+    return {
+      data: extractData<IOrder>(response),
+      message: extractMessage(response)
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudo cancelar la orden";
@@ -194,7 +204,7 @@ export const cancelPaidOrder = async (orderId: string): Promise<IOrder> => {
  * @returns Objeto con estadísticas de la operación
  * @throws Error si no se pueden limpiar las órdenes o si no es admin
  */
-export const clearAllOrders = async (): Promise<{ deletedOrders: number; restoredStock: number }> => {
+export const clearAllOrders = async (): Promise<{ data: { deletedOrders: number; restoredStock: number }, message: string }> => {
   try {
     const response = await apiClient.delete<{ 
       success: boolean; 
@@ -203,7 +213,10 @@ export const clearAllOrders = async (): Promise<{ deletedOrders: number; restore
     }>(
       "/orders/admin/clear-all"
     );
-    return extractData<{ deletedOrders: number; restoredStock: number }>(response);
+    return {
+      data: extractData<{ deletedOrders: number; restoredStock: number }>(response),
+      message: extractMessage(response)
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudieron limpiar las órdenes";
@@ -226,7 +239,7 @@ export const clearAllOrders = async (): Promise<{ deletedOrders: number; restore
  * @returns Objeto con estadísticas de la operación (deletedOrders y restoredStock)
  * @throws Error si no se pueden limpiar las órdenes canceladas o si no es admin
  */
-export const clearCancelledOrders = async (): Promise<{ deletedOrders: number; restoredStock: number }> => {
+export const clearCancelledOrders = async (): Promise<{ data: { deletedOrders: number; restoredStock: number }, message: string }> => {
   try {
     const response = await apiClient.delete<{ 
       success: boolean; 
@@ -235,7 +248,10 @@ export const clearCancelledOrders = async (): Promise<{ deletedOrders: number; r
     }>(
       "/orders/admin/clear-cancelled"
     );
-    return extractData<{ deletedOrders: number; restoredStock: number }>(response);
+    return {
+      data: extractData<{ deletedOrders: number; restoredStock: number }>(response),
+      message: extractMessage(response)
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "No se pudieron limpiar las órdenes canceladas";

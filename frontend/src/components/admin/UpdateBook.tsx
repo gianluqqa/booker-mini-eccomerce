@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import { IBook, IUpdateBook } from "@/types/Book";
 import { updateBookAdmin } from "@/services/adminService";
-import { Loader2, AlertCircle, CheckCircle, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+import { AdminToast } from "../alerts/AdminToast";
 
 interface UpdateBookProps {
   book: IBook;
@@ -25,7 +26,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
   });
 
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | string[] | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -57,15 +58,15 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
 
     try {
       setSubmitting(true);
-      await updateBookAdmin(formData.id, payload);
-      setSuccessMessage("Libro actualizado correctamente.");
+      const result = await updateBookAdmin(formData.id, payload);
+      setSuccessMessage(result.message || "Libro actualizado correctamente.");
       await onUpdated();
       // Opcional: cerrar automáticamente después de un corto tiempo
       setTimeout(() => {
         onClose();
-      }, 800);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "No se pudo actualizar el libro";
+      }, 1500);
+    } catch (err: any) {
+      const message = err.validationErrors || err.message || "No se pudo actualizar el libro";
       setError(message);
     } finally {
       setSubmitting(false);
@@ -87,17 +88,21 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
       </div>
 
       {error && (
-        <div className="mb-3 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 border border-red-200">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
+        <AdminToast 
+          type="error"
+          title="Error al actualizar" 
+          message={error} 
+          onClose={() => setError(null)}
+        />
       )}
 
       {successMessage && (
-        <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-xs text-green-700 border border-green-200">
-          <CheckCircle className="w-4 h-4" />
-          <span>{successMessage}</span>
-        </div>
+        <AdminToast 
+          type="success"
+          title="¡Éxito!" 
+          message={successMessage} 
+          onClose={() => setSuccessMessage(null)}
+        />
       )}
 
       <form onSubmit={handleSubmit} className="space-y-3">

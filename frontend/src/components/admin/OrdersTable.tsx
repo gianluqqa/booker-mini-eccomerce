@@ -4,11 +4,14 @@ import React, { useEffect, useState } from 'react'
 import { getAllOrders, cancelPaidOrder, clearAllOrders, clearCancelledOrders } from '@/services/adminService'
 import { IOrder } from '@/types/Order'
 import { Package, CheckCircle, XCircle, AlertCircle, Ban, Clock, Trash2 } from 'lucide-react'
+import { SuccessAlert } from '../alerts/SuccessAlert'
+import { ErrorAlert } from '../alerts/ErrorAlert'
 
 const OrdersTable: React.FC = () => {
   const [orders, setOrders] = useState<IOrder[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | string[] | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null)
   const [clearingOrders, setClearingOrders] = useState(false)
   const [clearingCancelledOrders, setClearingCancelledOrders] = useState(false)
@@ -37,21 +40,22 @@ const OrdersTable: React.FC = () => {
 
     try {
       setCancellingOrderId(orderId)
-      const updatedOrder = await cancelPaidOrder(orderId)
+      const result = await cancelPaidOrder(orderId)
       
       // Actualizar la orden en la lista local
       setOrders(prevOrders => 
         prevOrders.map(order => 
-          order.id === orderId ? updatedOrder : order
+          order.id === orderId ? result.data : order
         )
       )
 
       // Mostrar mensaje de éxito
-      alert('Orden cancelada exitosamente')
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error al cancelar la orden'
+      setSuccessMessage(result.message)
+      setTimeout(() => setSuccessMessage(null), 5000)
+    } catch (err: any) {
+      const errorMessage = err.message || 'Error al cancelar la orden'
       setError(errorMessage)
-      alert(`Error: ${errorMessage}`)
+      setTimeout(() => setError(null), 5000)
     } finally {
       setCancellingOrderId(null)
     }
@@ -71,11 +75,12 @@ const OrdersTable: React.FC = () => {
       setOrders([])
       
       // Mostrar mensaje de éxito con estadísticas
-      alert(`✅ Limpieza completada:\n• ${result.deletedOrders} órdenes eliminadas\n• ${result.restoredStock} unidades de stock restauradas`)
+      setSuccessMessage(`${result.message}: ${result.data.deletedOrders} órdenes eliminadas, ${result.data.restoredStock} unidades restauradas`)
+      setTimeout(() => setSuccessMessage(null), 5000)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al limpiar las órdenes'
       setError(errorMessage)
-      alert(`Error: ${errorMessage}`)
+      setTimeout(() => setError(null), 5000)
     } finally {
       setClearingOrders(false)
     }
@@ -95,11 +100,12 @@ const OrdersTable: React.FC = () => {
       setOrders(prevOrders => prevOrders.filter(order => order.status?.toLowerCase() !== 'cancelled'))
       
       // Mostrar mensaje de éxito
-      alert(`✅ Limpieza completada:\n• ${result.deletedOrders} órdenes canceladas eliminadas\n• ${result.restoredStock} unidades de stock restauradas`)
+      setSuccessMessage(`${result.message}: ${result.data.deletedOrders} eliminadas`)
+      setTimeout(() => setSuccessMessage(null), 5000)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al limpiar órdenes canceladas'
       setError(errorMessage)
-      alert(`Error: ${errorMessage}`)
+      setTimeout(() => setError(null), 5000)
     } finally {
       setClearingCancelledOrders(false)
     }
@@ -177,16 +183,16 @@ const OrdersTable: React.FC = () => {
     )
   }
 
-  if (error) {
+  if (error && loading) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div className="flex items-center">
-          <XCircle className="w-5 h-5 text-red-600 mr-2" />
-          <span className="text-red-800">{error}</span>
-        </div>
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <ErrorAlert 
+          title="Error al cargar órdenes" 
+          message={error} 
+        />
         <button
           onClick={fetchOrders}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded-sm hover:bg-red-700 transition-colors"
+          className="mt-4 px-4 py-2 bg-[#2e4b30] text-white rounded-sm hover:bg-[#1a2f1a] transition-colors"
         >
           Reintentar
         </button>
@@ -206,6 +212,18 @@ const OrdersTable: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {/* Alertas Globales */}
+      {error && !loading && (
+        <div className="mb-4">
+          <ErrorAlert title="Error" message={error} />
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="mb-4">
+          <SuccessAlert title="¡Éxito!" message={successMessage} />
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-[#2e4b30]">Todas las Órdenes</h3>

@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation'
 import { useBooks } from '@/hooks/useBooks'
 import { IBook } from '@/types/Book'
 import { deleteBookAdmin } from '@/services/adminService'
-import { BookOpen, Pencil, Trash2, Loader2, AlertCircle } from 'lucide-react'
+import { BookOpen, Pencil, Trash2, Loader2 } from 'lucide-react'
+import { AdminToast } from '../alerts/AdminToast'
 import UpdateBook from './UpdateBook'
 
 const BookList: React.FC = () => {
@@ -15,7 +16,8 @@ const BookList: React.FC = () => {
   const { books, loading, error, refetch } = useBooks()
 
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [actionError, setActionError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | string[] | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [editingBook, setEditingBook] = useState<IBook | null>(null)
 
   // Proteger: solo admin
@@ -38,7 +40,9 @@ const BookList: React.FC = () => {
     try {
       setActionError(null)
       setDeletingId(book.id)
-      await deleteBookAdmin(book.id)
+      const result = await deleteBookAdmin(book.id)
+      setSuccessMessage(result.message)
+      setTimeout(() => setSuccessMessage(null), 5000)
       await refetch()
     } catch (err) {
       const message =
@@ -90,17 +94,30 @@ const BookList: React.FC = () => {
       </div>
 
       {error && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-xs text-red-700 border border-red-200">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
-        </div>
+        <AdminToast 
+          type="error"
+          title="Error de carga" 
+          message={error} 
+          onClose={() => {}} // El hook useBooks maneja esto, pero para AdminToast lo dejamos así
+        />
       )}
 
       {actionError && (
-        <div className="mb-4 flex items-center gap-2 rounded-lg bg-red-50 px-4 py-3 text-xs text-red-700 border border-red-200">
-          <AlertCircle className="w-4 h-4" />
-          <span>{actionError}</span>
-        </div>
+        <AdminToast 
+          type="error"
+          title="Error de acción" 
+          message={actionError} 
+          onClose={() => setActionError(null)}
+        />
+      )}
+
+      {successMessage && (
+        <AdminToast 
+          type="success"
+          title="¡Éxito!" 
+          message={successMessage} 
+          onClose={() => setSuccessMessage(null)}
+        />
       )}
 
       {loading ? (

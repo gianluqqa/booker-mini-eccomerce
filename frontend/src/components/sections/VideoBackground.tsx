@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import Link from 'next/link'
 
 const VideoBackground = () => {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -55,13 +56,9 @@ const VideoBackground = () => {
 
             {/* Botones de acción */}
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <button className="bg-[#2e4b30] text-[#f5efe1] px-8 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium">
+              <Link href="/store" className="bg-[#2e4b30] text-[#f5efe1] px-8 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium">
                 Explorar Catálogo
-              </button>
-              
-              <button className="bg-booker-beige text-booker-green px-8 py-3 rounded-sm border border-booker-green hover:bg-booker-green hover:text-booker-beige hover:shadow-lg transition-all duration-200 font-medium">
-                Ver Novedades
-              </button>
+              </Link>
             </div>
           </div>
         </div>

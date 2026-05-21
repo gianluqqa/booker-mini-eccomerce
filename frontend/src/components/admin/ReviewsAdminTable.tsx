@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { getAllReviewsAdmin, deleteReviewAdmin, IAdminReview, IAdminReviewsFilters, IAdminReviewsResponse } from '@/services/adminService'
 import { Star, Filter, Search, Book, User, MessageSquare, ChevronLeft, ChevronRight, Eye, Trash2 } from 'lucide-react'
+import { AdminToast } from '../alerts/AdminToast'
 
 const ReviewsAdminTable: React.FC = () => {
   const router = useRouter()
@@ -20,6 +21,8 @@ const ReviewsAdminTable: React.FC = () => {
   const [bookFilter, setBookFilter] = useState('')
   const [userFilter, setUserFilter] = useState('')
   const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   const handleViewReview = (review: IAdminReview) => {
     // Navegar a la página del libro para ver la review completa
@@ -40,10 +43,12 @@ const ReviewsAdminTable: React.FC = () => {
       setTotal(prevTotal => prevTotal - 1)
       
       // Mostrar mensaje de éxito
-      alert('✅ Review eliminada exitosamente')
+      setSuccessMessage('Review eliminada exitosamente')
+      setTimeout(() => setSuccessMessage(null), 5000)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al eliminar la review'
-      alert(`❌ Error: ${errorMessage}`)
+      setActionError(errorMessage)
+      setTimeout(() => setActionError(null), 5000)
     } finally {
       setDeletingReviewId(null)
     }
@@ -132,6 +137,24 @@ const ReviewsAdminTable: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Alertas Globales Flotantes */}
+      {actionError && (
+        <AdminToast 
+          type="error"
+          title="Error de acción" 
+          message={actionError} 
+          onClose={() => setActionError(null)}
+        />
+      )}
+
+      {successMessage && (
+        <AdminToast 
+          type="success"
+          title="¡Éxito!" 
+          message={successMessage} 
+          onClose={() => setSuccessMessage(null)}
+        />
+      )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

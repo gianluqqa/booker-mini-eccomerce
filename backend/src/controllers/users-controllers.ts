@@ -108,7 +108,7 @@ export const firebaseLoginController = async (req: Request, res: Response) => {
     }
 
     const payload = req.body as FirebaseLoginDTO;
-    
+
     // Validar formato de email
     if (!payload.email || payload.email.trim() === "") {
       return res.status(400).json({
@@ -116,7 +116,7 @@ export const firebaseLoginController = async (req: Request, res: Response) => {
         message: "Email es requerido para el login con Firebase"
       });
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(payload.email)) {
       return res.status(400).json({
@@ -299,8 +299,8 @@ export const toggleFavoriteController = async (req: Request, res: Response) => {
       });
     }
 
-    // 🔹 Validar permisos: customers solo pueden modificar sus propios favoritos
-    if (authUser.role !== UserRole.ADMIN && authUser.id !== userId) {
+    // 🔹 Validar permisos: solo el usuario puede modificar sus propios favoritos
+    if (authUser.id !== userId) {
       return res.status(403).json({
         success: false,
         message: "Prohibido: Solo puedes modificar tus propios favoritos",
@@ -337,8 +337,8 @@ export const getUserFavoritesController = async (req: Request, res: Response) =>
       });
     }
 
-    // 🔹 Validar permisos: customers solo pueden ver sus propios favoritos
-    if (authUser.role !== UserRole.ADMIN && authUser.id !== userId) {
+    // 🔹 Validar permisos: solo el usuario puede ver sus propios favoritos
+    if (authUser.id !== userId) {
       return res.status(403).json({
         success: false,
         message: "Prohibido: Solo puedes ver tus propios favoritos",
@@ -358,4 +358,4 @@ export const getUserFavoritesController = async (req: Request, res: Response) =>
       message: error.message || "Error al obtener favoritos"
     });
   }
-};
+};

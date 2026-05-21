@@ -1,9 +1,8 @@
 "use client"
 import React, { useEffect, useMemo, useState } from 'react'
 import { IUser } from '@/types/User'
-import { ICartItem } from '@/types/Cart'
 import Image from 'next/image'
-import { Mail, MapPin, Phone, Calendar, ShoppingCart, Loader2 } from 'lucide-react'
+import { Mail, MapPin, Phone, Calendar, ShoppingCart, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import UpdateUserForm, { UpdateUserFormData } from '@/components/forms/UpdateUserForm'
@@ -22,7 +21,7 @@ import BookStrip from '@/components/cards/BookStrip'
 
 
 const Profile = () => {
-  const { isAuthenticated, loading: authLoading, user, updateUser } = useAuth()
+  const { isAuthenticated, loading: authLoading, updateUser } = useAuth()
 
   const router = useRouter()
   const [userData, setUserData] = useState<IUser | null>(null)
@@ -32,6 +31,8 @@ const Profile = () => {
   const [pendingOrders, setPendingOrders] = useState<IOrder[]>([])
   const [favorites, setFavorites] = useState<IBook[]>([])
   const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 4 // Mostrar 4 libros por página
 
   const [error, setError] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
@@ -39,14 +40,6 @@ const Profile = () => {
   const [formError, setFormError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
-
-  // Sincronizar favoritos locales con el contexto de auth (para actualización en tiempo real)
-  useEffect(() => {
-    if (user?.favorites) {
-      setFavorites(user.favorites)
-    }
-  }, [user?.favorites])
-
 
   useEffect(() => {
     if (authLoading) {
@@ -91,6 +84,8 @@ const Profile = () => {
         try {
           const userFavorites = await getUserFavorites(data.id)
           setFavorites(userFavorites)
+          // Sincronizar favoritos con el contexto del usuario
+          updateUser({ ...data, favorites: userFavorites })
         } catch {
           setFavorites([])
         }
@@ -98,7 +93,7 @@ const Profile = () => {
 
       } catch (err) {
         // Si es un error de autenticación (401), dejamos que el modal de sesión expirada lo maneje
-        if ((err as any).isAuthError) return;
+        if (err && typeof err === 'object' && 'isAuthError' in err) return;
 
         const errorMessage = err instanceof Error ? err.message : 'Error al cargar los datos del perfil'
         setError(errorMessage)
@@ -109,7 +104,7 @@ const Profile = () => {
     }
 
     fetchUserData()
-  }, [isAuthenticated, authLoading, router])
+  }, [isAuthenticated, authLoading, router]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const initialFormData = useMemo<UpdateUserFormData | null>(() => {
     if (!userData) {
@@ -190,6 +185,29 @@ const Profile = () => {
       setIsSubmitting(false)
     }
   }
+
+  // Lógica de paginación para favoritos
+  const totalPages = Math.ceil(favorites.length / itemsPerPage)
+  const indexOfLastFavorite = currentPage * itemsPerPage
+  const indexOfFirstFavorite = indexOfLastFavorite - itemsPerPage
+  const currentFavorites = favorites.slice(indexOfFirstFavorite, indexOfLastFavorite)
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  // Resetear a página 1 cuando cambian los favoritos
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [favorites.length])
 
   // Si no está autenticado, no renderizar nada (será redirigido)
   if (!isAuthenticated) {
@@ -378,11 +396,37 @@ const Profile = () => {
             Mis Libros Favoritos
           </h2>
           {favorites && favorites.length > 0 ? (
-            <div className="flex flex-col gap-3">
-              {favorites.map((book) => (
-                <BookStrip key={book.id} book={book} />
-              ))}
-            </div>
+            <>
+              <div className="flex flex-col gap-3">
+                {currentFavorites.map((book) => (
+                  <BookStrip key={book.id} book={book} />
+                ))}
+              </div>
+              {/* Controles de Paginación */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#2e4b30]/10">
+                  <button
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    className="flex items-center gap-2 px-4 py-2 rounded-sm font-medium text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f5efe1] text-[#2e4b30]"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    Anterior
+                  </button>
+                  <span className="text-sm font-medium text-[#2e4b30]">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className="flex items-center gap-2 px-4 py-2 rounded-sm font-medium text-sm transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#f5efe1] text-[#2e4b30]"
+                  >
+                    Siguiente
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
 
             <div className="text-center py-8 bg-[#f5efe1] bg-opacity-30 rounded-sm">
@@ -421,18 +465,6 @@ const Profile = () => {
           )}
         </div>
 
-        {/* Botones de Acción */}
-        <div className="flex flex-col sm:flex-row gap-4 mt-8">
-          <button
-            onClick={handleToggleForm}
-            className="flex-1 bg-[#2e4b30] text-[#f5efe1] px-6 py-3 rounded-sm font-medium hover:bg-[#1a3a1c] transition-colors duration-200"
-          >
-            {isEditing ? 'Cerrar formulario' : 'Editar Perfil'}
-          </button>
-          <button className="flex-1 bg-white text-[#2e4b30] border border-[#2e4b30] px-6 py-3 rounded-sm font-medium hover:bg-[#f5efe1] transition-colors duration-200">
-            Ver Historial
-          </button>
-        </div>
       </div>
     </div>
   )

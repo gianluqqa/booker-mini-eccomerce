@@ -5,7 +5,7 @@ import { BookOpen, Sparkles, Heart, Zap, Shield, Brain, Telescope, Crown, Star, 
 import { useBooks } from "@/hooks/useBooks";
 
 const Collections = () => {
-  const { books, loading, error } = useBooks();
+  const { books, loading } = useBooks();
   const [selectedGenre, setSelectedGenre] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);

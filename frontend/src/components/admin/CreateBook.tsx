@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { createBookAdmin } from "@/services/adminService";
 import { getGenres, IGenre } from "@/services/booksService";
 import { ICreateBook } from "@/types/Book";
-import { Loader2, AlertCircle, CheckCircle } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { AdminToast } from "../alerts/AdminToast";
+import { ErrorAlert } from "../alerts/ErrorAlert";
 
 interface CreateBookForm {
   title: string;
@@ -37,7 +39,7 @@ const CreateBook: React.FC = () => {
   const [genres, setGenres] = useState<IGenre[]>([]);
   const [loadingGenres, setLoadingGenres] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Proteger ruta: solo admin
@@ -73,30 +75,41 @@ const CreateBook: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setFieldErrors({});
     setSuccessMessage(null);
 
     // Validaciones básicas en frontend
     const priceNumber = Number(formData.price);
     const stockNumber = Number(formData.stock);
+    const errors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      errors.title = "El título es requerido";
+    }
+
+    if (!formData.author.trim()) {
+      errors.author = "El autor es requerido";
+    }
 
     if (Number.isNaN(priceNumber) || priceNumber <= 0) {
-      setError("El precio debe ser un número mayor a 0");
-      return;
+      errors.price = "El precio debe ser un número mayor a 0";
     }
 
     if (!Number.isInteger(stockNumber) || stockNumber < 0) {
-      setError("El stock debe ser un número entero mayor o igual a 0");
-      return;
+      errors.stock = "El stock debe ser un número entero mayor o igual a 0";
     }
 
     if (!formData.genre) {
-      setError("Debes seleccionar un género");
-      return;
+      errors.genre = "Debes seleccionar un género";
     }
 
     if (!formData.description || formData.description.trim().length < 10) {
-      setError("La descripción debe tener al menos 10 caracteres");
+      errors.description = "La descripción debe tener al menos 10 caracteres";
+    }
+
+    // Si hay errores de validación, mostrarlos y detener
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -113,8 +126,8 @@ const CreateBook: React.FC = () => {
 
     try {
       setSubmitting(true);
-      await createBookAdmin(payload);
-      setSuccessMessage("Libro creado correctamente.");
+      const result = await createBookAdmin(payload);
+      setSuccessMessage(result.message || "Libro creado correctamente.");
       setFormData({
         title: "",
         author: "",
@@ -125,9 +138,25 @@ const CreateBook: React.FC = () => {
         intro: "",
         description: "",
       });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "No se pudo crear el libro";
-      setError(message);
+    } catch (err: unknown) {
+      // Capturar mensajes exactos del backend y mapearlos a campos específicos
+      const errors: Record<string, string> = {};
+      
+      if (err && typeof err === 'object') {
+        const errorObj = err as { validationErrors?: Record<string, string>; message?: string };
+        
+        if (errorObj.validationErrors) {
+          // Si vienen errores de validación por campo del backend
+          Object.assign(errors, errorObj.validationErrors);
+        } else if (errorObj.message) {
+          // Si viene un mensaje general, mostrarlo como error genérico
+          errors.general = errorObj.message;
+        }
+      } else {
+        errors.general = "No se pudo crear el libro";
+      }
+      
+      setFieldErrors(errors);
     } finally {
       setSubmitting(false);
     }
@@ -157,18 +186,22 @@ const CreateBook: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div className="mb-3 flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 border border-red-200">
-          <AlertCircle className="w-4 h-4" />
-          <span>{error}</span>
+      {fieldErrors.general && (
+        <div className="mb-4">
+          <ErrorAlert 
+            title="Error al crear libro" 
+            message={fieldErrors.general} 
+          />
         </div>
       )}
-
+ 
       {successMessage && (
-        <div className="mb-3 flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-xs text-green-700 border border-green-200">
-          <CheckCircle className="w-4 h-4" />
-          <span>{successMessage}</span>
-        </div>
+        <AdminToast 
+          type="success"
+          title="¡Éxito!" 
+          message={successMessage} 
+          onClose={() => setSuccessMessage(null)}
+        />
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -184,9 +217,14 @@ const CreateBook: React.FC = () => {
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
+              className={`w-full px-3 py-1.5 border rounded-md focus:ring-2 focus:ring-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white ${
+                fieldErrors.title ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-[#2e4b30]'
+              }`}
               placeholder="Ej: El Señor de los Anillos"
             />
+            {fieldErrors.title && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.title}</p>
+            )}
           </div>
 
           <div>
@@ -200,9 +238,14 @@ const CreateBook: React.FC = () => {
               value={formData.author}
               onChange={handleChange}
               required
-              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
+              className={`w-full px-3 py-1.5 border rounded-md focus:ring-2 focus:ring-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white ${
+                fieldErrors.author ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-[#2e4b30]'
+              }`}
               placeholder="Ej: J.R.R. Tolkien"
             />
+            {fieldErrors.author && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.author}</p>
+            )}
           </div>
         </div>
 
@@ -220,9 +263,14 @@ const CreateBook: React.FC = () => {
               value={formData.price}
               onChange={handleChange}
               required
-              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
+              className={`w-full px-3 py-1.5 border rounded-md focus:ring-2 focus:ring-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white ${
+                fieldErrors.price ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-[#2e4b30]'
+              }`}
               placeholder="Ej: 19.99"
             />
+            {fieldErrors.price && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.price}</p>
+            )}
           </div>
 
           <div>
@@ -238,9 +286,14 @@ const CreateBook: React.FC = () => {
               value={formData.stock}
               onChange={handleChange}
               required
-              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white"
+              className={`w-full px-3 py-1.5 border rounded-md focus:ring-2 focus:ring-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white ${
+                fieldErrors.stock ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-[#2e4b30]'
+              }`}
               placeholder="Ej: 100"
             />
+            {fieldErrors.stock && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.stock}</p>
+            )}
           </div>
 
           <div>
@@ -254,7 +307,9 @@ const CreateBook: React.FC = () => {
               onChange={handleChange}
               required
               disabled={loadingGenres}
-              className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 bg-white disabled:bg-gray-100 disabled:text-gray-400"
+              className={`w-full px-3 py-1.5 border rounded-md focus:ring-2 text-xs text-gray-900 bg-white disabled:bg-gray-100 disabled:text-gray-400 ${
+                fieldErrors.genre ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-[#2e4b30]'
+              }`}
             >
               <option value="">{loadingGenres ? "Cargando géneros..." : "Selecciona un género"}</option>
               {genres.map((g) => (
@@ -263,6 +318,9 @@ const CreateBook: React.FC = () => {
                 </option>
               ))}
             </select>
+            {fieldErrors.genre && (
+              <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.genre}</p>
+            )}
           </div>
         </div>
 
@@ -307,9 +365,14 @@ const CreateBook: React.FC = () => {
             onChange={handleChange}
             rows={4}
             required
-            className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#2e4b30] focus:border-[#2e4b30] text-xs text-gray-900 placeholder:text-gray-500 bg-white resize-none"
+            className={`w-full px-3 py-1.5 border rounded-md focus:ring-2 text-xs text-gray-900 placeholder:text-gray-500 bg-white resize-none ${
+              fieldErrors.description ? 'border-red-300 focus:border-red-500' : 'border-gray-300 focus:border-[#2e4b30]'
+            }`}
             placeholder="Describe de qué trata el libro y por qué es interesante..."
           />
+          {fieldErrors.description && (
+            <p className="mt-1 text-xs text-red-600 font-medium">{fieldErrors.description}</p>
+          )}
         </div>
 
         <div className="flex justify-end">

@@ -1,28 +1,65 @@
 "use client"
-import React from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import BookCard from '@/components/cards/BookCard'
 import { IBook } from '@/types/Book'
-import { BookOpen, Star, TrendingUp, Award, Loader2, Zap } from 'lucide-react'
+import { Award, Loader2, Zap, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useBooks } from '@/hooks/useBooks'
 
 const Bestsellers = () => {
   const { books, loading, error } = useBooks()
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true)
 
-  // Method to get bestsellers: every 5 books from the collection
-  const getBestsellers = (): IBook[] => {
+  // Duplicar elementos para crear loop infinito
+  const getInfiniteBestsellers = (): IBook[] => {
     const bestsellers: IBook[] = []
-    
-    // Take every 5 books (indices 0, 5, 10, 15, etc.)
     for (let i = 0; i < books.length; i += 5) {
       if (books[i]) {
         bestsellers.push(books[i])
       }
     }
-    
-    return bestsellers
+    // Duplicar los elementos 4 veces para loop suave
+    return [...bestsellers, ...bestsellers, ...bestsellers, ...bestsellers]
   }
 
-  const bestsellers = getBestsellers()
+  const infiniteBestsellers = getInfiniteBestsellers()
+
+  useEffect(() => {
+    if (!carouselRef.current || !isAutoScrolling) return
+
+    const scrollInterval = setInterval(() => {
+      if (carouselRef.current) {
+        const contentWidth = carouselRef.current.scrollWidth
+        const maxScroll = contentWidth / 4 // Un cuarto del total (un set completo)
+        const currentScroll = carouselRef.current.scrollLeft
+
+        if (currentScroll >= maxScroll) {
+          // Resetear al inicio sin animación cuando completa un ciclo
+          carouselRef.current.scrollLeft = 0
+        } else {
+          carouselRef.current.scrollLeft += 0.5 // Velocidad más suave
+        }
+      }
+    }, 20) // Velocidad del auto-scroll (más frecuente = más suave)
+
+    return () => clearInterval(scrollInterval)
+  }, [isAutoScrolling, infiniteBestsellers])
+
+  const scrollLeft = () => {
+    setIsAutoScrolling(false)
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -400, behavior: 'smooth' })
+      setTimeout(() => setIsAutoScrolling(true), 3000)
+    }
+  }
+
+  const scrollRight = () => {
+    setIsAutoScrolling(false)
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: 400, behavior: 'smooth' })
+      setTimeout(() => setIsAutoScrolling(true), 3000)
+    }
+  }
 
   if (loading) {
     return (
@@ -38,7 +75,7 @@ const Bestsellers = () => {
     )
   }
 
-  if (error || bestsellers.length === 0) {
+  if (error || infiniteBestsellers.length === 0) {
     return (
       <section id="bestsellers" className="py-16 px-4 bg-[#2e4b30] border-y border-[#1a3a1c]">
         <div className="max-w-7xl mx-auto text-center">
@@ -88,31 +125,52 @@ const Bestsellers = () => {
           </div>
         </div>
 
-        {/* Bestsellers Grid with Numbers */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-16 gap-x-8">
-          {bestsellers.map((book, index) => (
-            <div key={book.id} className="relative group perspective-1000 animate-scale-in" style={{ animationDelay: `${index * 150}ms` }}>
-              {/* Massive Modern Numbering */}
-              <div className="absolute -top-12 left-4 text-9xl font-black text-[#1a3a1c]/40 group-hover:text-[#f5efe1]/10 transition-colors duration-500 z-0 pointer-events-none tracking-tighter">
-                {String(index + 1).padStart(2, '0')}
-              </div>
-              
-              {/* Card Container */}
-              <div className="relative z-10 transform-gpu group-hover:-translate-y-4 transition-transform duration-500 ease-out">
-                {/* Ranking Tag */}
-                <div className="absolute -top-4 -right-2 z-20 flex items-center justify-center">
-                  <div className="bg-[#f5efe1] text-[#2e4b30] px-4 py-1.5 font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 shadow-[4px_4px_0px_#1a3a1c]">
-                    <Award className="w-3 h-3" />
-                    Top Choice
-                  </div>
+        {/* Bestsellers Carousel */}
+        <div className="relative">
+          {/* Navigation Buttons */}
+          <button
+            onClick={scrollLeft}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-[#f5efe1] text-[#2e4b30] p-3 shadow-lg hover:bg-[#2e4b30] hover:text-[#f5efe1] transition-all duration-300 -ml-4"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button
+            onClick={scrollRight}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-30 bg-[#f5efe1] text-[#2e4b30] p-3 shadow-lg hover:bg-[#2e4b30] hover:text-[#f5efe1] transition-all duration-300 -mr-4"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+
+          {/* Carousel Container */}
+          <div
+            ref={carouselRef}
+            className="flex gap-8 overflow-x-hidden pb-8 scrollbar-hide"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {infiniteBestsellers.map((book: IBook, index: number) => (
+              <div key={`${book.id}-${index}`} className="relative group perspective-1000 animate-scale-in flex-shrink-0 w-80" style={{ animationDelay: `${index * 150}ms` }}>
+                {/* Massive Modern Numbering */}
+                <div className="absolute -top-12 left-4 text-9xl font-black text-[#1a3a1c]/40 group-hover:text-[#f5efe1]/10 transition-colors duration-500 z-0 pointer-events-none tracking-tighter">
+                  {String((index % Math.floor(infiniteBestsellers.length / 4)) + 1).padStart(2, '0')}
                 </div>
                 
-                <div className="shadow-2xl shadow-black/20">
-                  <BookCard book={book} />
+                {/* Card Container */}
+                <div className="relative z-10 transform-gpu group-hover:-translate-y-4 transition-transform duration-500 ease-out">
+                  {/* Ranking Tag */}
+                  <div className="absolute -top-4 -right-2 z-20 flex items-center justify-center">
+                    <div className="bg-[#f5efe1] text-[#2e4b30] px-4 py-1.5 font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 shadow-[4px_4px_0px_#1a3a1c]">
+                      <Award className="w-3 h-3" />
+                      Top Choice
+                    </div>
+                  </div>
+                  
+                  <div className="shadow-2xl shadow-black/20">
+                    <BookCard book={book} />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
@@ -126,4 +184,4 @@ const Bestsellers = () => {
   )
 }
 
-export default Bestsellers
+export default Bestsellers

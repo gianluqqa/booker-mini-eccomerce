@@ -23,9 +23,9 @@ body {
   font-size: 0.75rem; /* base pequeña equivalente a text-xs; Tailwind ajustará tamaños relativos */
 }
 
-/* Forzar remoción de redondeos en toda la aplicación */
+/* Forzar redondeo en toda la aplicación */
 * {
-  border-radius: 0 !important;
+  border-radius: 0.25rem !important;
 }
 
 /* Animaciones Modernas */

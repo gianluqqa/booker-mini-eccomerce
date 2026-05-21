@@ -12,9 +12,10 @@ interface CardData {
 interface PaymentFormProps {
   cardData: CardData;
   setCardData: React.Dispatch<React.SetStateAction<CardData>>;
+  fieldErrors: Record<string, string>;
 }
 
-export const PaymentForm: React.FC<PaymentFormProps> = ({ cardData, setCardData }) => {
+export const PaymentForm: React.FC<PaymentFormProps> = ({ cardData, setCardData, fieldErrors }) => {
   return (
     <div className="bg-white rounded-sm shadow-sm p-6">
       <div className="flex items-center mb-4">
@@ -23,14 +24,34 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ cardData, setCardData 
       </div>
 
       <div className="space-y-4 mb-4">
-        <PaymentCardNumberInput value={cardData.cardNumber} onChange={(e) => handleCardNumberChange(e, setCardData)} />
+        <PaymentCardNumberInput 
+          value={cardData.cardNumber} 
+          onChange={(e) => handleCardNumberChange(e, setCardData)} 
+          error={fieldErrors.cardNumber}
+        />
 
-        <PaymentCardNameInput value={cardData.cardName} onChange={(value) => setCardData({ ...cardData, cardName: value })} />
+        <PaymentCardNameInput 
+          value={cardData.cardName} 
+          onChange={(value) => {
+            // ✅ MANTENEMOS EL FILTRO: Solo letras y espacios
+            const filteredValue = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+            setCardData({ ...cardData, cardName: filteredValue });
+          }} 
+          error={fieldErrors.cardName}
+        />
 
         <div className="grid grid-cols-2 gap-4">
-          <PaymentExpiryDateInput value={cardData.expiryDate} onChange={(e) => handleExpiryDateChange(e, setCardData)} />
+          <PaymentExpiryDateInput 
+            value={cardData.expiryDate} 
+            onChange={(e) => handleExpiryDateChange(e, setCardData)} 
+            error={fieldErrors.expiryDate}
+          />
 
-          <PaymentCvcInput value={cardData.cvc} onChange={(value) => setCardData({ ...cardData, cvc: value })} />
+          <PaymentCvcInput 
+            value={cardData.cvc} 
+            onChange={(value) => setCardData({ ...cardData, cvc: value })} 
+            error={fieldErrors.cvc}
+          />
         </div>
       </div>
 
@@ -43,7 +64,8 @@ export const PaymentForm: React.FC<PaymentFormProps> = ({ cardData, setCardData 
 const PaymentCardNumberInput: React.FC<{
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ value, onChange }) => {
+  error?: string;
+}> = ({ value, onChange, error }) => {
   return (
     <div>
       <label htmlFor="cardNumber" className="block text-sm font-medium text-[#2e4b30] mb-1">
@@ -54,10 +76,11 @@ const PaymentCardNumberInput: React.FC<{
         id="cardNumber"
         placeholder="1234 5678 9012 3456"
         maxLength={19} // 16 dígitos + 3 espacios
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className={`w-full px-4 py-2 border ${error ? 'border-red-500' : 'border-[#2e4b30]/20'} rounded-sm focus:ring-2 ${error ? 'focus:ring-red-200' : 'focus:ring-[#2e4b30]/50'} focus:border-${error ? 'red-500' : '[#2e4b30]'} outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50`}
         value={value}
         onChange={onChange}
       />
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };
@@ -66,7 +89,8 @@ const PaymentCardNumberInput: React.FC<{
 const PaymentCardNameInput: React.FC<{
   value: string;
   onChange: (value: string) => void;
-}> = ({ value, onChange }) => {
+  error?: string;
+}> = ({ value, onChange, error }) => {
   return (
     <div>
       <label htmlFor="cardName" className="block text-sm font-medium text-[#2e4b30] mb-1">
@@ -76,10 +100,11 @@ const PaymentCardNameInput: React.FC<{
         type="text"
         id="cardName"
         placeholder="JUAN PEREZ"
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className={`w-full px-4 py-2 border ${error ? 'border-red-500' : 'border-[#2e4b30]/20'} rounded-sm focus:ring-2 ${error ? 'focus:ring-red-200' : 'focus:ring-[#2e4b30]/50'} focus:border-${error ? 'red-500' : '[#2e4b30]'} outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };
@@ -88,7 +113,8 @@ const PaymentCardNameInput: React.FC<{
 const PaymentExpiryDateInput: React.FC<{
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ value, onChange }) => {
+  error?: string;
+}> = ({ value, onChange, error }) => {
   return (
     <div>
       <label htmlFor="expiryDate" className="block text-sm font-medium text-[#2e4b30] mb-1">
@@ -99,10 +125,11 @@ const PaymentExpiryDateInput: React.FC<{
         id="expiryDate"
         placeholder="12/25"
         maxLength={5} // MM/YY
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className={`w-full px-4 py-2 border ${error ? 'border-red-500' : 'border-[#2e4b30]/20'} rounded-sm focus:ring-2 ${error ? 'focus:ring-red-200' : 'focus:ring-[#2e4b30]/50'} focus:border-${error ? 'red-500' : '[#2e4b30]'} outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50`}
         value={value}
         onChange={onChange}
       />
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };
@@ -111,7 +138,8 @@ const PaymentExpiryDateInput: React.FC<{
 const PaymentCvcInput: React.FC<{
   value: string;
   onChange: (value: string) => void;
-}> = ({ value, onChange }) => {
+  error?: string;
+}> = ({ value, onChange, error }) => {
   return (
     <div>
       <label htmlFor="cvc" className="block text-sm font-medium text-[#2e4b30] mb-1">
@@ -122,10 +150,11 @@ const PaymentCvcInput: React.FC<{
         id="cvc"
         placeholder="123"
         maxLength={4}
-        className="w-full px-4 py-2 border border-[#2e4b30]/20 rounded-sm focus:ring-2 focus:ring-[#2e4b30]/50 focus:border-[#2e4b30] outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50"
+        className={`w-full px-4 py-2 border ${error ? 'border-red-500' : 'border-[#2e4b30]/20'} rounded-sm focus:ring-2 ${error ? 'focus:ring-red-200' : 'focus:ring-[#2e4b30]/50'} focus:border-${error ? 'red-500' : '[#2e4b30]'} outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50`}
         value={value}
         onChange={(e) => onChange(e.target.value)}
       />
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
     </div>
   );
 };

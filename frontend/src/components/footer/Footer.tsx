@@ -20,18 +20,18 @@ const Footer = () => {
                   Tu destino definitivo para descubrir y coleccionar libros. Desde clásicos atemporales hasta bestsellers modernos.
                 </p>
                 <div className="flex space-x-3 pt-2">
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
+                  <button className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200 cursor-pointer">
                     <Facebook className="w-5 h-5 text-[#F5EFE1]" />
-                  </a>
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
+                  </button>
+                  <button className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200 cursor-pointer">
                     <Instagram className="w-5 h-5 text-[#F5EFE1]" />
-                  </a>
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
+                  </button>
+                  <button className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200 cursor-pointer">
                     <Twitter className="w-5 h-5 text-[#F5EFE1]" />
-                  </a>
-                  <a href="#" className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200">
+                  </button>
+                  <button className="bg-[#F5EFE1]/10 hover:bg-[#F5EFE1]/20 p-2 rounded-sm transition-all duration-200 cursor-pointer">
                     <Youtube className="w-5 h-5 text-[#F5EFE1]" />
-                  </a>
+                  </button>
                 </div>
               </div>
     
@@ -40,29 +40,29 @@ const Footer = () => {
                 <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Enlaces Rápidos</h3>
                 <ul className="space-y-3">
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Todos los Libros
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Más Vendidos
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Nuevos Lanzamientos
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Ofertas Especiales
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Tarjetas de Regalo
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -72,29 +72,29 @@ const Footer = () => {
                 <h3 className="text-[#F5EFE1] font-bold text-lg mb-4">Servicio al Cliente</h3>
                 <ul className="space-y-3">
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Centro de Ayuda
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Información de Envío
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Devoluciones y Cambios
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Rastrear Pedido
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a href="#" className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                    <button className="text-[#F5EFE1]/80 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer text-left">
                       Preguntas Frecuentes
-                    </a>
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -143,18 +143,18 @@ const Footer = () => {
             <div className="border-t border-[#F5EFE1]/20 pt-8">
               <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <p className="text-[#F5EFE1]/60 text-sm">
-                  © 2025 Booker. Todos los derechos reservados.
+                  2025 Booker. Todos los derechos reservados.
                 </p>
                 <div className="flex space-x-6">
-                  <a href="#" className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                  <button className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer">
                     Política de Privacidad
-                  </a>
-                  <a href="#" className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                  </button>
+                  <button className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer">
                     Términos de Servicio
-                  </a>
-                  <a href="#" className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm">
+                  </button>
+                  <button className="text-[#F5EFE1]/60 hover:text-[#F5EFE1] transition-colors duration-200 text-sm cursor-pointer">
                     Política de Cookies
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

@@ -99,11 +99,20 @@ const extractData = <T>(response: { data: { success?: boolean; data?: T } | T })
   return responseData as T;
 };
 
+/**
+ * Helper para extraer el mensaje de éxito de una respuesta del backend
+ * @param response Respuesta de Axios
+ * @returns El mensaje contenido en la respuesta o un string vacío
+ */
+const extractMessage = (response: any): string => {
+  return response?.data?.message || "";
+};
+
 // Exportar la instancia de axios configurada
 export { apiClient };
 
 // Exportar helper si se necesita
-export { extractData };
+export { extractData, extractMessage };
 
 export default apiClient;
 

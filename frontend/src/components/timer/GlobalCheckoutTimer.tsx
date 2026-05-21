@@ -14,7 +14,7 @@ interface GlobalCheckoutTimerProps {
 export const GlobalCheckoutTimer: React.FC<GlobalCheckoutTimerProps> = ({ className = "" }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { pendingOrder, hasPendingOrder, loading, refreshCart } = useCart();
+  const { pendingOrder, loading, refreshCart } = useCart();
   const [cancelling, setCancelling] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 80 });

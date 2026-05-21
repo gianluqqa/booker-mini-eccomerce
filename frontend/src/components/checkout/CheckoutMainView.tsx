@@ -10,7 +10,7 @@ import { CheckoutErrorState } from "./CheckoutStates";
 interface CheckoutMainViewProps {
   cartItems: ICartItem[];
   order: IOrder | null;
-  error: string | null;
+  error: string | string[] | null;
   processing: boolean;
   orderExpired: boolean;
   cardData: {
@@ -26,6 +26,7 @@ interface CheckoutMainViewProps {
   handleCancelCheckout: () => void;
   handleOrderExpired: () => void;
   handleRestartCheckout: () => void;
+  fieldErrors: Record<string, string>;
   setCardData: React.Dispatch<React.SetStateAction<{
     cardNumber: string;
     cardName: string;
@@ -41,6 +42,7 @@ export const CheckoutMainView: React.FC<CheckoutMainViewProps> = ({
   processing,
   orderExpired,
   cardData,
+  fieldErrors,
   subtotal,
   tax,
   total,
@@ -60,7 +62,11 @@ export const CheckoutMainView: React.FC<CheckoutMainViewProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="lg:col-span-2">
             <CartPreview cartItems={cartItems} />
-            <PaymentForm cardData={cardData} setCardData={setCardData} />
+            <PaymentForm 
+              cardData={cardData} 
+              setCardData={setCardData} 
+              fieldErrors={fieldErrors}
+            />
           </div>
 
           <div className="lg:sticky lg:top-24">

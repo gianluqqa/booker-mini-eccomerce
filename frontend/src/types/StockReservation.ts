@@ -10,12 +10,11 @@ export interface IReservationItem {
 
 // Respuesta al crear reserva de stock
 export interface IStockReservationResponse {
-  reservationId: string;
+  id: string;
   items: IReservationItem[];
   totalAmount: number;
   expiresAt: string;
   totalMinutes: number;
-  message: string;
 }
 
 // Estados del temporizador

@@ -53,7 +53,7 @@ const CartItemBookImage: React.FC<{ book: ICartItem['book'] }> = ({ book }) => {
   return (
     <div className="flex-shrink-0">
       <img
-        src={book.image || ''}
+        src={book.image || 'https://via.placeholder.com/150x200?text=No+Image'}
         alt={book.title}
         className="w-20 h-28 object-cover rounded-sm shadow-sm"
         referrerPolicy="no-referrer"

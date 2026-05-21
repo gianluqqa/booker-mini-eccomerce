@@ -6,6 +6,7 @@ export interface IOrderItem {
     title: string;
     author?: string;
     price: number;
+    image?: string;
   };
   quantity: number;
   price: number; // precio unitario

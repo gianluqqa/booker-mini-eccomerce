@@ -39,17 +39,27 @@ export const EmptyCartState: React.FC<EmptyCartProps> = ({ onBackToCart }) => {
 };
 
 interface CheckoutErrorProps {
-  error: string;
+  error: string | string[];
   onRetry?: () => void;
 }
 
 export const CheckoutErrorState: React.FC<CheckoutErrorProps> = ({ error, onRetry }) => {
+  const isArray = Array.isArray(error);
+
   return (
-    <div className="bg-red-50 border border-red-200 rounded-sm p-4 mb-6 flex items-start">
+    <div className="bg-red-50 border border-red-200 rounded-sm p-4 mb-6 flex items-start animate-fade-in">
       <AlertCircle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
       <div>
         <p className="font-semibold text-red-800">Error</p>
-        <p className="text-sm text-red-700">{error}</p>
+        {isArray ? (
+          <ul className="list-disc list-inside mt-1 text-sm text-red-700">
+            {error.map((err, index) => (
+              <li key={index}>{err}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-red-700">{error}</p>
+        )}
         {onRetry && (
           <button onClick={onRetry} className="mt-2 text-sm text-red-600 hover:text-red-800 underline">
             Reintentar

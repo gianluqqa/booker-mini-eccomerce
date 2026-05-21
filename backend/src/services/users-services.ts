@@ -194,11 +194,11 @@ export const getUsersService = async () => {
 export const getCurrentUserService = async (id: string) => {
   const userRepo = AppDataSource.getRepository(User);
   const user = await userRepo.findOne({ where: { id } });
-  
+
   if (!user) {
     throw { status: 404, message: "Usuario no encontrado" };
   }
-  
+
   return excludeSensitiveData(user);
 };
 
@@ -206,18 +206,18 @@ export const getCurrentUserService = async (id: string) => {
 export const getUserByIdService = async (id: string) => {
   const userRepo = AppDataSource.getRepository(User);
   const user = await userRepo.findOne({ where: { id } });
-  
+
   if (!user) {
     throw { status: 404, message: "Usuario no encontrado" };
   }
-  
+
   return excludeSensitiveData(user);
 };
 
 //? Actualizar un usuario (PUT).
 export const updateUserService = async (id: string, user: UpdateUserDTO) => {
   const userRepo = AppDataSource.getRepository(User);
-  
+
   try {
     const existingUser = await userRepo.findOne({ where: { id } });
     if (!existingUser) {
@@ -232,7 +232,7 @@ export const updateUserService = async (id: string, user: UpdateUserDTO) => {
     // Actualizar solo los campos definidos
     Object.assign(existingUser, user);
     await userRepo.save(existingUser);
-    
+
     return excludeSensitiveData(existingUser);
   } catch (error: any) {
     console.error("Error updating user:", error);
@@ -244,7 +244,7 @@ export const updateUserService = async (id: string, user: UpdateUserDTO) => {
 //? Eliminar un usuario específico por ID (DELETE).
 export const deleteUserService = async (id: string) => {
   const userRepo = AppDataSource.getRepository(User);
-  
+
   try {
     const user = await userRepo.findOne({ where: { id } });
     if (!user) {
@@ -257,7 +257,7 @@ export const deleteUserService = async (id: string) => {
     }
 
     await userRepo.remove(user);
-    
+
     return { message: "Usuario eliminado exitosamente", userId: id };
   } catch (error: any) {
     console.error("Error deleting user:", error);
@@ -269,7 +269,7 @@ export const deleteUserService = async (id: string) => {
 //? Eliminar todos los usuarios excepto el admin (DELETE).
 export const deleteAllUsersExceptAdminService = async () => {
   const userRepo = AppDataSource.getRepository(User);
-  
+
   try {
     // Encontrar todos los usuarios que no sean admin
     const usersToDelete = await userRepo.find({
@@ -282,10 +282,10 @@ export const deleteAllUsersExceptAdminService = async () => {
 
     // Eliminar todos los usuarios encontrados de forma masiva
     await userRepo.delete({ role: UserRole.CUSTOMER });
-    
-    return { 
-      message: "Se eliminaron todos los usuarios clientes exitosamente", 
-      deletedCount: usersToDelete.length 
+
+    return {
+      message: "Se eliminaron todos los usuarios clientes exitosamente",
+      deletedCount: usersToDelete.length
     };
   } catch (error: any) {
     console.error("Error deleting all users except admin:", error);
