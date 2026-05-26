@@ -3,10 +3,10 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { getAllReviewsAdmin, deleteReviewAdmin, IAdminReview, IAdminReviewsFilters, IAdminReviewsResponse } from '@/services/adminService'
-import { Star, Filter, Search, Book, User, MessageSquare, ChevronLeft, ChevronRight, Eye, Trash2 } from 'lucide-react'
+import { Star, MessageSquare, ChevronLeft, ChevronRight, Eye, Trash2 } from 'lucide-react'
 import { AdminToast } from '../alerts/AdminToast'
 
-const ReviewsAdminTable: React.FC = () => {
+const ReviewsAdminTable: React.FC<{ userSearchTerm?: string }> = ({ userSearchTerm = '' }) => {
   const router = useRouter()
   const [reviews, setReviews] = useState<IAdminReview[]>([])
   const [loading, setLoading] = useState(true)
@@ -17,9 +17,6 @@ const ReviewsAdminTable: React.FC = () => {
     page: 1,
     limit: 10
   })
-  const [showFilters, setShowFilters] = useState(false)
-  const [bookFilter, setBookFilter] = useState('')
-  const [userFilter, setUserFilter] = useState('')
   const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -37,11 +34,11 @@ const ReviewsAdminTable: React.FC = () => {
     try {
       setDeletingReviewId(reviewId)
       await deleteReviewAdmin(reviewId)
-      
+
       // Actualizar la lista local eliminando la review eliminada
       setReviews(prevReviews => prevReviews.filter(review => review.id !== reviewId))
       setTotal(prevTotal => prevTotal - 1)
-      
+
       // Mostrar mensaje de éxito
       setSuccessMessage('Review eliminada exitosamente')
       setTimeout(() => setSuccessMessage(null), 5000)
@@ -73,21 +70,17 @@ const ReviewsAdminTable: React.FC = () => {
     fetchReviews()
   }, [fetchReviews])
 
-  const handleFilter = () => {
-    const newFilters: IAdminReviewsFilters = {
-      ...filters,
-      page: 1,
-      book: bookFilter.trim() || undefined,
-      user: userFilter.trim() || undefined
-    }
-    setFilters(newFilters)
-  }
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      setFilters(prev => ({
+        ...prev,
+        page: 1,
+        user: userSearchTerm.trim() || undefined
+      }))
+    }, 500)
 
-  const handleClearFilters = () => {
-    setBookFilter('')
-    setUserFilter('')
-    setFilters({ page: 1, limit: 10 })
-  }
+    return () => clearTimeout(delayDebounceFn)
+  }, [userSearchTerm])
 
   const handlePageChange = (newPage: number) => {
     setFilters({ ...filters, page: newPage })
@@ -99,9 +92,8 @@ const ReviewsAdminTable: React.FC = () => {
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
-            className={`w-4 h-4 ${
-              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-            }`}
+            className={`w-4 h-4 ${star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+              }`}
           />
         ))}
         <span className="ml-1 text-sm font-medium text-gray-600">({rating})</span>
@@ -139,88 +131,23 @@ const ReviewsAdminTable: React.FC = () => {
     <div className="space-y-6">
       {/* Alertas Globales Flotantes */}
       {actionError && (
-        <AdminToast 
+        <AdminToast
           type="error"
-          title="Error de acción" 
-          message={actionError} 
+          title="Error de acción"
+          message={actionError}
           onClose={() => setActionError(null)}
         />
       )}
 
       {successMessage && (
-        <AdminToast 
+        <AdminToast
           type="success"
-          title="¡Éxito!" 
-          message={successMessage} 
+          title="¡Éxito!"
+          message={successMessage}
           onClose={() => setSuccessMessage(null)}
         />
       )}
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-[#2e4b30]">Gestión de Reviews</h3>
-          <p className="text-sm text-gray-600">
-            Visualiza y filtra todas las reviews del sistema ({total} totales)
-          </p>
-        </div>
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <Filter className="w-4 h-4" />
-          {showFilters ? 'Ocultar filtros' : 'Mostrar filtros'}
-        </button>
-      </div>
-
-      {/* Filters */}
-      {showFilters && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <Book className="w-4 h-4 inline mr-1" />
-                Nombre del Libro
-              </label>
-              <input
-                type="text"
-                value={bookFilter}
-                onChange={(e) => setBookFilter(e.target.value)}
-                placeholder="Título del libro..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e4b30] text-gray-900 bg-white"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                <User className="w-4 h-4 inline mr-1" />
-                Nombre del Usuario
-              </label>
-              <input
-                type="text"
-                value={userFilter}
-                onChange={(e) => setUserFilter(e.target.value)}
-                placeholder="Nombre o apellido..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e4b30] text-gray-900 bg-white"
-              />
-            </div>
-            <div className="flex items-end gap-2">
-              <button
-                onClick={handleFilter}
-                disabled={loading}
-                className="flex-1 px-4 py-2 bg-[#2e4b30] text-white rounded-lg hover:bg-[#2e4b30]/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {loading ? <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div> : <Search className="w-4 h-4" />}
-                Filtrar
-              </button>
-              <button
-                onClick={handleClearFilters}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
-              >
-                Limpiar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+    
 
       {/* Reviews Table */}
       <div className={`bg-white border border-gray-200 rounded-lg overflow-hidden transition-opacity duration-200 ${loading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>

@@ -55,8 +55,8 @@ const VideoBackground = () => {
             </p>
 
             {/* Botones de acción */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Link href="/store" className="bg-[#2e4b30] text-[#f5efe1] px-8 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium">
+            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center relative z-20">
+              <Link href="/store" className="bg-[#2e4b30] text-[#f5efe1] px-8 py-3 rounded-sm hover:bg-[#1a3a1c] transition-all duration-200 font-medium cursor-pointer">
                 Explorar Catálogo
               </Link>
             </div>
@@ -65,7 +65,7 @@ const VideoBackground = () => {
       </div>
 
       {/* Gradiente inferior para suavizar transición */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 h-32 bg-gradient-to-t from-booker-green to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 z-10 h-32 bg-gradient-to-t from-booker-green to-transparent pointer-events-none" />
     </section>
   )
 }

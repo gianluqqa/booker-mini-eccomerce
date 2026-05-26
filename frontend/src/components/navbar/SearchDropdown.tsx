@@ -5,7 +5,6 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Loader2, BookOpen } from "lucide-react";
 import { IBook } from "@/types/Book";
 
@@ -60,11 +59,12 @@ const SearchDropdown: React.FC<SearchDropdownProps> = ({
                   // Cerrar el dropdown cuando se hace clic en un libro
                   onClose();
                 }}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-[#f5efe1] transition-colors duration-200 border-b border-[#2e4b30]/10 last:border-b-0 cursor-pointer block"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-[#f5efe1] transition-colors duration-200 border-b border-[#2e4b30]/10 last:border-b-0 cursor-pointer"
               >
               {/* Imagen del libro */}
               <div className="flex-shrink-0 w-12 h-16 bg-[#f5efe1] rounded-sm overflow-hidden">
                 {book.image ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     src={book.image}
                     alt={book.title}

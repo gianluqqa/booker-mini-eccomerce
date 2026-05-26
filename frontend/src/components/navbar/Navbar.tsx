@@ -164,10 +164,10 @@ const Navbar = () => {
                   Libros
                 </button>
                 <button
-                  onClick={() => scrollToSection("bestsellers")}
-                  className="text-[#2e4b30] hover:text-[#2e4b30]/60 transition-colors duration-300 whitespace-nowrap border-b-2 border-transparent hover:border-[#2e4b30]/20 pb-0.5"
+                  onClick={() => scrollToSection("about")}
+                  className="text-[#2e4b30] hover:text-[#2e4b30]/60 transition-colors duration-300 border-b-2 border-transparent hover:border-[#2e4b30]/20 pb-0.5"
                 >
-                  Más Vendidos
+                  Nosotros
                 </button>
                 <button
                   onClick={() => scrollToSection("collections")}
@@ -176,10 +176,10 @@ const Navbar = () => {
                   Colecciones
                 </button>
                 <button
-                  onClick={() => scrollToSection("about")}
-                  className="text-[#2e4b30] hover:text-[#2e4b30]/60 transition-colors duration-300 border-b-2 border-transparent hover:border-[#2e4b30]/20 pb-0.5"
+                  onClick={() => scrollToSection("bestsellers")}
+                  className="text-[#2e4b30] hover:text-[#2e4b30]/60 transition-colors duration-300 whitespace-nowrap border-b-2 border-transparent hover:border-[#2e4b30]/20 pb-0.5"
                 >
-                  Nosotros
+                  Más Vendidos
                 </button>
               </div>
             )}
@@ -207,7 +207,7 @@ const Navbar = () => {
                 className="hidden lg:flex items-center p-2 rounded-sm text-[#2e4b30] hover:bg-[#2e4b30]/10 transition-all duration-300 active:scale-95"
                 title="Ir a la Tienda"
               >
-                <ShoppingBag className="w-5 h-5 sm:w-6 h-6" strokeWidth={2.5} />
+                <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
               </Link>
             )}
 
@@ -245,7 +245,7 @@ const Navbar = () => {
                     className={`p-2 text-[#2e4b30] hover:bg-[#2e4b30]/10 rounded-none transition-all duration-300 ${isSearchExpanded ? "bg-[#2e4b30]/10" : ""}`}
                     aria-label="Buscar"
                   >
-                    {isSearchExpanded ? <X className="w-5 h-5" strokeWidth={2.5} /> : <Search className="w-5 h-5 sm:w-6 h-6" strokeWidth={2.5} />}
+                    {isSearchExpanded ? <X className="w-5 h-5" strokeWidth={2.5} /> : <Search className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />}
                   </button>
 
                   <div className="absolute top-full right-0 mt-2 w-72">
@@ -268,7 +268,7 @@ const Navbar = () => {
                 className="relative p-2 text-[#2e4b30] hover:opacity-80 transition-all"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <ShoppingCart className="w-5 h-5 sm:w-6 h-6" strokeWidth={2.5} />
+                <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
                 {cartCount > 0 && (
                   <span className="absolute top-0.5 right-0.5 bg-red-600 text-white text-[9px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-sm">
                     {cartCount > 9 ? "9+" : cartCount}
@@ -285,7 +285,7 @@ const Navbar = () => {
                   className="text-[#2e4b30] hover:bg-[#2e4b30]/10 p-2 rounded-sm transition-all duration-200 flex items-center space-x-1"
                   title="Mi Perfil"
                 >
-                  <User className="w-5 h-5 sm:w-6 h-6" strokeWidth={2.5} />
+                  <User className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
                 </Link>
                 <button
                   onClick={() => {

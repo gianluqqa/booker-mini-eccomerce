@@ -4,8 +4,12 @@ import React, { useEffect } from 'react'
 import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
-import { Users, BookOpen, BarChart3, Settings, Star } from 'lucide-react'
+import { Users, BookOpen, BarChart3, Star, Search } from 'lucide-react'
 import { getRoleDisplay } from '@/utils/helpers'
+import { getAllUsers } from '@/services/adminService'
+import { getBooks } from '@/services/booksService'
+import { getAllOrders } from '@/services/adminService'
+import { useState } from 'react'
 import UsersTable from './UserTable'
 import CreateBook from './CreateBook'
 import BookList from './BookList'
@@ -15,6 +19,11 @@ import ReviewsAdminTable from './ReviewsAdminTable'
 const AdminDashboard: React.FC = () => {
   const { user, isAuthenticated, loading } = useAuth()
   const router = useRouter()
+  const [usersCount, setUsersCount] = useState<number | null>(null)
+  const [booksCount, setBooksCount] = useState<number | null>(null)
+  const [ordersCount, setOrdersCount] = useState<number | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+  const [userSearchTerm, setUserSearchTerm] = useState('')
 
   // Redirigir si no es admin
   useEffect(() => {
@@ -22,7 +31,26 @@ const AdminDashboard: React.FC = () => {
 
     if (!isAuthenticated || user?.role !== 'admin') {
       router.push('/login')
+      return
     }
+    // Fetch dashboard stats after confirming admin
+    const fetchStats = async () => {
+      try {
+        const [users, books, orders] = await Promise.all([
+          getAllUsers(),
+          getBooks(),
+          getAllOrders(),
+        ])
+        setUsersCount(users.length)
+        setBooksCount(books.length)
+        setOrdersCount(orders.length)
+      } catch (err) {
+        console.error('Error loading admin stats', err)
+      } finally {
+        setStatsLoading(false)
+      }
+    }
+    fetchStats()
   }, [isAuthenticated, loading, user, router])
 
   if (loading) {
@@ -53,7 +81,7 @@ const AdminDashboard: React.FC = () => {
 
           <div className="w-full sm:w-auto sm:min-w-[250px] flex-shrink-0 bg-[#f5efe1]/10 rounded-xl p-4">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-9 h-9 rounded-full bg-[#f5efe1]/20 flex items-center justify-center overflow-hidden">
+              <div className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden">
                 <Image src="/admin-logo.png" alt="Avatar admin" width={36} height={36} className="object-contain" />
               </div>
               <div>
@@ -67,22 +95,23 @@ const AdminDashboard: React.FC = () => {
               <span className="px-3 py-1 rounded-full bg-[#f5efe1]/10 border border-[#f5efe1]/30">
                 {getRoleDisplay(user.role)}
               </span>
-              <span className="text-[11px] text-[#f5efe1]/90">
-                ID: {user.id?.slice(0, 8)}...
-              </span>
             </div>
           </div>
         </div>
 
         {/* Sección de resumen / métricas (maqueta) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-[#fcfaf5] rounded-xl p-3 shadow-sm border border-gray-200/50 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
               <Users className="w-5 h-5 text-emerald-600" />
             </div>
             <div>
               <p className="text-[11px] text-gray-500 uppercase tracking-wide">Usuarios</p>
-              <p className="text-lg font-semibold text-[#2e4b30]">—</p>
+              {statsLoading ? (
+                <p className="text-lg font-semibold text-[#2e4b30]">Cargando...</p>
+              ) : (
+                <p className="text-lg font-semibold text-[#2e4b30]">{usersCount ?? '—'}</p>
+              )}
               <p className="text-[11px] text-gray-400">Usuarios registrados</p>
             </div>
           </div>
@@ -93,7 +122,11 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-[11px] text-gray-500 uppercase tracking-wide">Libros</p>
-              <p className="text-lg font-semibold text-[#2e4b30]">—</p>
+              {statsLoading ? (
+                <p className="text-lg font-semibold text-[#2e4b30]">Cargando...</p>
+              ) : (
+                <p className="text-lg font-semibold text-[#2e4b30]">{booksCount ?? '—'}</p>
+              )}
               <p className="text-[11px] text-gray-400">Gestión de catálogo</p>
             </div>
           </div>
@@ -104,72 +137,13 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div>
               <p className="text-[11px] text-gray-500 uppercase tracking-wide">Pedidos</p>
-              <p className="text-lg font-semibold text-[#2e4b30]">—</p>
+              {statsLoading ? (
+                <p className="text-lg font-semibold text-[#2e4b30]">Cargando...</p>
+              ) : (
+                <p className="text-lg font-semibold text-[#2e4b30]">{ordersCount ?? '—'}</p>
+              )}
               <p className="text-[11px] text-gray-400">Monitoreo de ventas</p>
             </div>
-          </div>
-
-          <div className="bg-[#fcfaf5] rounded-xl p-3 shadow-sm border border-gray-200/50 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center">
-              <Settings className="w-5 h-5 text-slate-700" />
-            </div>
-            <div>
-              <p className="text-[11px] text-gray-500 uppercase tracking-wide">Configuración</p>
-              <p className="text-lg font-semibold text-[#2e4b30]">—</p>
-              <p className="text-[11px] text-gray-400">Parámetros de la tienda</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Sección de acciones rápidas (maqueta basada en endpoints existentes) */}
-        <div className="bg-[#fcfaf5] rounded-2xl p-6 shadow-sm border border-gray-200/50 space-y-6">
-          <div>
-            <h2 className="text-lg font-semibold text-[#2e4b30] mb-2">
-              Acciones rápidas de administrador
-            </h2>
-            <p className="text-xs text-gray-600">
-              Atajos a las tareas más frecuentes de administración: gestión de usuarios y
-              catálogo de libros. Más adelante aquí podrás conectar vistas dedicadas.
-            </p>
-          </div>
-
-          {/* Botones de acciones rápidas */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <button
-              type="button"
-              className="flex items-center justify-between w-full bg-white hover:bg-gray-50 text-[#2e4b30] px-4 py-3 rounded-sm transition-colors duration-200 border border-gray-200"
-            >
-              <div className="flex items-center gap-3">
-                <Users className="w-5 h-5" />
-                <div className="text-left">
-                  <p className="text-xs font-semibold">Ver y gestionar usuarios</p>
-                  <p className="text-[11px] text-gray-600">
-                    Tabla detallada con todos los usuarios de la plataforma
-                  </p>
-                </div>
-              </div>
-              <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#2e4b30] text-[#f5efe1]">
-                Tabla abajo
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className="flex items-center justify-between w-full bg-white hover:bg-gray-50 text-[#2e4b30] px-4 py-3 rounded-sm transition-colors duration-200 border border-gray-200"
-            >
-              <div className="flex items-center gap-3">
-                <BookOpen className="w-5 h-5" />
-                <div className="text-left">
-                  <p className="text-xs font-semibold">Administrar catálogo de libros</p>
-                  <p className="text-[11px] text-gray-600">
-                    Crear nuevos libros y gestionar el listado existente
-                  </p>
-                </div>
-              </div>
-              <span className="text-xs font-medium px-3 py-1 rounded-full bg-[#2e4b30] text-[#f5efe1]">
-                Sección abajo
-              </span>
-            </button>
           </div>
         </div>
 
@@ -219,21 +193,34 @@ const AdminDashboard: React.FC = () => {
 
         {/* Gestión de Reviews */}
         <div className="bg-[#fcfaf5] rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200/50 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
-              <Star className="w-5 h-5 text-purple-600" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center flex-shrink-0">
+                <Star className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-[#2e4b30]">
+                  Gestión de Reviews
+                </h2>
+                <p className="text-xs text-gray-600">
+                  Visualiza y filtra todas las reviews del sistema por usuario.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-[#2e4b30]">
-                Gestión de Reviews
-              </h2>
-              <p className="text-xs text-gray-600">
-                Visualiza y filtra todas las reviews del sistema con información de usuarios y libros.
-              </p>
+
+            <div className="relative w-full sm:w-64 shrink-0">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Buscar por usuario..."
+                value={userSearchTerm}
+                onChange={(e) => setUserSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2e4b30] text-sm text-gray-900"
+              />
             </div>
           </div>
 
-          <ReviewsAdminTable />
+          <ReviewsAdminTable userSearchTerm={userSearchTerm} />
         </div>
       </div>
     </div>
