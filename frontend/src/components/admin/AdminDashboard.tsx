@@ -95,6 +95,12 @@ const AdminDashboard: React.FC = () => {
               <span className="px-3 py-1 rounded-full bg-[#f5efe1]/10 border border-[#f5efe1]/30">
                 {getRoleDisplay(user.role)}
               </span>
+              <button 
+                onClick={() => router.push('/profile')}
+                className="px-3 py-1 rounded-full bg-[#f5efe1] text-[#2e4b30] font-semibold hover:bg-white transition-colors"
+              >
+                Ir a Perfil de Comprador
+              </button>
             </div>
           </div>
         </div>

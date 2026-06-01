@@ -4,12 +4,12 @@ import { createTestUser } from "../../helpers/userActions";
 import { createTestBook } from "../../helpers/bookActions";
 import { loginUser } from "../../helpers/authActions";
 import { validateErrorResponse } from "../../helpers/validateErrorResponse";
-import { 
-  getAllReviews, 
-  createReview, 
-  getReviewsByBook, 
-  getUserReviews, 
-  updateReview, 
+import {
+  getAllReviews,
+  createReview,
+  getReviewsByBook,
+  getUserReviews,
+  updateReview,
   deleteReview
 } from "../../helpers/reviewActions";
 import { validateReviewContract, validateReviewListContract } from "../../helpers/reviewValidationHelpers";
@@ -64,7 +64,7 @@ describe("Reviews - Módulo de Reseñas", () => {
       };
 
       const response = await createReview(app, authToken, reviewData);
-      
+
       expect(response.status).toBe(201);
       expect(response.body.success).toBe(true);
       validateReviewContract(response.body.data);
@@ -88,7 +88,7 @@ describe("Reviews - Módulo de Reseñas", () => {
 
     it("4. debe retornar 400 si el usuario ya reseñó este libro", async () => {
       await createReview(app, authToken, { bookId: testBook.id, rating: 5, comment: "Primera" });
-      
+
       const response = await createReview(app, authToken, { bookId: testBook.id, rating: 4, comment: "Segunda" });
       validateErrorResponse(response, 400, "Ya has reseñado este libro. Puedes editar tu reseña existente si deseas actualizarla.");
     });
@@ -108,7 +108,7 @@ describe("Reviews - Módulo de Reseñas", () => {
       await createReview(app, authToken, { bookId: testBook.id, rating: 4, comment: "Muy bueno" });
 
       const response = await getReviewsByBook(app, testBook.id);
-      
+
       expect(response.status).toBe(200);
       validateReviewListContract(response.body);
       expect(response.body.data.length).toBe(1);

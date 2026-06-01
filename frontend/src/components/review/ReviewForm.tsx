@@ -85,7 +85,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
               </label>
               <div className="flex items-center gap-2 bg-white/40 p-3 border border-[#2e4b30]/10 rounded-none w-fit">
                 {renderStars()}
-                <span className="text-[10px] font-black text-[#2e4b30] ml-4 bg-[#2e4b30] text-white px-2 py-1">
+                <span className="text-[10px] font-black ml-4 bg-[#2e4b30] text-white px-2 py-1">
                   {rating}/5
                 </span>
               </div>

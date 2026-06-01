@@ -733,16 +733,16 @@ describe("Cart - Carrito de Compras", () => {
     });
 
     it("41. debe funcionar correctamente incluso si el carrito ya está vacío", async () => {
-        // 1. El carrito ya está vacío por el beforeEach, así que disparamos el clear directamente
-        const response = await clearCart(app, authToken);
+      // 1. El carrito ya está vacío por el beforeEach, así que disparamos el clear directamente
+      const response = await clearCart(app, authToken);
 
-        // 2. Validamos que la respuesta sea exitosa
-        expect(response.status).toBe(200);
-        expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Carrito vaciado exitosamente");
+      // 2. Validamos que la respuesta sea exitosa
+      expect(response.status).toBe(200);
+      expect(response.body.success).toBe(true);
+      expect(response.body.message).toBe("Carrito vaciado exitosamente");
 
-        // 3. LA CLAVE: El conteo de items borrados debe ser 0
-        expect(response.body.data.count).toBe(0);
+      // 3. LA CLAVE: El conteo de items borrados debe ser 0
+      expect(response.body.data.count).toBe(0);
     });
 
     it("42. debe rechazar el vaciado si hay una orden pendiente", async () => {
@@ -767,13 +767,13 @@ describe("Cart - Carrito de Compras", () => {
     it("43. debe dejar el carrito vacío al consultar con GET tras el vaciado", async () => {
       // 1. Llenamos el carrito
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
-      
+
       // 2. Vaciamos
       await clearCart(app, authToken);
 
       // 3. Verificamos con GET
       const getResponse = await getCart(app, authToken);
-      
+
       expect(getResponse.status).toBe(200);
       validateFullCartContract(getResponse.body.data);
       expect(getResponse.body.data.items).toHaveLength(0);
@@ -787,7 +787,7 @@ describe("Cart - Carrito de Compras", () => {
     it("44. debe mantener el carrito separado entre distintos usuarios (Aislamiento)", async () => {
       // 1. Creamos un segundo usuario (acabará siendo borrado por el afterEach gracias al @test.com)
       const userB = await createTestUser({ email: `userB_${Date.now()}@test.com` });
-      
+
       const loginB = await loginUser(app, { email: userB.email });
       const tokenB = loginB.body.data.accessToken;
 
@@ -799,7 +799,7 @@ describe("Cart - Carrito de Compras", () => {
       expect(cartB.body.data.items).toHaveLength(0);
       expect(cartB.body.data.totalPrice).toBe(0);
     });
-  
+
     it("45. debe validar stock dinámicamente si el stock del libro cambia externamente", async () => {
       const addRes = await addToCart(app, authToken, { bookId: testBook.id, quantity: 5 });
       const cartId = addRes.body.data.id;
@@ -811,10 +811,10 @@ describe("Cart - Carrito de Compras", () => {
       const updateRes = await updateCart(app, authToken, cartId, 3);
       validateErrorResponse(updateRes, 409, "Stock insuficiente para el libro solicitado");
     });
-  
+
     it("46. debe manejar correctamente cambios de precio en el catálogo", async () => {
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
-      
+
       // Cambiamos el precio en el catálogo
       await AppDataSource.getRepository(Book).update(testBook.id, { price: 99.99 });
 
@@ -822,7 +822,7 @@ describe("Cart - Carrito de Compras", () => {
       expect(Number(cartRes.body.data.items[0].book.price)).toBe(99.99);
       expect(cartRes.body.data.totalPrice).toBe(99.99);
     });
-  
+
     it("47. debe persistir el carrito tras un cierre de sesión y nuevo login", async () => {
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 });
 
@@ -834,9 +834,9 @@ describe("Cart - Carrito de Compras", () => {
       expect(cartRes.body.data.items).toHaveLength(1);
       expect(cartRes.body.data.items[0].quantity).toBe(2);
     });
-  
+
     it("48. debe rechazar cualquier modificación (ADD, PUT, DELETE) si hay orden pendiente", async () => {
-       // 1. Preparar un item y una orden
+      // 1. Preparar un item y una orden
       const addRes = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
       const cartId = addRes.body.data.id;
 
@@ -855,23 +855,23 @@ describe("Cart - Carrito de Compras", () => {
       validateErrorResponse(resPut, 409, "Ya tienes una orden pendiente en proceso");
       validateErrorResponse(resDel, 409, "Ya tienes una orden pendiente en proceso");
     });
-  
+
     it("49. debe permitir re-agregar un libro después de haber vaciado el carrito", async () => {
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 3 });
       await clearCart(app, authToken);
-      
+
       const addAgain = await addToCart(app, authToken, { bookId: testBook.id, quantity: 1 });
       expect([200, 201]).toContain(addAgain.status);
       expect(addAgain.body.data.quantity).toBe(1);
     });
-  
+
     it("50. debe garantizar que el total del carrito sea la suma de subtotales válida", async () => {
       const book2 = await createTestBook({ title: "Math Book", price: 10.50, stock: 100 });
       // testBook vale 29.99
-      
+
       await addToCart(app, authToken, { bookId: testBook.id, quantity: 2 }); // 59.98
       await addToCart(app, authToken, { bookId: book2.id, quantity: 3 });    // 31.50
-      
+
       const cartRes = await getCart(app, authToken);
       // 59.98 + 31.50 = 91.48
       expect(cartRes.body.data.totalPrice).toBe(91.48);

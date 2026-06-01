@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import BookCard from "@/components/cards/BookCard";
 import { useBooks } from "@/hooks/useBooks";
-import { Loader2, Search, ChevronLeft, ChevronRight, BookOpen } from "lucide-react";
+import { Loader2, Search, ChevronLeft, ChevronRight } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -57,9 +57,8 @@ const Store = () => {
         {/* Encabezado de la Tienda */}
         <div className="mb-12 text-center md:text-left md:flex md:items-end md:justify-between border-b border-[#2e4b30] border-opacity-10 pb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#2e4b30] bg-opacity-10 rounded-sm mb-4">
-              <BookOpen className="w-4 h-4 text-[#2e4b30]" />
-              <span className="text-[#2e4b30] text-xs font-bold tracking-widest uppercase">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#2e4b30] rounded-sm mb-4">
+              <span className="text-[#f5efe1] text-xs font-bold tracking-widest uppercase">
                 Catálogo Completo
               </span>
             </div>
@@ -117,9 +116,9 @@ const Store = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`p-2 rounded-sm border border-[#2e4b30] border-opacity-20 transition-all ${currentPage === 1
-                      ? "opacity-30 cursor-not-allowed"
-                      : "hover:bg-[#2e4b30] hover:text-[#f5efe1]"
+                  className={`p-2 rounded-sm border border-[#2e4b30] border-opacity-20 text-[#2e4b30] transition-all ${currentPage === 1
+                    ? "opacity-30 cursor-not-allowed"
+                    : "hover:bg-[#2e4b30] hover:text-[#f5efe1]"
                     }`}
                   aria-label="Página anterior"
                 >
@@ -140,8 +139,8 @@ const Store = () => {
                           key={pageNum}
                           onClick={() => handlePageChange(pageNum)}
                           className={`w-10 h-10 rounded-sm text-sm font-medium transition-all ${currentPage === pageNum
-                              ? "bg-[#2e4b30] text-[#f5efe1] shadow-md"
-                              : "text-[#2e4b30] hover:bg-[#2e4b30] hover:bg-opacity-5"
+                            ? "bg-[#2e4b30] text-[#f5efe1] shadow-md"
+                            : "text-[#2e4b30] hover:bg-[#2e4b30] hover:bg-opacity-5"
                             }`}
                         >
                           {pageNum}
@@ -161,9 +160,9 @@ const Store = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`p-2 rounded-sm border border-[#2e4b30] border-opacity-20 transition-all ${currentPage === totalPages
-                      ? "opacity-30 cursor-not-allowed"
-                      : "hover:bg-[#2e4b30] hover:text-[#f5efe1]"
+                  className={`p-2 rounded-sm border border-[#2e4b30] border-opacity-20 text-[#2e4b30] transition-all ${currentPage === totalPages
+                    ? "opacity-30 cursor-not-allowed"
+                    : "hover:bg-[#2e4b30] hover:text-[#f5efe1]"
                     }`}
                   aria-label="Siguiente página"
                 >

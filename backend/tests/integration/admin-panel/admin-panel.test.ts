@@ -65,7 +65,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       it("debe listar todas las órdenes de todos los usuarios para un Admin", async () => {
         const orderRepository = AppDataSource.getRepository(Order);
         const orderItemRepository = AppDataSource.getRepository(OrderItem);
-        
+
         const adminUser = await createTestUser({ email: `admin_${Date.now()}@test.com`, role: "admin" });
         const loginRes = await loginUser(app, { email: adminUser.email });
         const adminToken = loginRes.body.data.accessToken;
@@ -76,12 +76,12 @@ describe("Admin Panel - Módulo de Administración", () => {
 
         const orderA = await orderRepository.save(orderRepository.create({ user: userA, status: OrderStatus.PAID, total: 10 }));
         await orderItemRepository.save(orderItemRepository.create({ order: orderA, book: book, quantity: 1, price: 10 }));
-        
+
         const orderB = await orderRepository.save(orderRepository.create({ user: userB, status: OrderStatus.PENDING, total: 20 }));
         await orderItemRepository.save(orderItemRepository.create({ order: orderB, book: book, quantity: 2, price: 10 }));
 
         const allOrdersAdminResponse = await getAllOrdersAdmin(app, adminToken);
-        
+
         expect(allOrdersAdminResponse.status).toBe(200);
         expect(allOrdersAdminResponse.body.success).toBe(true);
         expect(allOrdersAdminResponse.body.data.length).toBeGreaterThanOrEqual(2);
@@ -100,7 +100,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       it("debe rechazar con 403 si un usuario normal intenta cancelar", async () => {
         const orderRepository = AppDataSource.getRepository(Order);
         const order = await orderRepository.save(orderRepository.create({ user: testUser, status: OrderStatus.PAID, total: 10 }));
-        
+
         const normalUserCancelResponse = await cancelOrderAdmin(app, authToken, order.id);
         validateErrorResponse(normalUserCancelResponse, 403, "Prohibido: se requiere rol de administrador");
       });
@@ -108,7 +108,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       it("debe retornar 400 si la orden ya estaba CANCELLED", async () => {
         const orderRepository = AppDataSource.getRepository(Order);
         const order = await orderRepository.save(orderRepository.create({ user: testUser, status: OrderStatus.CANCELLED, total: 10 }));
-        
+
         const res = await cancelOrderAdmin(app, adminToken, order.id);
         validateErrorResponse(res, 400, "Solo se pueden cancelar órdenes en estado PAID o PENDING");
       });
@@ -117,13 +117,13 @@ describe("Admin Panel - Módulo de Administración", () => {
         const orderRepository = AppDataSource.getRepository(Order);
         const orderItemRepository = AppDataSource.getRepository(OrderItem);
         const bookRepository = AppDataSource.getRepository(Book);
-        
+
         const book = await createTestBook({ title: "Stock Book", stock: 10, price: 10 });
         const order = await orderRepository.save(orderRepository.create({ user: testUser, status: OrderStatus.PENDING, total: 10 }));
         await orderItemRepository.save(orderItemRepository.create({ order: order, book: book, quantity: 3, price: 10 }));
 
         const res = await cancelOrderAdmin(app, adminToken, order.id);
-        
+
         expect(res.status).toBe(200);
         expect(res.body.data.status).toBe(OrderStatus.CANCELLED);
       });
@@ -146,7 +146,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       it("debe limpiar todas las órdenes para un administrador", async () => {
         const orderRepository = AppDataSource.getRepository(Order);
         await orderRepository.save(orderRepository.create({ user: testUser, status: OrderStatus.PAID, total: 10 }));
-        
+
         const res = await clearAllOrdersAdmin(app, adminToken);
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
@@ -170,7 +170,7 @@ describe("Admin Panel - Módulo de Administración", () => {
       it("debe limpiar todas las órdenes canceladas para un administrador", async () => {
         const orderRepository = AppDataSource.getRepository(Order);
         await orderRepository.save(orderRepository.create({ user: testUser, status: OrderStatus.CANCELLED, total: 10 }));
-        
+
         const res = await clearCancelledOrdersAdmin(app, adminToken);
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
@@ -303,7 +303,7 @@ describe("Admin Panel - Módulo de Administración", () => {
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
         expect(res.body.message).toBe("Reseña eliminada exitosamente");
-        
+
         // Verificar que ya no existe
         const reviewRepository = AppDataSource.getRepository(Review);
         const deletedReview = await reviewRepository.findOne({ where: { id: review.id } });

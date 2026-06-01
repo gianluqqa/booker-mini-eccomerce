@@ -117,7 +117,7 @@ describe("Authentication - Login", () => {
       // Iteramos sobre cada email de la lista 'invalidEmails'.
       // La sintaxis 'for...of' nos permite iterar sobre los elementos de un array.
       // En cada iteración, el bucle asigna el siguiente elemento a la variable 'email'.
-      for (const email of invalidEmails) { 
+      for (const email of invalidEmails) {
         const response = await request(app)
           .post("/users/login")
           .send({
@@ -197,7 +197,7 @@ describe("Authentication - Login", () => {
       // Emails que realmente fallan la validación de regex (400)
       const invalidEmails = [
         "test@.com",
-        "test@com", 
+        "test@com",
         "test@te st.com"
       ];
 
@@ -408,7 +408,7 @@ describe("Authentication - Login", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveProperty("accessToken");
-      
+
       const token = response.body.data.accessToken;
       const tokenParts = token.split('.');
       expect(tokenParts).toHaveLength(3); // JWT tiene 3 partes
@@ -461,7 +461,7 @@ describe("Authentication - Login", () => {
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveProperty("accessToken");
-      
+
       const token = response.body.data.accessToken;
       const tokenParts = token.split('.');
       expect(tokenParts).toHaveLength(3); // JWT tiene 3 partes: header.payload.signature

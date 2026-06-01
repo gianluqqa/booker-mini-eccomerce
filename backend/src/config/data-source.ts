@@ -20,7 +20,7 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   synchronize: true, // solo para desarrollo
-  //dropSchema: true,
+  // dropSchema: true,
   logging: false,
   uuidExtension: "uuid-ossp",
   entities: [User, Book, Order, OrderItem, Cart, Genre, StockReservation, Review],

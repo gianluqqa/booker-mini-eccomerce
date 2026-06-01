@@ -4,14 +4,14 @@ import { createTestUser } from "../../helpers/userActions";
 import { createTestBook } from "../../helpers/bookActions";
 import { loginUser } from "../../helpers/authActions";
 import { validateErrorResponse } from "../../helpers/validateErrorResponse";
-import { 
-  toggleFavorite, 
-  getUserFavorites 
+import {
+  toggleFavorite,
+  getUserFavorites
 } from "../../helpers/favoriteActions";
-import { 
-  validateBookContract, 
-  validateFavoriteListContract, 
-  validateToggleFavoriteResponse 
+import {
+  validateBookContract,
+  validateFavoriteListContract,
+  validateToggleFavoriteResponse
 } from "../../helpers/favoriteValidationHelpers";
 import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
 
@@ -63,7 +63,7 @@ describe("Favorites - Módulo de Favoritos", () => {
   describe("POST /users/:userId/favorites/:bookId - Toggle Favorito", () => {
     it("1. debe agregar un libro a favoritos exitosamente (200)", async () => {
       const response = await toggleFavorite(app, authToken, testUser.id, testBook.id);
-      
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       validateToggleFavoriteResponse(response.body);
@@ -74,10 +74,10 @@ describe("Favorites - Módulo de Favoritos", () => {
     it("2. debe quitar un libro de favoritos exitosamente (200)", async () => {
       // Primero agregar a favoritos
       await toggleFavorite(app, authToken, testUser.id, testBook.id);
-      
+
       // Luego quitar
       const response = await toggleFavorite(app, authToken, testUser.id, testBook.id);
-      
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       validateToggleFavoriteResponse(response.body);
@@ -110,7 +110,7 @@ describe("Favorites - Módulo de Favoritos", () => {
   describe("GET /users/:userId/favorites - Obtener Favoritos", () => {
     it("1. debe obtener la lista de favoritos vacía (200)", async () => {
       const response = await getUserFavorites(app, authToken, testUser.id);
-      
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       validateFavoriteListContract(response.body);
@@ -121,14 +121,14 @@ describe("Favorites - Módulo de Favoritos", () => {
       // Agregar libros a favoritos
       await toggleFavorite(app, authToken, testUser.id, testBook.id);
       await toggleFavorite(app, authToken, testUser.id, testBook2.id);
-      
+
       const response = await getUserFavorites(app, authToken, testUser.id);
-      
+
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       validateFavoriteListContract(response.body);
       expect(response.body.data.length).toBe(2);
-      
+
       // Validar que cada libro tenga el contrato correcto
       response.body.data.forEach((book: any) => {
         validateBookContract(book);

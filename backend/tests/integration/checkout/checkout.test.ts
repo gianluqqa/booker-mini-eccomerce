@@ -91,8 +91,8 @@ describe("Checkout - Proceso de Compra", () => {
       const reserveStockResponse = await reserveStock(app, authToken);
 
       validateErrorResponse(
-        reserveStockResponse, 
-        409, 
+        reserveStockResponse,
+        409,
         "Ya tienes una orden pendiente en proceso",
         ErrorCodes.PENDING_ORDER_EXISTS
       );
@@ -102,8 +102,8 @@ describe("Checkout - Proceso de Compra", () => {
     it("4. debe fallar si carrito está vacío", async () => {
       const reserveStockResponse = await reserveStock(app, authToken);
       validateErrorResponse(
-        reserveStockResponse, 
-        400, 
+        reserveStockResponse,
+        400,
         "Tu carrito está vacío. Agrega libros antes de iniciar el checkout.",
         ErrorCodes.CART_EMPTY
       );
@@ -122,8 +122,8 @@ describe("Checkout - Proceso de Compra", () => {
       const reserveStockResponse = await reserveStock(app, authToken);
 
       validateErrorResponse(
-        reserveStockResponse, 
-        409, 
+        reserveStockResponse,
+        409,
         "Stock insuficiente para el libro solicitado"
       );
     });
@@ -192,8 +192,8 @@ describe("Checkout - Proceso de Compra", () => {
       const checkoutPayResponse = await payOrder(app, authToken, paymentData);
 
       validateErrorResponse(
-        checkoutPayResponse, 
-        400, 
+        checkoutPayResponse,
+        400,
         "Datos de pago inválidos",
         ErrorCodes.PAYMENT_DATA_INVALID
       );
@@ -208,8 +208,8 @@ describe("Checkout - Proceso de Compra", () => {
 
       // 3. Validación
       validateErrorResponse(
-        checkoutResponse, 
-        400, 
+        checkoutResponse,
+        400,
         "No tienes una reserva de stock activa. Por favor, inicia el proceso de nuevo.",
         ErrorCodes.NO_ACTIVE_RESERVATION
       );
@@ -255,8 +255,8 @@ describe("Checkout - Proceso de Compra", () => {
 
       // 3. Validación: El contrato exige 404
       validateErrorResponse(
-        payResponse, 
-        404, 
+        payResponse,
+        404,
         "No se encontró ninguna orden pendiente para procesar el pago.",
         ErrorCodes.ORDER_NOT_FOUND
       );
@@ -273,10 +273,10 @@ describe("Checkout - Proceso de Compra", () => {
       // Verificar que existen en BD
       const orderRepo = AppDataSource.getRepository(Order);
       const reservationRepo = AppDataSource.getRepository(StockReservation);
-      
+
       const orderBefore = await orderRepo.findOne({ where: { user: { id: testUser.id }, status: OrderStatus.PENDING } });
       const reservationBefore = await reservationRepo.findOne({ where: { userId: testUser.id } });
-      
+
       expect(orderBefore).toBeDefined();
       expect(reservationBefore).toBeDefined();
 
@@ -287,11 +287,11 @@ describe("Checkout - Proceso de Compra", () => {
       expect(cancelResponse.status).toBe(200);
       expect(cancelResponse.body.success).toBe(true);
       expect(cancelResponse.body.message).toContain("cancelada");
-      
+
       // Verificar limpieza en BD
       const orderAfter = await orderRepo.findOne({ where: { id: orderBefore?.id } });
       const reservationAfter = await reservationRepo.findOne({ where: { userId: testUser.id } });
-      
+
       expect(orderAfter).toBeNull();
       expect(reservationAfter).toBeNull();
     });
@@ -300,8 +300,8 @@ describe("Checkout - Proceso de Compra", () => {
       const cancelResponse = await cancelCheckout(app, authToken);
 
       validateErrorResponse(
-        cancelResponse, 
-        404, 
+        cancelResponse,
+        404,
         "No tienes ninguna reserva o pedido pendiente para cancelar.",
         ErrorCodes.NOTHING_TO_CANCEL
       );
@@ -327,8 +327,8 @@ describe("Checkout - Proceso de Compra", () => {
 
       // 4. Validación
       validateErrorResponse(
-        checkoutResponse, 
-        410, 
+        checkoutResponse,
+        410,
         "Tu reserva de stock ha expirado. Por favor, inicia el proceso de nuevo.",
         ErrorCodes.RESERVATION_EXPIRED
       );
@@ -415,7 +415,7 @@ describe("Checkout - Proceso de Compra", () => {
       // ignorando los cambios recientes en el carrito hasta que se cancele la actual.
       expect(secondReserve.status).toBe(201);
       expect(secondReserve.body.data.id).toBe(firstReserve.body.data.id);
-      expect(secondReserve.body.data.items).toHaveLength(1); 
+      expect(secondReserve.body.data.items).toHaveLength(1);
       expect(secondReserve.body.data.items[0].bookId).toBe(testBook.id);
     });
   });

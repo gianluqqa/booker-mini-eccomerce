@@ -9,9 +9,9 @@ const booksData = [
     stock: 100,
     image:
       "https://images.cdn2.buscalibre.com/fit-in/360x360/43/b3/43b37a982ff4b3fdefeb3fa969de1149.jpg",
-    genre: "Classic Literature",
+    genre: "Literatura Clásica",
     description:
-      "A story about the mysterious millionaire Jay Gatsby and his obsessive love for Daisy Buchanan, set in the Roaring Twenties on Long Island.",
+      "Una historia sobre el misterioso millonario Jay Gatsby y su amor obsesivo por Daisy Buchanan, ambientada en los locos años veinte en Long Island.",
   },
   {
     title: "1984",
@@ -20,9 +20,9 @@ const booksData = [
     stock: 85,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/360x360/ab/54/ab54a82815e061d7fc8f22bcd22f2605.jpg",
-    genre: "Dystopian Fiction",
+    genre: "Ficción Distópica",
     description:
-      "A dystopian novel set in a totalitarian society where the Party, led by Big Brother, has complete control over every aspect of human life.",
+      "Una novela distópica ambientada en una sociedad totalitaria donde el Partido, liderado por el Gran Hermano, tiene el control completo sobre cada aspecto de la vida humana.",
   },
   {
     title: "To Kill a Mockingbird",
@@ -31,9 +31,9 @@ const booksData = [
     stock: 120,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/360x360/f6/b6/f6b6a354bbc07e0791081e6e988e0efe.jpg",
-    genre: "Classic Literature",
+    genre: "Literatura Clásica",
     description:
-      "A novel about racial injustice in a small Southern town, seen through the eyes of a young girl named Scout Finch.",
+      "Una novela sobre la injusticia racial en un pequeño pueblo del sur, vista a través de los ojos de una niña llamada Scout Finch.",
   },
   {
     title: "Pride and Prejudice",
@@ -44,7 +44,7 @@ const booksData = [
       "https://images.cdn2.buscalibre.com/fit-in/360x360/65/13/65137ebf9c785c28053642d321c89209.jpg",
     genre: "Romance",
     description:
-      "A romantic novel that charts the emotional development of Elizabeth Bennet, who learns the error of making hasty judgments.",
+      "Una novela romántica que traza el desarrollo emocional de Elizabeth Bennet, quien aprende el error de hacer juicios precipitados.",
   },
   {
     title: "The Catcher in the Rye",
@@ -53,9 +53,9 @@ const booksData = [
     stock: 75,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/360x360/60/29/60297e36593e7322bdab153d11c5ed95.jpg",
-    genre: "Coming-of-Age",
+    genre: "Ficción de Crecimiento",
     description:
-      "A story about teenage angst and alienation, narrated by the cynical and disillusioned Holden Caulfield.",
+      "Una historia sobre la angustia y la alienación adolescente, narrada por el cínico y desilusionado Holden Caulfield.",
   },
   {
     title: "The Lord of the Rings",
@@ -64,9 +64,9 @@ const booksData = [
     stock: 60,
     image:
       "https://images.cdn3.buscalibre.com/fit-in/360x360/2c/c8/2cc8d8b40389605434add789a1fc055d.jpg",
-    genre: "Fantasy",
+    genre: "Fantasía",
     description:
-      "An epic high-fantasy novel that follows the quest of the hobbit Frodo Baggins to destroy the One Ring and defeat the Dark Lord Sauron.",
+      "Una novela épica de alta fantasía que sigue la misión del hobbit Frodo Bolsón para destruir el Anillo Único y derrotar al Señor Oscuro Sauron.",
   },
   {
     title: "Harry Potter and the Philosopher's Stone",
@@ -75,9 +75,9 @@ const booksData = [
     stock: 200,
     image:
       "https://images.cdn3.buscalibre.com/fit-in/360x360/10/9d/109df8e47c0b36b888ea2be18a4ce3e5.jpg",
-    genre: "Fantasy",
+    genre: "Fantasía",
     description:
-      "The first novel in the Harry Potter series, introducing a young wizard, Harry Potter, and his adventures at Hogwarts School of Witchcraft and Wizardry.",
+      "La primera novela de la serie de Harry Potter, que presenta a un joven mago, Harry Potter, y sus aventuras en el Colegio Hogwarts de Magia y Hechicería.",
   },
   {
     title: "The Hobbit",
@@ -86,9 +86,9 @@ const booksData = [
     stock: 95,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/360x360/45/44/4544aa9e50feca33c58b1d4646f34b2f.jpg",
-    genre: "Fantasy",
+    genre: "Fantasía",
     description:
-      "A fantasy novel about the hobbit Bilbo Baggins, who is swept into an epic quest to reclaim a lost Dwarf Kingdom from the fearsome dragon Smaug.",
+      "Una novela de fantasía sobre el hobbit Bilbo Bolsón, quien se ve envuelto en una misión épica para recuperar un Reino Enano perdido del temible dragón Smaug.",
   },
   {
     title: "The Chronicles of Narnia",
@@ -97,9 +97,9 @@ const booksData = [
     stock: 110,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/360x360/3e/b7/3eb7fa1d683c5ef60c2e6cc56ce8d40d.jpg",
-    genre: "Fantasy",
+    genre: "Fantasía",
     description:
-      "A story of four siblings who discover the magical world of Narnia, ruled by the evil White Witch, and their quest to free it with the help of the lion Aslan.",
+      "Una historia de cuatro hermanos que descubren el mundo mágico de Narnia, gobernado por la malvada Bruja Blanca, y su misión para liberarlo con la ayuda del león Aslan.",
   },
   {
     title: "The Alchemist",
@@ -108,9 +108,9 @@ const booksData = [
     stock: 150,
     image:
       "https://images.cdn3.buscalibre.com/fit-in/360x360/7b/3d/7b3dced43f7cbbac894dd1fb1196041b.jpg",
-    genre: "Philosophical Fiction",
+    genre: "Ficción Filosófica",
     description:
-      "A philosophical novel about a young Andalusian shepherd named Santiago who journeys to the pyramids of Egypt in search of a treasure.",
+      "Una novela filosófica sobre un joven pastor andaluz llamado Santiago que viaja a las pirámides de Egipto en busca de un tesoro.",
   },
   {
     title: "The Da Vinci Code",
@@ -119,9 +119,9 @@ const booksData = [
     stock: 180,
     image:
       "https://images.cdn3.buscalibre.com/fit-in/360x360/09/2b/092be19c48bac23fb897b3d4696a3a09.jpg",
-    genre: "Thriller",
+    genre: "Suspense",
     description:
-      "A thriller that follows symbologist Robert Langdon and cryptologist Sophie Neveu as they investigate a murder in the Louvre Museum and uncover a battle between the Priory of Sion and Opus Dei.",
+      "Un thriller que sigue al simbologista Robert Langdon y la criptóloga Sophie Neveu mientras investigan un asesinato en el Museo del Louvre y descubren una batalla entre el Priorato de Sión y el Opus Dei.",
   },
   {
     title: "The Kite Runner",
@@ -130,9 +130,9 @@ const booksData = [
     stock: 95,
     image:
       "https://images.cdn2.buscalibre.com/fit-in/360x360/ec/fc/ecfc2c780d25a9841882ae4823bfabf9.jpg",
-    genre: "Literary Fiction",
+    genre: "Ficción Literaria",
     description:
-      "A powerful story of friendship, betrayal, and redemption set against the tumultuous backdrop of modern Afghanistan.",
+      "Una poderosa historia de amistad, traición y redención con el tumultuoso trasfondo de la Afganistán moderna.",
   },
   {
     title: "The Book Thief",
@@ -141,9 +141,9 @@ const booksData = [
     stock: 80,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/360x360/1f/1e/1f1ede0b04d8e6d02f804f97ac89e59d.jpg",
-    genre: "Historical Fiction",
+    genre: "Ficción Histórica",
     description:
-      "A historical novel set in Nazi Germany, narrated by Death, about a young girl who finds solace by stealing books and sharing them with others.",
+      "Una novela histórica ambientada en la Alemania nazi, narrada por la Muerte, sobre una joven que encuentra consuelo robando libros y compartiéndolos con otros.",
   },
   {
     title: "The Hunger Games",
@@ -152,9 +152,9 @@ const booksData = [
     stock: 160,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/520x520/b8/38/be5fe97a07edbb2c5d6e6d755d70b707.jpg",
-    genre: "Dystopian Fiction",
+    genre: "Ficción Distópica",
     description:
-      "A dystopian novel where teenagers are forced to compete in a televised fight to the death in a post-apocalyptic nation.",
+      "Una novela distópica donde unos adolescentes son obligados a competir en una lucha televisada a muerte en una nación post-apocalíptica.",
   },
   {
     title: "The Girl with the Dragon Tattoo",
@@ -163,9 +163,9 @@ const booksData = [
     stock: 70,
     image:
       "https://images.cdn2.buscalibre.com/fit-in/360x360/95/f6/95f60abf76ed2f6546c4eb694f221cb6.jpg",
-    genre: "Crime Thriller",
+    genre: "Thriller Criminal",
     description:
-      "A psychological thriller in which a disgraced journalist and a troubled but brilliant computer hacker investigate a 40-year-old mystery.",
+      "Un thriller psicológico en el que un periodista en desgracia y una brillante pero problemática hacker investigan un misterio de hace 40 años.",
   },
   {
     title: "The Handmaid's Tale",
@@ -174,9 +174,9 @@ const booksData = [
     stock: 105,
     image:
       "https://images.cdn2.buscalibre.com/fit-in/520x520/76/64/7664588388ee26ead4557ab7a8af8bb0.jpg",
-    genre: "Dystopian Fiction",
+    genre: "Ficción Distópica",
     description:
-      "A dystopian novel set in a patriarchal, totalitarian society where fertile women, called 'Handmaids,' are forced into child-bearing servitude.",
+      "Una novela distópica ambientada en una sociedad patriarcal y totalitaria donde las mujeres fértiles, llamadas 'Criadas', son forzadas a la servidumbre reproductiva.",
   },
   {
     title: "The Fault in Our Stars",
@@ -185,9 +185,9 @@ const booksData = [
     stock: 140,
     image:
       "https://images.cdn3.buscalibre.com/fit-in/360x360/03/d4/03d441320c2eecb3bee3faaeea9b56ca.jpg",
-    genre: "Young Adult Romance",
+    genre: "Romance Juvenil",
     description:
-      "A heart-wrenching novel about two teenagers with cancer who fall in love, exploring the beauty and tragedy of life and loss.",
+      "Una novela desgarradora sobre dos adolescentes con cáncer que se enamoran, explorando la belleza y la tragedia de la vida y la pérdida.",
   },
   {
     title: "The Martian",
@@ -196,9 +196,9 @@ const booksData = [
     stock: 90,
     image:
       "https://images.cdn3.buscalibre.com/fit-in/360x360/4d/2c/4d2cb1fac874b84c30fcf0fd63fe4eba.jpg",
-    genre: "Science Fiction",
+    genre: "Ciencia Ficción",
     description:
-      "A science fiction novel about an astronaut stranded on Mars who must use his ingenuity to survive.",
+      "Una novela de ciencia ficción sobre un astronauta varado en Marte que debe usar su ingenio para sobrevivir.",
   },
   {
     title: "The Silent Patient",
@@ -207,9 +207,9 @@ const booksData = [
     stock: 85,
     image:
       "https://images.cdn2.buscalibre.com/fit-in/360x360/f3/5f/f35f34fddce312369d8246773a650ade.jpg",
-    genre: "Psychological Thriller",
+    genre: "Thriller Psicológico",
     description:
-      "A shocking psychological thriller of a woman's act of violence against her husband—and of the therapist obsessed with uncovering her motive.",
+      "Un impactante thriller psicológico sobre el acto de violencia de una mujer contra su esposo, y del terapeuta obsesionado con descubrir su motivo.",
   },
   {
     title: "Educated",
@@ -218,9 +218,9 @@ const booksData = [
     stock: 75,
     image:
       "https://images.cdn1.buscalibre.com/fit-in/360x360/e1/5f/e15f89a3e8f60854c6dce67070944796.jpg",
-    genre: "Memoir",
+    genre: "Memorias",
     description:
-      "A memoir by Tara Westover, who, after a sheltered upbringing in a survivalist family, educates herself and earns a PhD from Cambridge University.",
+      "Unas memorias de Tara Westover, quien, tras una educación protegida en una familia de supervivencialistas, se educa a sí misma y obtiene un doctorado de la Universidad de Cambridge.",
   },
 ];
 

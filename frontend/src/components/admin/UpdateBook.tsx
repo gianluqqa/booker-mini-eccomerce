@@ -65,8 +65,18 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
       setTimeout(() => {
         onClose();
       }, 1500);
-    } catch (err: any) {
-      const message = err.validationErrors || err.message || "No se pudo actualizar el libro";
+    } catch (err: unknown) {
+      let message = "No se pudo actualizar el libro";
+      if (typeof err === "object" && err !== null) {
+        const e = err as { message?: string; validationErrors?: string | string[] };
+        if (e.validationErrors) {
+          message = typeof e.validationErrors === "string"
+            ? e.validationErrors
+            : e.validationErrors.join(", ");
+        } else if (e.message) {
+          message = e.message;
+        }
+      }
       setError(message);
     } finally {
       setSubmitting(false);
@@ -74,7 +84,7 @@ const UpdateBook: React.FC<UpdateBookProps> = ({ book, onClose, onUpdated }) => 
   };
 
   return (
-    <div>
+    <div className="max-h-[80vh] overflow-y-auto p-4">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div>

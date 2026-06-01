@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { usePendingOrderCheck } from "@/hooks/usePendingOrderCheck";
 import PendingOrderAlert from "@/components/alerts/PendingOrderAlert";
+import ConfirmClearCartAlert from "@/components/alerts/ConfirmClearCartAlert";
 
 const Cart = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const Cart = () => {
   const [error, setError] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState<{ [key: string]: boolean }>({});
   const [isRemoving, setIsRemoving] = useState<{ [key: string]: boolean }>({});
+  const [isClearCartAlertOpen, setIsClearCartAlertOpen] = useState(false);
 
   // Refs para el auto-incremento (long press)
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -145,23 +147,23 @@ const Cart = () => {
     }
   };
 
-  const handleClearCart = async () => {
+  const handleClearCart = () => {
     if (isCartBlocked) {
       alert("No puedes vaciar el carrito mientras tienes una orden pendiente. Debes completarla o cancelarla primero.");
       return;
     }
+    
+    setIsClearCartAlertOpen(true);
+  };
 
-    if (window.confirm("¿Estás seguro de que quieres vaciar el carrito?")) {
-      try {
-        await clearCart();
-        setCartItems([]);
-
-        // Actualizar el contexto del carrito para sincronizar el contador del Navbar
-        await refreshCart();
-      } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : "Error al vaciar el carrito";
-        setError(errorMessage);
-      }
+  const confirmClearCart = async () => {
+    try {
+      await clearCart();
+      setCartItems([]);
+      await refreshCart();
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Error al vaciar el carrito";
+      setError(errorMessage);
     }
   };
 
@@ -328,6 +330,12 @@ const Cart = () => {
             />
           </div>
         )}
+
+        <ConfirmClearCartAlert 
+          isOpen={isClearCartAlertOpen} 
+          onClose={() => setIsClearCartAlertOpen(false)} 
+          onConfirm={confirmClearCart} 
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           <div className="lg:col-span-3">

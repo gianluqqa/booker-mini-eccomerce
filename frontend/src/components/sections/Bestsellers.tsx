@@ -156,14 +156,7 @@ const Bestsellers = () => {
                 
                 {/* Card Container */}
                 <div className="relative z-10 transform-gpu group-hover:-translate-y-4 transition-transform duration-500 ease-out">
-                  {/* Ranking Tag */}
-                  <div className="absolute -top-4 -right-2 z-20 flex items-center justify-center">
-                    <div className="bg-[#f5efe1] text-[#2e4b30] px-4 py-1.5 font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 shadow-[4px_4px_0px_#1a3a1c]">
-                      <Award className="w-3 h-3" />
-                      Top Choice
-                    </div>
-                  </div>
-                  
+
                   <div className="shadow-2xl shadow-black/20">
                     <BookCard book={book} />
                   </div>

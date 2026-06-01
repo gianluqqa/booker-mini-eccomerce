@@ -63,7 +63,7 @@ describe("Orders - Módulo de Órdenes", () => {
 
     it("3. debe listar las órdenes confirmadas del usuario", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
-      
+
       const newOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PAID,
@@ -75,7 +75,7 @@ describe("Orders - Módulo de Órdenes", () => {
       expect(confirmedOrdersResponse.status).toBe(200);
       expect(confirmedOrdersResponse.body.success).toBe(true);
       expect(confirmedOrdersResponse.body.data.length).toBe(1);
-      
+
       const orderData = confirmedOrdersResponse.body.data[0];
       validateOrderContract(orderData);
       expect(orderData.id).toBe(savedOrder.id);
@@ -89,31 +89,31 @@ describe("Orders - Módulo de Órdenes", () => {
 
     it("5. debe excluir estrictamente órdenes en estado PENDING o CANCELLED", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
-      
+
       const paidOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PAID,
         total: 10.00,
       });
-      
+
       const pendingOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PENDING,
         total: 20.00,
       });
-      
+
       const cancelledOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.CANCELLED,
         total: 30.00,
       });
-      
+
       await orderRepository.save([paidOrder, pendingOrder, cancelledOrder]);
 
       const filteredOrdersResponse = await getUserOrders(app, authToken);
       expect(filteredOrdersResponse.status).toBe(200);
       expect(filteredOrdersResponse.body.success).toBe(true);
-      
+
       expect(filteredOrdersResponse.body.data.length).toBe(1);
       expect(filteredOrdersResponse.body.data[0].id).toBe(paidOrder.id);
       expect(filteredOrdersResponse.body.data[0].status).toBe(OrderStatus.PAID);
@@ -121,32 +121,32 @@ describe("Orders - Módulo de Órdenes", () => {
 
     it("6. debe garantizar privacidad: no devolver órdenes pagadas que pertenezcan a otros usuarios", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
-      
+
       const otherUser = await createTestUser({
         email: `other_order_user_${Date.now()}@test.com`,
         name: "Other",
         surname: "User"
       });
-      
+
       const mainUserOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PAID,
         total: 50.00,
       });
-      
+
       const otherUserOrder = orderRepository.create({
         user: { id: otherUser.id },
         status: OrderStatus.PAID,
         total: 99.99,
       });
-      
+
       await orderRepository.save([mainUserOrder, otherUserOrder]);
 
       const privateOrdersResponse = await getUserOrders(app, authToken);
-      
+
       expect(privateOrdersResponse.status).toBe(200);
       expect(privateOrdersResponse.body.success).toBe(true);
-      
+
       expect(privateOrdersResponse.body.data.length).toBe(1);
       expect(privateOrdersResponse.body.data[0].id).toBe(mainUserOrder.id);
     });
@@ -172,7 +172,7 @@ describe("Orders - Módulo de Órdenes", () => {
 
     it("10. debe retornar solo la orden PENDING del usuario", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
-      
+
       const newOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PENDING,
@@ -183,10 +183,10 @@ describe("Orders - Módulo de Órdenes", () => {
       const pendingOrderResponse = await getUserPendingOrders(app, authToken);
       expect(pendingOrderResponse.status).toBe(200);
       expect(pendingOrderResponse.body.success).toBe(true);
-      
+
       // El controlador devuelve [pendingOrder] o []
       expect(pendingOrderResponse.body.data.length).toBe(1);
-      
+
       const orderData = pendingOrderResponse.body.data[0];
       validateOrderContract(orderData);
       expect(orderData.id).toBe(savedOrder.id);
@@ -195,31 +195,31 @@ describe("Orders - Módulo de Órdenes", () => {
 
     it("11. debe excluir estrictamente órdenes en estado PAID o CANCELLED", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
-      
+
       const paidOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PAID,
         total: 10.00,
       });
-      
+
       const pendingOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PENDING,
         total: 20.00,
       });
-      
+
       const cancelledOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.CANCELLED,
         total: 30.00,
       });
-      
+
       await orderRepository.save([paidOrder, pendingOrder, cancelledOrder]);
 
       const filteredPendingOrdersResponse = await getUserPendingOrders(app, authToken);
       expect(filteredPendingOrdersResponse.status).toBe(200);
       expect(filteredPendingOrdersResponse.body.success).toBe(true);
-      
+
       expect(filteredPendingOrdersResponse.body.data.length).toBe(1);
       expect(filteredPendingOrdersResponse.body.data[0].id).toBe(pendingOrder.id);
       expect(filteredPendingOrdersResponse.body.data[0].status).toBe(OrderStatus.PENDING);
@@ -227,32 +227,32 @@ describe("Orders - Módulo de Órdenes", () => {
 
     it("12. debe garantizar privacidad: no devolver órdenes pendientes que pertenezcan a otros usuarios", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
-      
+
       const otherUser = await createTestUser({
         email: `other_pending_user_${Date.now()}@test.com`,
         name: "Other",
         surname: "User"
       });
-      
+
       const mainUserOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PENDING,
         total: 50.00,
       });
-      
+
       const otherUserOrder = orderRepository.create({
         user: { id: otherUser.id },
         status: OrderStatus.PENDING,
         total: 99.99,
       });
-      
+
       await orderRepository.save([mainUserOrder, otherUserOrder]);
 
       const privatePendingOrdersResponse = await getUserPendingOrders(app, authToken);
-      
+
       expect(privatePendingOrdersResponse.status).toBe(200);
       expect(privatePendingOrdersResponse.body.success).toBe(true);
-      
+
       expect(privatePendingOrdersResponse.body.data.length).toBe(1);
       expect(privatePendingOrdersResponse.body.data[0].id).toBe(mainUserOrder.id);
     });
@@ -262,14 +262,14 @@ describe("Orders - Módulo de Órdenes", () => {
     it("13. debe obtener los detalles de una orden específica por ID", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
       const orderItemRepository = AppDataSource.getRepository(OrderItem);
-      
+
       const newOrder = orderRepository.create({
         user: { id: testUser.id },
         status: OrderStatus.PAID,
         total: 29.99,
       });
       const savedOrder = await orderRepository.save(newOrder);
-      
+
       const newItem = orderItemRepository.create({
         order: { id: savedOrder.id },
         book: { id: testBook.id },
@@ -279,10 +279,10 @@ describe("Orders - Módulo de Órdenes", () => {
       await orderItemRepository.save(newItem);
 
       const orderDetailsResponse = await getOrderById(app, authToken, savedOrder.id);
-      
+
       expect(orderDetailsResponse.status).toBe(200);
       expect(orderDetailsResponse.body.success).toBe(true);
-      
+
       validateOrderContract(orderDetailsResponse.body.data);
       expect(orderDetailsResponse.body.data.id).toBe(savedOrder.id);
       expect(orderDetailsResponse.body.data.items.length).toBe(1);
@@ -291,19 +291,19 @@ describe("Orders - Módulo de Órdenes", () => {
     it("14. debe retornar 404 al intentar obtener una orden que no existe", async () => {
       const nonExistentId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
       const notFoundOrderResponse = await getOrderById(app, authToken, nonExistentId);
-      
+
       validateErrorResponse(notFoundOrderResponse, 404, "Orden no encontrada");
     });
 
     it("15. (Seguridad): debe retornar 403 si un usuario intenta ver una orden de otro usuario", async () => {
       const orderRepository = AppDataSource.getRepository(Order);
-      
+
       const anotherUser = await createTestUser({
         email: `intruder_user_${Date.now()}@test.com`,
         name: "Intruder",
         surname: "User"
       });
-      
+
       const othersOrder = orderRepository.create({
         user: { id: anotherUser.id },
         status: OrderStatus.PAID,
@@ -312,13 +312,13 @@ describe("Orders - Módulo de Órdenes", () => {
       const savedOthersOrder = await orderRepository.save(othersOrder);
 
       const unauthorizedOrderResponse = await getOrderById(app, authToken, savedOthersOrder.id);
-      
+
       validateErrorResponse(unauthorizedOrderResponse, 403, "No tienes permiso para ver esta orden");
     });
 
     it("16. debe retornar un error si el ID proporcionado no es un UUID válido", async () => {
       const invalidUuidResponse = await getOrderById(app, authToken, "id-invalido-123");
-      
+
       expect(invalidUuidResponse.status).toBe(500);
       expect(invalidUuidResponse.body.success).toBe(false);
       expect(invalidUuidResponse.body.message).toBe("Error al obtener la orden");

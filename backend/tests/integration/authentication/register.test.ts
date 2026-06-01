@@ -23,7 +23,7 @@ describe("Authentication - Registro", () => {
 
     it("1. debe registrar usuario con datos básicos exitosamente", async () => {
       registeredUserEmail = `success_${Date.now()}@test.com`;
-      
+
       const registrationResponse = await request(app)
         .post("/users/register")
         .send({
@@ -39,7 +39,7 @@ describe("Authentication - Registro", () => {
       expect(registrationResponse.body.success).toBe(true);
       expect(registrationResponse.body.message).toBe("Usuario creado exitosamente");
       expect(registrationResponse.body).toHaveProperty("data");
-      
+
       // Verificar datos del usuario
       const newUser = registrationResponse.body.data; //Resumimos creando una variable que engloba todo el body de la response.
       expect(newUser.email).toBe(registeredUserEmail);
@@ -73,7 +73,7 @@ describe("Authentication - Registro", () => {
       expect(optionalFieldsResponse.body.success).toBe(true);
       expect(optionalFieldsResponse.body.message).toBe("Usuario creado exitosamente");
       expect(optionalFieldsResponse.body).toHaveProperty("data");
-      
+
       // Verificar campos opcionales
       const userWithOptionalFields = optionalFieldsResponse.body.data;
       expect(userWithOptionalFields.address).toBe("Calle Principal 123");
@@ -107,7 +107,7 @@ describe("Authentication - Registro", () => {
 
     it("4. debe rechazar email duplicado sin importar mayúsculas/minúsculas", async () => {
       const baseEmail = `consistency${Date.now()}@test.com`;
-      
+
       // Primer registro con email en mayúsculas
       const firstRegistration = await createTestUser({
         email: baseEmail.toUpperCase(),
@@ -407,7 +407,7 @@ describe("Authentication - Registro", () => {
       // Verificar que el helper no expone contraseñas
       expect(userWithSecurityTest).not.toHaveProperty("password");
       expect(userWithSecurityTest).not.toHaveProperty("confirmPassword");
-      
+
       // Verificación adicional con request directo para confirmar seguridad en respuesta HTTP
       const securityResponse = await request(app)
         .post("/users/register")
@@ -449,7 +449,7 @@ describe("Authentication - Registro", () => {
 
     it("23. debe mantener consistencia de email y evitar duplicados", async () => {
       const baseEmail = `consistency${Date.now()}@test.com`;
-      
+
       // Primer registro con email en mayúsculas
       const firstRegistration = await request(app)
         .post("/users/register")

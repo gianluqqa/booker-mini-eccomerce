@@ -188,7 +188,6 @@ const ReviewsAdminTable: React.FC<{ userSearchTerm?: string }> = ({ userSearchTe
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                     <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                     <p>No se encontraron reviews</p>
-                    <p className="text-sm">Intenta ajustar los filtros o carga más datos</p>
                   </td>
                 </tr>
               ) : (
