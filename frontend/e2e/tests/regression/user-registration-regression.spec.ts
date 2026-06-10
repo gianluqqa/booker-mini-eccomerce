@@ -115,4 +115,24 @@ test.describe('Registro de Usuario - Regression Suite @regression', () => {
     await expect(emailError).toHaveText(USER_REGISTRATION_TEST_DATA.duplicateEmail.errorMessage);
   });
 
+  test('Debería registrar un usuario exitosamente completando solo campos obligatorios', async ({ registrationPage }) => {
+    const onlyMandatoryUser = {
+      name: 'MandatoryOnly',
+      surname: 'QAUser',
+      email: generateUniqueEmail('mandatory.only'),
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
+    };
+
+    await registrationPage.fillRegistrationForm(onlyMandatoryUser);
+    await registrationPage.submitRegistrationForm();
+    await registrationPage.expectSuccessfulRegistration();
+  });
+
+  test('Debería navegar a la página de inicio de sesión al hacer clic en el enlace correspondiente', async ({ registrationPage, page }) => {
+    await page.getByRole('link', { name: 'Inicia sesión aquí' }).click();
+    await expect(page).toHaveURL(/\/login$/);
+    await expect(page.getByRole('heading', { name: 'Iniciar Sesión' })).toBeVisible();
+  });
+
 });

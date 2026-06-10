@@ -1,3 +1,122 @@
+# FILOSOFÍA DE AUTOMATIZACIÓN PLAYWRIGHT DEL PROYECTO
+
+A partir de este momento, todas las pruebas Playwright deben construirse siguiendo una estrategia orientada a negocio y a comportamiento del usuario.
+
+El objetivo de este proyecto no es verificar cada detalle implementado en el frontend.
+
+El objetivo es demostrar capacidad profesional para identificar, diseñar y automatizar los flujos críticos de una aplicación utilizando Playwright.
+
+---
+
+## PRINCIPIO FUNDAMENTAL
+
+Playwright debe validar funcionalidades.
+
+No debe validar implementaciones.
+
+La automatización debe enfocarse en aquello que genera valor para el usuario final y para el negocio.
+
+No debe enfocarse en detalles técnicos internos del frontend.
+
+---
+
+## QUÉ DEBE PROBAR PLAYWRIGHT
+
+Playwright debe verificar que las funcionalidades críticas del producto continúan funcionando correctamente.
+
+Ejemplos:
+
+* Registro de usuario.
+* Inicio de sesión.
+* Cierre de sesión.
+* Navegación entre páginas.
+* Búsqueda de productos.
+* Agregar productos al carrito.
+* Modificar el carrito.
+* Checkout.
+* Confirmación de compra.
+* Visualización de órdenes.
+* Acceso a funcionalidades protegidas.
+
+La pregunta principal siempre debe ser:
+
+"¿El usuario puede completar exitosamente la tarea que vino a realizar?"
+
+---
+
+## QUÉ NO DEBE PROBAR PLAYWRIGHT
+
+No generar pruebas enfocadas en detalles técnicos o visuales que no representen una funcionalidad crítica.
+
+Ejemplos:
+
+* Duración exacta de animaciones.
+* Valores específicos de CSS.
+* Márgenes.
+* Padding.
+* Tamaños de fuentes.
+* Colores.
+* Transiciones.
+* Implementaciones internas de componentes.
+* Estructura interna del DOM que no afecte al usuario.
+* Detalles de implementación de librerías frontend.
+
+---
+
+## REGLA DE ESTABILIDAD
+
+Una prueba debe seguir pasando si se modifica la implementación interna pero la funcionalidad continúa funcionando para el usuario.
+
+Ejemplo:
+
+Implementación actual:
+
+animation-duration: 3000ms;
+
+Implementación futura:
+
+animation-duration: 1500ms;
+
+Si el usuario sigue viendo correctamente la transición y puede completar su flujo sin problemas, el test debe seguir pasando.
+
+Por lo tanto, los tests no deben depender de detalles internos de implementación.
+
+---
+
+## CRITERIO DE DISEÑO DE TESTS
+
+Antes de crear cualquier caso automatizado, responder:
+
+1. ¿Esta funcionalidad es importante para el usuario?
+2. ¿Esta funcionalidad es importante para el negocio?
+3. ¿Si falla, el usuario pierde capacidad de utilizar el producto?
+4. ¿Si falla, el negocio pierde una capacidad importante?
+
+Si la respuesta es sí, la funcionalidad merece cobertura automatizada.
+
+Si la respuesta es no, probablemente no sea un buen candidato para un Smoke Test.
+
+---
+
+## OBJETIVO DEL PORTFOLIO
+
+Este proyecto fue creado para demostrar habilidades de QA Automation utilizando Playwright.
+
+Por lo tanto, las pruebas deben reflejar cómo trabaja un QA Automation profesional:
+
+* Priorizando funcionalidades críticas.
+* Priorizando flujos de negocio.
+* Priorizando experiencia de usuario.
+* Evitando pruebas frágiles.
+* Evitando validaciones innecesarias.
+* Evitando dependencia de detalles de implementación.
+
+La calidad de una suite de Playwright no se mide por la cantidad de elementos del frontend que prueba.
+
+La calidad de una suite de Playwright se mide por su capacidad para detectar fallos reales en funcionalidades importantes del producto.
+
+---
+
 # DIRECTIVA PERMANENTE — PLAYWRIGHT
 
 Esta directiva es la fuente de verdad del proyecto y debe aplicarse en toda tarea relacionada con Playwright.

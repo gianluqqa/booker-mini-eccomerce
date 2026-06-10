@@ -80,4 +80,33 @@ test.describe('Inicio de Sesión - Regression Suite @regression', () => {
     );
   });
 
+  test('Debería navegar a la página de registro al hacer clic en el enlace correspondiente', async ({ loginPage, page }) => {
+    await page.getByRole('link', { name: 'Regístrate aquí' }).click();
+    await expect(page).toHaveURL(/\/register$/);
+    await expect(page.getByRole('heading', { name: 'Crear Cuenta' })).toBeVisible();
+  });
+
+  test('Debería alternar la visibilidad de la contraseña con el botón Mostrar/Ocultar', async ({ loginPage, page }) => {
+    const passwordInput = page.locator('input#password');
+    const toggleButton = page.getByRole('button', { name: /mostrar|ocultar/i });
+
+    // Rellenar contraseña
+    await loginPage.fillLoginForm({
+      password: 'MySecretPassword123!',
+    });
+
+    // Validar tipo inicial "password"
+    await expect(passwordInput).toHaveAttribute('type', 'password');
+
+    // Hacer clic en "Mostrar"
+    await toggleButton.click();
+    await expect(passwordInput).toHaveAttribute('type', 'text');
+    await expect(toggleButton).toHaveText(/ocultar/i);
+
+    // Hacer clic en "Ocultar"
+    await toggleButton.click();
+    await expect(passwordInput).toHaveAttribute('type', 'password');
+    await expect(toggleButton).toHaveText(/mostrar/i);
+  });
+
 });
