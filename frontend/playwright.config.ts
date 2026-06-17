@@ -35,11 +35,11 @@ export default defineConfig({
      * muestre la línea de tiempo, acciones y la página (no queda en about:blank).
      * En CI: solo se guardan artefactos cuando falla un test.
      */
-    trace: process.env.CI ? 'retain-on-failure' : 'on',
-    screenshot: process.env.CI ? 'only-on-failure' : 'on',
-    video: process.env.CI ? 'retain-on-failure' : 'on',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
     /* Con la UI de Playwright, el navegador visible se controla con "Show browser" */
-    headless: !!process.env.CI,
+    headless: true,
   },
 
   /* Navegadores a utilizar */

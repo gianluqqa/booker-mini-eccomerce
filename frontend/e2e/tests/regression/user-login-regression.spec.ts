@@ -80,7 +80,7 @@ test.describe('Inicio de Sesión - Regression Suite @regression', () => {
     );
   });
 
-  test('Debería navegar a la página de registro al hacer clic en el enlace correspondiente', async ({ loginPage, page }) => {
+  test('Debería navegar a la página de registro al hacer clic en el enlace correspondiente', async ({ page }) => {
     await page.getByRole('link', { name: 'Regístrate aquí' }).click();
     await expect(page).toHaveURL(/\/register$/);
     await expect(page.getByRole('heading', { name: 'Crear Cuenta' })).toBeVisible();
