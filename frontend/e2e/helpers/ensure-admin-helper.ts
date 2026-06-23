@@ -1,6 +1,6 @@
 import path from 'path';
 import { spawn } from 'child_process';
-import { ADMIN_TEST_DATA } from '../test-data/admin-test-data';
+import { ADMIN_DATA } from '../data/admin-data';
 
 const BACKEND_DIR = path.resolve(__dirname, '../../../backend');
 
@@ -18,8 +18,8 @@ function runAdminSeed(): Promise<void> {
       cwd: BACKEND_DIR,
       env: {
         ...process.env,
-        ADMIN_EMAIL: ADMIN_TEST_DATA.credentials.email,
-        ADMIN_PASSWORD: ADMIN_TEST_DATA.credentials.password,
+        ADMIN_EMAIL: ADMIN_DATA.credentials.email,
+        ADMIN_PASSWORD: ADMIN_DATA.credentials.password,
       },
       stdio: 'pipe',
       shell: process.platform === 'win32',
@@ -55,7 +55,7 @@ function runAdminSeed(): Promise<void> {
  * Reutiliza `backend/src/seeds/admin.seed.ts` para no duplicar lógica de negocio.
  * La ejecución se cachea por worker para evitar lanzar el seed en cada test.
  */
-export async function ensureAdminUser(): Promise<void> {
+export async function ensureAdminHelper(): Promise<void> {
   if (!ensureAdminPromise) {
     ensureAdminPromise = runAdminSeed();
   }

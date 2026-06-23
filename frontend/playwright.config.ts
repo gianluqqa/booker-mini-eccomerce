@@ -4,6 +4,10 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Ver la documentación de Playwright para más detalles:
  * https://playwright.dev/docs/test-configuration
+ * 
+ * Configuración optimizada para Chromium con estrategia de tags:
+ * - @smoke: Tests críticos que validan el flujo principal (happy path)
+ * - @regression: Tests detallados de validaciones y edge cases
  */
 export default defineConfig({
   testDir: './e2e',
@@ -13,17 +17,20 @@ export default defineConfig({
     /* Tiempo límite para aserciones individuales */
     timeout: 5000,
   },
-  /* Un worker evita que Chromium, Firefox y WebKit golpeen el backend a la vez (menos flaky) */
+  /* Un worker evita problemas de concurrencia en la base de datos */
   fullyParallel: true,
   /* Cancelar ejecución si hay fallos en CI */
   forbidOnly: !!process.env.CI,
   /* Reintentos ante fallos */
   retries: process.env.CI ? 2 : 1,
-  /* Un test a la vez: registro comparte backend y WebKit en Windows suele ir más lento */
+  /* Un test a la vez para evitar contaminación de datos */
   workers: 1,
   /* Reportería */
   reporter: [
-    ['html', { open: 'never' }],
+    ['html', { 
+      open: 'never',
+      outputFolder: 'e2e/reports/html'
+    }],
     ['list']
   ],
   /* Configuración del navegador */
@@ -42,7 +49,7 @@ export default defineConfig({
     headless: true,
   },
 
-  /* Navegadores a utilizar */
+  /* Navegadores a utilizar - Solo Chromium según requisitos */
   projects: [
     {
       name: 'chromium',

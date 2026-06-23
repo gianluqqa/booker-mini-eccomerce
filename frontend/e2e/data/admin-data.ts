@@ -10,7 +10,7 @@ export interface AdminCredentials {
  * Credenciales del admin usadas en fixtures y utilidades de setup.
  * Deben coincidir con el usuario creado por el seed del backend.
  */
-export const ADMIN_TEST_DATA = {
+export const ADMIN_DATA = {
   credentials: {
     email: 'admin@booker.com',
     password: 'TuPasswordSegura123!',

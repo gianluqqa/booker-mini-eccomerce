@@ -1,5 +1,5 @@
 import { Page, Locator, expect } from '@playwright/test';
-import { UserLoginData } from '../test-data/user-login-test-data';
+import { UserLoginData } from '../data/auth-data';
 
 /**
  * Page Object para la página de Login (/login).

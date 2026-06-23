@@ -1,5 +1,5 @@
 /**
- * Interfaz que define la estructura del formulario de registro de usuario.
+ * Interfaz que define la estructura del formulario de registro.
  */
 export interface UserRegistrationData {
   name?: string;
@@ -15,10 +15,20 @@ export interface UserRegistrationData {
 }
 
 /**
- * Catálogo de datos estáticos e insumos de prueba para los escenarios de registro.
+ * Interfaz que define la estructura del formulario de login.
  */
-export const USER_REGISTRATION_TEST_DATA = {
-  // Datos base válidos que se usarán junto con el generador de correo único
+export interface UserLoginData {
+  email?: string;
+  password?: string;
+}
+
+/**
+ * Datos de prueba para autenticación (registro + login).
+ * Unifica los datos de registro y login en un solo archivo para evitar duplicación.
+ */
+export const AUTH_DATA = {
+  validPassword: 'Password123!',
+
   validUserBase: {
     name: 'Automation',
     surname: 'QA',
@@ -31,7 +41,19 @@ export const USER_REGISTRATION_TEST_DATA = {
     gender: 'not_specific' as const,
   },
 
-  // Mismos casos que backend/tests/integration/authentication/register.test.ts (ítem 11)
+  blankFieldsValidationErrors: {
+    name: 'El nombre solo puede contener letras y espacios',
+    surname: 'El apellido solo puede contener letras y espacios',
+    email: 'El email es obligatorio',
+    password: 'La contraseña es obligatoria',
+    confirmPassword: 'La confirmación es obligatoria',
+  },
+
+  loginBlankFieldsValidationErrors: {
+    email: 'Los campos email y contraseña son obligatorios',
+    password: 'Los campos email y contraseña son obligatorios',
+  },
+
   invalidEmailFormats: [
     'correo-sin-arroba',
     'email@sin-punto',
@@ -44,7 +66,6 @@ export const USER_REGISTRATION_TEST_DATA = {
     errorMessage: 'El formato del email es inválido',
   },
 
-  // Escenarios con contraseñas débiles (Next.js valida complejidad: min 8 carac, 1 mayús, 1 minús, 1 número)
   weakPasswords: {
     noUppercase: {
       password: 'password123',
@@ -63,24 +84,17 @@ export const USER_REGISTRATION_TEST_DATA = {
     },
   },
 
-  // Contraseñas válidas pero no coincidentes
   mismatchedPasswords: {
     password: 'Password123!',
     confirmPassword: 'Different123!',
     errorMessage: 'Las contraseñas no coinciden',
   },
 
-  // Mensaje mostrado al usuario cuando el email ya está registrado
   duplicateEmail: {
     errorMessage: 'Ya existe un usuario con ese email',
   },
 
-  // Mensajes de error esperados ante campos en blanco
-  blankFieldsValidationErrors: {
-    name: 'El nombre solo puede contener letras y espacios',
-    surname: 'El apellido solo puede contener letras y espacios',
-    email: 'El email es obligatorio',
-    password: 'La contraseña es obligatoria',
-    confirmPassword: 'La confirmación es obligatoria',
+  invalidCredentials: {
+    errorMessage: 'Credenciales inválidas',
   },
 };
