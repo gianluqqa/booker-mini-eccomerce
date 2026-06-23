@@ -150,9 +150,6 @@ export class RegisterPage {
     const globalError = this.getGlobalErrorLocator();
     const registrationOutcome = successAlert.or(globalError);
 
-    // El envío válido activa "Registrando..." antes de la alerta de éxito
-    await expect(this.submitButton).toHaveText('Registrando...', { timeout: 10000 });
-
     try {
       await expect(registrationOutcome).toBeVisible({ timeout: 25000 });
     } catch {

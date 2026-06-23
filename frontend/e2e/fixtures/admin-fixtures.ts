@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { test as baseTest, Page, expect } from '@playwright/test';
 import { LoginPage } from '../pages/login-page';
+import { ADMIN_TEST_DATA } from '../test-data/admin-test-data';
+import { ensureAdminUser } from '../utilities/ensure-admin-user';
 
 interface AdminFixtures {
   adminLoginPage: LoginPage;
@@ -14,14 +16,13 @@ export const test = baseTest.extend<AdminFixtures>({
   },
 
   authenticatedAdminPage: async ({ page }, use) => {
+    await ensureAdminUser();
+
     const loginPage = new LoginPage(page);
 
     await loginPage.navigateToLogin();
 
-    await loginPage.fillLoginForm({
-      email: 'admin@booker.com',
-      password: 'TuPasswordSegura123!',
-    });
+    await loginPage.fillLoginForm(ADMIN_TEST_DATA.credentials);
 
     await loginPage.submitLoginForm();
 
