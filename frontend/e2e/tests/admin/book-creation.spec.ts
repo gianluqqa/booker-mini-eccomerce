@@ -6,7 +6,7 @@ test.describe('Creación de Libros (Admin)', () => {
 
   test('Debería crear un libro exitosamente @smoke', async ({ authenticatedAdminPage }) => {
     const page = authenticatedAdminPage;
-    const uniqueTitle = generateUniqueTitle('Booker Test Book');
+    const uniqueTitle = generateUniqueTitle('Test Book');
 
     await page.locator('input#title').fill(uniqueTitle);
     await page.locator('input#author').fill('T. Booker');

@@ -47,9 +47,9 @@ export function generateUniqueEmail(prefix: string = 'qa.test'): string {
  * @returns Título único que nunca se repite
  * 
  * Ejemplo:
- * generateUniqueTitle('Libro') → 'Libro Test 1719123456789.789'
+ * generateUniqueTitle('Test Book') → 'Test Book 1719123456789.789'
  */
-export function generateUniqueTitle(prefix: string = 'Book'): string {
+export function generateUniqueTitle(prefix: string = 'Test Book'): string {
   // PASO 1: Obtenemos la hora actual
   const timestamp = Date.now();
   
@@ -57,5 +57,5 @@ export function generateUniqueTitle(prefix: string = 'Book'): string {
   const randomSuffix = Math.floor(Math.random() * 1000);
   
   // PASO 3: Combinamos para crear el título único
-  return `${prefix} Test ${timestamp}.${randomSuffix}`;
+  return `${prefix} ${timestamp}.${randomSuffix}`;
 }
