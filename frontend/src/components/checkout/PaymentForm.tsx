@@ -123,7 +123,7 @@ const PaymentExpiryDateInput: React.FC<{
       <input
         type="text"
         id="expiryDate"
-        placeholder="12/25"
+        placeholder="12/30"
         maxLength={5} // MM/YY
         className={`w-full px-4 py-2 border ${error ? 'border-red-500' : 'border-[#2e4b30]/20'} rounded-sm focus:ring-2 ${error ? 'focus:ring-red-200' : 'focus:ring-[#2e4b30]/50'} focus:border-${error ? 'red-500' : '[#2e4b30]'} outline-none transition-all duration-200 text-[#2e4b30] placeholder:text-[#2e4b30]/50`}
         value={value}

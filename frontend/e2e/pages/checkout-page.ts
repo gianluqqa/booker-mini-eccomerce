@@ -14,6 +14,7 @@ export class CheckoutPage {
   readonly expiryDateInput: Locator;
   readonly cvcInput: Locator;
   readonly confirmPaymentButton: Locator;
+  readonly cancelCheckoutButton: Locator;
   readonly successMessage: Locator;
 
   constructor(page: Page) {
@@ -27,6 +28,9 @@ export class CheckoutPage {
     
     this.confirmPaymentButton = page.getByRole('button', { name: /confirmar pago/i });
     this.successMessage = page.getByRole('heading', { name: /¡Orden Confirmada!/i });
+    
+    // Elementos de regresión
+    this.cancelCheckoutButton = page.getByRole('button', { name: /cancelar checkout/i });
   }
 
   /**
@@ -50,11 +54,25 @@ export class CheckoutPage {
   async submitPayment() {
     await this.confirmPaymentButton.click();
   }
+  
+  /**
+   * Cancela el proceso de pago
+   */
+  async cancelCheckout() {
+    await this.cancelCheckoutButton.click();
+  }
 
   /**
    * Verifica que la orden haya sido confirmada exitosamente
    */
   async expectPaymentSuccess() {
     await expect(this.successMessage).toBeVisible({ timeout: 15000 });
+  }
+  
+  /**
+   * Verifica la aparición de un mensaje de error de validación específico
+   */
+  async expectValidationError(message: string) {
+    await expect(this.page.getByText(message, { exact: false }).first()).toBeVisible();
   }
 }
