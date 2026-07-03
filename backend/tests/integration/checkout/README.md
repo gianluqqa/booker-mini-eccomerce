@@ -38,7 +38,7 @@
    - Response: `201`, `{ "success": true, "message": "Orden pendiente creada exitosamente", "data": { "status": "PENDING" } }`
 7. **debe procesar pago exitosamente**
    - Setup: Agregar al carrito + reservar stock
-   - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/25", "cvv": "123" }`
+   - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/30", "cvv": "123" }`
    - Response: `201`, `{ "success": true, "message": "Pago procesado exitosamente", "data": { "status": "PAID" } }`
 8. **debe fallar con datos de pago inválidos**
    - Setup: Agregar al carrito + reservar stock
@@ -46,17 +46,17 @@
    - Response: `400`, `{ "success": false, "message": "Datos de pago inválidos" }`
 9. **debe fallar si no hay reserva activa**
    - Setup: Sin reserva previa
-   - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/25", "cvv": "123" }`
+   - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/30", "cvv": "123" }`
    - Response: `400`, `{ "success": false, "message": "No hay una reserva activa" }`
 
 ### Procesamiento de Pago (POST /checkout/pay)
 10. **debe procesar pago de orden pendiente existente**
     - Setup: Crear orden PENDING previamente
-    - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/25", "cvv": "123" }`
+    - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/30", "cvv": "123" }`
     - Response: `201`, `{ "success": true, "message": "Pago procesado exitosamente", "data": { "status": "PAID" } }`
 11. **debe fallar si no hay orden pendiente**
     - Setup: Sin orden PENDING
-    - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/25", "cvv": "123" }`
+    - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/30", "cvv": "123" }`
     - Response: `400`, `{ "success": false, "message": "No hay una orden pendiente" }`
 
 ### Cancelación de Checkout (DELETE /checkout/cancel)
@@ -88,7 +88,7 @@
     - Response: `201`, `{ "success": true, "data": { "totalAmount": 79.97 } }`
 18. **debe actualizar stock después de pago exitoso**
     - Setup: Proceso completo de compra
-    - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/25", "cvv": "123" }`
+    - Request: `{ "cardNumber": "4111111111111111", "cardName": "Test User", "expiryDate": "12/30", "cvv": "123" }`
     - Response: `201`, `{ "success": true, "data": { "status": "PAID" } }`
     - Verify: Stock actualizado en BD
 

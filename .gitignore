@@ -101,3 +101,12 @@ Thumbs.db
 # Test reports
 test-report.html
 test-results/
+# Backend ignores
+backend/node_modules/
+backend/dist/
+
+# Frontend ignores
+frontend/node_modules/
+frontend/.next/
+frontend/playwright-report/
+frontend/test-results/
