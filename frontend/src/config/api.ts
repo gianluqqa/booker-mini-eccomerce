@@ -52,7 +52,7 @@ apiClient.interceptors.response.use(
         window.dispatchEvent(new Event('auth-logout'));
       }
       // Marcar el error como de autenticación para que el frontend lo ignore o lo maneje distinto
-      (error as any).isAuthError = true;
+      (error as { isAuthError?: boolean }).isAuthError = true;
       error.message = "Tu sesión ha terminado. Por favor, vuelve a ingresar.";
     }
 
@@ -69,12 +69,12 @@ apiClient.interceptors.response.use(
       error.message = responseData.errors.join(". ");
       
       // Enriquecer el objeto de error para componentes que quieran manejar errores específicos por campo
-      (error as any).validationErrors = responseData.errors;
+      (error as { validationErrors?: string[] }).validationErrors = responseData.errors;
     } 
     // 2. Si no hay lista de errores pero sí un mensaje principal, lo usamos
     else if (responseData?.message) {
       // Si ya marcamos como isAuthError, mantenemos el mensaje amigable a menos que el backend tenga algo más específico
-      if (!(error as any).isAuthError) {
+      if (!(error as { isAuthError?: boolean }).isAuthError) {
         error.message = responseData.message;
       }
     }
@@ -104,7 +104,7 @@ const extractData = <T>(response: { data: { success?: boolean; data?: T } | T })
  * @param response Respuesta de Axios
  * @returns El mensaje contenido en la respuesta o un string vacío
  */
-const extractMessage = (response: any): string => {
+const extractMessage = (response: { data?: { message?: string } }): string => {
   return response?.data?.message || "";
 };
 

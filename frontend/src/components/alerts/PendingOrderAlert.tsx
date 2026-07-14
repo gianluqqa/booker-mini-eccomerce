@@ -30,7 +30,7 @@ export const PendingOrderAlert: React.FC<PendingOrderAlertProps> = ({
     new Date(pendingOrder.expiresAt) < new Date() : false
 
   // Calcular el total de forma robusta
-  const totalAmount = Number(pendingOrder.total) || Number((pendingOrder as any).totalPrice) || 0;
+  const totalAmount = Number(pendingOrder.total) || 0;
 
   return (
     <div className={`relative overflow-hidden bg-white border-t-4 border-t-amber-300 ${className}`}>

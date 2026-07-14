@@ -52,8 +52,8 @@ const OrdersTable: React.FC = () => {
       // Mostrar mensaje de éxito
       setSuccessMessage(result.message)
       setTimeout(() => setSuccessMessage(null), 5000)
-    } catch (err: any) {
-      const errorMessage = err.message || 'Error al cancelar la orden'
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al cancelar la orden'
       setError(errorMessage)
       setTimeout(() => setError(null), 5000)
     } finally {

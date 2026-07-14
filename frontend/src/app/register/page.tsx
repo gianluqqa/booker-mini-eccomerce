@@ -27,14 +27,10 @@ export default function RegisterPage() {
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; confirmPassword?: string; name?: string; surname?: string }>({});
 
-  const getRedirectPath = () => {
-    return user?.role === "admin" ? "/admin" : "/profile";
-  };
-
   // Redirigir si ya está autenticado
   React.useEffect(() => {
     if (isAuthenticated) {
-      router.push(getRedirectPath());
+      router.push(user?.role === "admin" ? "/admin" : "/profile");
     }
   }, [isAuthenticated, user, router]);
 
@@ -46,7 +42,7 @@ export default function RegisterPage() {
     // 1. Validar campos obligatorios vacíos y formato
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
     let hasErrors = false;
-    const newFieldErrors: any = {};
+    const newFieldErrors: { email?: string; password?: string; confirmPassword?: string; name?: string; surname?: string } = {};
 
     if (!formData.name.trim()) {
       newFieldErrors.name = "El nombre solo puede contener letras y espacios";
@@ -104,21 +100,26 @@ export default function RegisterPage() {
       setTimeout(() => {
         router.push('/login');
       }, 3000);
-    } catch (err: any) {
-      const backendMessage = err.response?.data?.message || err.message || 'Error al registrar usuario';
+    } catch (err: unknown) {
+      const backendMessage = err instanceof Error && 'response' in err ? (err as { response?: { data?: { message?: string } } }).response?.data?.message || err.message : 'Error al registrar usuario';
       
       // Mapeo exacto basado en el nuevo contrato del Backend
-      if (err.response?.status === 400 || err.response?.status === 409) {
-        if (backendMessage.includes("email") || backendMessage.includes("Ya existe")) {
-          setFieldErrors({ email: backendMessage });
-        } else if (backendMessage.includes("nombre")) {
-          setFieldErrors({ name: backendMessage });
-        } else if (backendMessage.includes("apellido")) {
-          setFieldErrors({ surname: backendMessage });
-        } else if (backendMessage.includes("contraseña") || backendMessage.includes("mayúscula")) {
-          setFieldErrors({ password: backendMessage });
-        } else if (backendMessage.includes("coinciden")) {
-          setFieldErrors({ confirmPassword: backendMessage });
+      if (err instanceof Error && 'response' in err) {
+        const axiosError = err as { response?: { status?: number } };
+        if (axiosError.response?.status === 400 || axiosError.response?.status === 409) {
+          if (backendMessage.includes("email") || backendMessage.includes("Ya existe")) {
+            setFieldErrors({ email: backendMessage });
+          } else if (backendMessage.includes("nombre")) {
+            setFieldErrors({ name: backendMessage });
+          } else if (backendMessage.includes("apellido")) {
+            setFieldErrors({ surname: backendMessage });
+          } else if (backendMessage.includes("contraseña") || backendMessage.includes("mayúscula")) {
+            setFieldErrors({ password: backendMessage });
+          } else if (backendMessage.includes("coinciden")) {
+            setFieldErrors({ confirmPassword: backendMessage });
+          } else {
+            setError(backendMessage);
+          }
         } else {
           setError(backendMessage);
         }

@@ -8,6 +8,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { ReservationProvider } from "@/contexts/ReservationContext";
 import { GlobalCheckoutTimer } from "@/components/timer/GlobalCheckoutTimer";
 import { NoAuthAlertProvider } from "@/contexts/NoAuthAlertContext";
+import { Suspense } from "react";
 
 
 const geistSans = Geist({
@@ -39,7 +40,9 @@ export default function RootLayout({
           <NoAuthAlertProvider>
             <CartProvider>
               <ReservationProvider>
-                <Navbar />
+                <Suspense fallback={<div className="h-16 bg-[#f5efe1] border-b border-gray-200" />}>
+                  <Navbar />
+                </Suspense>
                 {children}
                 <Footer />
                 <GlobalCheckoutTimer />

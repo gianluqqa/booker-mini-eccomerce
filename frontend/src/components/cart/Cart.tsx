@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -105,9 +104,9 @@ const Cart = () => {
 
       // Actualizar el contexto del carrito para sincronizar el contador del Navbar
       await refreshCart();
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Manejar específicamente el error de stock (409 Conflict)
-      if (error.response?.status === 409) {
+      if (error instanceof Error && 'response' in error && (error as { response?: { status?: number } }).response?.status === 409) {
         alert("Stock insuficiente: No podemos añadir más unidades de este libro en este momento.");
       } else {
         const errorMessage = error instanceof Error ? error.message : "Error al actualizar la cantidad";

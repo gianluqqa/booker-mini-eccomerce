@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, SetStateAction } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useReservation } from "@/contexts/ReservationContext";
 import { useCart } from "@/contexts/CartContext";
@@ -222,9 +222,9 @@ export const useCheckoutLogic = () => {
       setProcessing(false);
       clearReservation();
       await refreshCart(); // 🔔 Notificar que ya no hay pendiente
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Priorizar la lista detallada de errores de validación para el componente CheckoutErrorState
-      const validationErrors = error.validationErrors || [];
+      const validationErrors = error instanceof Error && 'validationErrors' in error ? (error as { validationErrors?: string[] }).validationErrors || [] : [];
       
       if (validationErrors.length > 0) {
         const mappedErrors: Record<string, string> = {};
@@ -244,7 +244,7 @@ export const useCheckoutLogic = () => {
         setFieldErrors(mappedErrors);
         setError("Por favor, corrige los errores en el formulario.");
       } else {
-        setError(error.message || "Error al procesar el pago");
+        setError(error instanceof Error ? error.message : "Error al procesar el pago");
       }
       
       setProcessing(false);
@@ -324,7 +324,7 @@ export const useCheckoutLogic = () => {
     handleCancelCheckout,
     handleOrderExpired,
     handleRestartCheckout,
-    setCardData: (data: any) => {
+    setCardData: (data: SetStateAction<{ cardNumber: string; cardName: string; expiryDate: string; cvc: string }>) => {
       setCardData(data);
       setFieldErrors({}); // Limpiar errores al interactuar
     },
