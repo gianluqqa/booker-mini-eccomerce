@@ -13,7 +13,7 @@
     "start": "node dist/server.ts",
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:coverage:serial": "jest --coverage --runInBand",
     "test:verbose": "jest --verbose",
     "test:users": "jest test/modules/users/automated/user.test.ts",
     "test:integration": "jest test/integration-tests/user-register-login.test.ts",
