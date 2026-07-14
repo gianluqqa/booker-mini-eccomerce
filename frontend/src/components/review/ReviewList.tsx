@@ -3,7 +3,7 @@ import { Review, ReviewListDto, CreateReviewDto, UpdateReviewDto } from "../../t
 import { getReviewsByBook } from "../../services/reviewService";
 import { ReviewCard } from "./ReviewCard";
 import { ReviewForm } from "./ReviewForm";
-import { Star, MessageSquare, BarChart3, Loader2, Plus } from "lucide-react";
+import { Star, MessageSquare, Loader2, Plus } from "lucide-react";
 import Link from "next/link";
 
 interface ReviewListProps {
@@ -21,7 +21,6 @@ export const ReviewList: React.FC<ReviewListProps> = ({
 }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [stats, setStats] = useState<{
@@ -44,9 +43,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
         averageRating: data.averageRating,
         ratingDistribution: data.ratingDistribution,
       });
-      setError(null);
     } catch (err) {
-      setError("Error al cargar las reseñas");
       console.error("Error fetching reviews:", err);
     } finally {
       setLoading(false);

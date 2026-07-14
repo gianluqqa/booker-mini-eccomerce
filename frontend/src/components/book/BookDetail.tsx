@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from "react";
-import { ShoppingCart, Star, BookOpen, Package, Tag, ArrowLeft, Loader2, Share2, Heart, ShieldCheck, MessageSquare } from "lucide-react";
+import Image from "next/image";
+import { ShoppingCart, Star, BookOpen, Package, Tag, ArrowLeft, Loader2, Heart, ShieldCheck, MessageSquare } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { getBookById } from "@/services/booksService";
 import { IBook } from "@/types/Book";
@@ -150,12 +151,14 @@ const BookDetail = () => {
               <div className="absolute top-8 left-8 w-full h-full border-2 border-[#2e4b30] rounded-none -z-10 group-hover:top-4 group-hover:left-4 transition-all duration-500"></div>
               <div className="aspect-[3/4.5] w-full bg-[#1a3a1c] relative overflow-hidden rounded-none shadow-2xl border-2 border-[#2e4b30]">
                 {book.image && !imageError ? (
-                  <img
+                  <Image
                     src={book.image}
                     alt={book.title}
+                    width={300}
+                    height={450}
                     className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-700"
                     onError={() => setImageError(true)}
-                    referrerPolicy="no-referrer"
+                    unoptimized
                   />
 
                 ) : (

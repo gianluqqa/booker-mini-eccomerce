@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useBooks } from '@/hooks/useBooks'
 import { IBook } from '@/types/Book'
 import { deleteBookAdmin } from '@/services/adminService'
-import { BookOpen, Pencil, Trash2, Loader2 } from 'lucide-react'
+import { Pencil, Trash2, Loader2 } from 'lucide-react'
 import { AdminToast } from '../alerts/AdminToast'
 import UpdateBook from './UpdateBook'
 

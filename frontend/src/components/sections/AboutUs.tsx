@@ -1,4 +1,4 @@
-import { BookOpen, Zap, CheckCircle, Shield, Globe, Layers, Users, Sparkles } from "lucide-react";
+import { Shield, Globe, Layers } from "lucide-react";
 
 const About = () => {
   return (

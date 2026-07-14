@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import { Minus, Plus, Trash2, ShoppingBag, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -344,11 +345,13 @@ const Cart = () => {
                   <div key={item.id} className="p-6">
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
-                        <img
+                        <Image
                           src={item.book.image || "/placeholder-book.jpg"}
                           alt={item.book.title}
+                          width={80}
+                          height={112}
                           className="w-20 h-28 object-cover rounded-sm"
-                          referrerPolicy="no-referrer"
+                          unoptimized
                         />
 
                       </div>

@@ -14,7 +14,6 @@ interface ErrorAlertProps {
 export const ErrorAlert: React.FC<ErrorAlertProps> = ({
   title,
   message,
-  className = '',
   duration = 3000
 }) => {
   const [isVisible, setIsVisible] = useState(true)

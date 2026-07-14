@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react'
 import BookCard from '@/components/cards/BookCard'
 import { IBook } from '@/types/Book'
-import { Award, Loader2, Zap, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Loader2, Zap, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useBooks } from '@/hooks/useBooks'
 
 const Bestsellers = () => {

@@ -28,7 +28,7 @@ const CheckoutPage = () => {
   }
 
   if (checkoutLogic.cartItems.length === 0 && !checkoutLogic.order) {
-    return <EmptyCartState onBackToCart={() => router.push("/cart")} />;
+    return <EmptyCartState />;
   }
 
   // Confirmación de orden solo si está PAID

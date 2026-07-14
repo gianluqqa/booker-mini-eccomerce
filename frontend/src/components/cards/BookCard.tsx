@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { IBookCardProps } from "@/types/Book";
 import { Eye, ShoppingCart, Loader2, Heart } from "lucide-react";
@@ -126,12 +127,14 @@ const BookCard: React.FC<IBookCardProps> = ({ book }) => {
         </button>
 
         {book.image && !imageError ? (
-          <img
+          <Image
             src={book.image}
             alt={book.title}
+            width={200}
+            height={300}
             className="w-full h-full object-cover transition-transform duration-300"
             onError={() => setImageError(true)}
-            referrerPolicy="no-referrer"
+            unoptimized
           />
 
         ) : (

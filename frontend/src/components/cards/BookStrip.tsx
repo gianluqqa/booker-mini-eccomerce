@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IBookCardProps } from "@/types/Book";
-import { Eye, ShoppingCart, Loader2, Plus, Heart } from "lucide-react";
+import { Eye, Loader2, Plus, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { toggleFavorite } from "@/services/userService";
