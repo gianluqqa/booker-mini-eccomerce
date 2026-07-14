@@ -2,9 +2,9 @@ import { test, expect } from '../../fixtures/admin-fixture';
 import { test as customerTest } from '../../fixtures/auth-fixture';
 import { generateUniqueTitle } from '../../helpers/unique-data-generator';
 
-test.describe('Creación de Libros (Admin)', () => {
+test.describe('Admin - Module - Book Creation', () => {
 
-  test('Debería crear un libro exitosamente @smoke', async ({ authenticatedAdminPage }) => {
+  test('Should create a book successfully @smoke', async ({ authenticatedAdminPage }) => {
     const page = authenticatedAdminPage;
     const uniqueTitle = generateUniqueTitle('Test Book');
 
@@ -26,7 +26,7 @@ test.describe('Creación de Libros (Admin)', () => {
     await expect(page.locator('textarea#description')).toHaveValue('');
   });
 
-  test('Debería rechazar valores inválidos @regression', async ({ authenticatedAdminPage }) => {
+  test('Should reject invalid field values @regression', async ({ authenticatedAdminPage }) => {
     const page = authenticatedAdminPage;
 
     await page.locator('input#title').fill('   ');
@@ -46,7 +46,7 @@ test.describe('Creación de Libros (Admin)', () => {
     await expect(page.getByText('La descripción debe tener al menos 10 caracteres')).toBeVisible();
   });
 
-  test('Debería activar validación nativa del navegador cuando el formulario esté vacío @regression', async ({ authenticatedAdminPage }) => {
+  test('Should trigger native browser validation when the form is empty @regression', async ({ authenticatedAdminPage }) => {
     const page = authenticatedAdminPage;
 
     await page.getByRole('button', { name: 'Crear libro', exact: true }).click();
@@ -58,16 +58,16 @@ test.describe('Creación de Libros (Admin)', () => {
     expect(isTitleInvalid).toBe(true);
   });
 
-  test('Debería redirigir al login a un visitante anónimo que intente entrar al panel @regression', async ({ page }) => {
+  test('Should redirect an anonymous visitor to login when attempting to access the admin panel @regression', async ({ page }) => {
     await page.goto('/admin');
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByRole('heading', { name: 'Iniciar Sesión' })).toBeVisible();
   });
 });
 
-customerTest.describe('Creación de Libros (Admin) - Restricción de Acceso', () => {
+customerTest.describe('Admin - Module - Book Creation - Access Restriction', () => {
 
-  customerTest('Debería redirigir al login a un cliente común que intente entrar al panel @regression', async ({ loginPage, registeredCustomer, page }) => {
+  customerTest('Should redirect a regular customer to login when attempting to access the admin panel @regression', async ({ loginPage, registeredCustomer, page }) => {
     await loginPage.navigateToLogin();
     await loginPage.fillLoginForm({
       email: registeredCustomer.email,

@@ -2,9 +2,9 @@ import { test, expect } from '../../fixtures/auth-fixture';
 import { AUTH_DATA } from '../../data/auth-data';
 import { generateUniqueEmail } from '../../helpers/unique-data-generator';
 
-test.describe('Registro de Usuario', () => {
+test.describe('Authentication - Module - Registration', () => {
 
-  test('Debería registrar un usuario exitosamente @smoke', async ({ registerPage }) => {
+  test('Should register a user successfully @smoke', async ({ registerPage }) => {
     await registerPage.navigateToRegistration();
 
     const newUser = {
@@ -17,7 +17,7 @@ test.describe('Registro de Usuario', () => {
     await registerPage.expectRegistrationSmokeComplete();
   });
 
-  test('Debería validar campos obligatorios vacíos @regression', async ({ registerPage }) => {
+  test('Should validate empty required fields @regression', async ({ registerPage }) => {
     await registerPage.navigateToRegistration();
     await registerPage.submitRegistrationForm();
 
@@ -30,7 +30,7 @@ test.describe('Registro de Usuario', () => {
     await expect(registerPage.getFieldErrorLocator('confirmPassword')).toHaveText(errors.confirmPassword);
   });
 
-  test('Debería validar contraseñas que no coinciden @regression', async ({ registerPage }) => {
+  test('Should validate mismatched passwords @regression', async ({ registerPage }) => {
     await registerPage.navigateToRegistration();
 
     const userWithMismatchedPassword = {
@@ -47,7 +47,7 @@ test.describe('Registro de Usuario', () => {
     await expect(registerPage.getFieldErrorLocator('confirmPassword')).toHaveText(expectedError);
   });
 
-  test('Debería validar contraseñas débiles @regression', async ({ registerPage }) => {
+  test('Should validate weak passwords @regression', async ({ registerPage }) => {
     await registerPage.navigateToRegistration();
     const baseUser = { ...AUTH_DATA.validUserBase, email: generateUniqueEmail() };
 
@@ -73,7 +73,7 @@ test.describe('Registro de Usuario', () => {
     );
   });
 
-  test('Debería rechazar un email con formato inválido @regression', async ({ registerPage }) => {
+  test('Should reject an email with invalid format @regression', async ({ registerPage }) => {
     await registerPage.navigateToRegistration();
     const baseUser = { ...AUTH_DATA.validUserBase, password: 'Password123!', confirmPassword: 'Password123!' };
 
@@ -85,7 +85,7 @@ test.describe('Registro de Usuario', () => {
     }
   });
 
-  test('Debería mostrar error al intentar registrar un correo electrónico ya existente @regression', async ({ registerPage }) => {
+  test('Should show an error when attempting to register a duplicate email @regression', async ({ registerPage }) => {
     const duplicateEmail = generateUniqueEmail('duplicate.test');
     const userToRegister = { ...AUTH_DATA.validUserBase, email: duplicateEmail };
 
@@ -105,7 +105,7 @@ test.describe('Registro de Usuario', () => {
     await expect(emailError).toHaveText(AUTH_DATA.duplicateEmail.errorMessage);
   });
 
-  test('Debería registrar un usuario exitosamente completando solo campos obligatorios @regression', async ({ registerPage }) => {
+  test('Should register a user successfully filling only mandatory fields @regression', async ({ registerPage }) => {
     await registerPage.navigateToRegistration();
 
     const onlyMandatoryUser = {
@@ -121,7 +121,7 @@ test.describe('Registro de Usuario', () => {
     await registerPage.expectSuccessfulRegistration();
   });
 
-  test('Debería navegar a la página de inicio de sesión al hacer clic en el enlace correspondiente @regression', async ({ registerPage, page }) => {
+  test('Should navigate to the login page when clicking the corresponding link @regression', async ({ registerPage, page }) => {
     await registerPage.navigateToRegistration();
     await page.getByRole('link', { name: 'Inicia sesión aquí' }).click();
     await expect(page).toHaveURL(/\/register$/);

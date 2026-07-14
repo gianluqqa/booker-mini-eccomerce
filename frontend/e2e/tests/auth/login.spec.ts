@@ -2,9 +2,9 @@ import { test, expect } from '../../fixtures/auth-fixture';
 import { AUTH_DATA } from '../../data/auth-data';
 import { generateUniqueEmail } from '../../helpers/unique-data-generator';
 
-test.describe('Inicio de Sesión', () => {
+test.describe('Authentication - Module - Login', () => {
 
-  test('Debería iniciar sesión exitosamente con credenciales válidas @smoke', async ({ loginPage, registeredCustomer }) => {
+  test('Should login successfully with valid credentials @smoke', async ({ loginPage, registeredCustomer }) => {
     await loginPage.navigateToLogin();
     await loginPage.fillLoginForm({
       email: registeredCustomer.email,
@@ -14,7 +14,7 @@ test.describe('Inicio de Sesión', () => {
     await loginPage.expectLoginSmokeComplete();
   });
 
-  test('Debería cerrar sesión exitosamente @smoke', async ({ loginPage, registeredCustomer, page }) => {
+  test('Should logout successfully @smoke', async ({ loginPage, registeredCustomer, page }) => {
     await loginPage.navigateToLogin();
     await loginPage.fillLoginForm({
       email: registeredCustomer.email,
@@ -31,7 +31,7 @@ test.describe('Inicio de Sesión', () => {
     await expect(page.getByRole('link', { name: /acceder/i })).toBeVisible();
   });
 
-  test('Debería validar campos obligatorios vacíos @regression', async ({ loginPage }) => {
+  test('Should validate empty required fields @regression', async ({ loginPage }) => {
     await loginPage.navigateToLogin();
     await loginPage.submitLoginForm();
 
@@ -40,7 +40,7 @@ test.describe('Inicio de Sesión', () => {
     await expect(loginPage.getFieldErrorLocator('password')).toHaveText(errors.password);
   });
 
-  test('Debería validar email vacío con contraseña completada @regression', async ({ loginPage }) => {
+  test('Should validate empty email with password filled in @regression', async ({ loginPage }) => {
     await loginPage.navigateToLogin();
     await loginPage.fillLoginForm({ password: AUTH_DATA.validPassword });
     await loginPage.submitLoginForm();
@@ -51,7 +51,7 @@ test.describe('Inicio de Sesión', () => {
     );
   });
 
-  test('Debería validar contraseña vacía con email completado @regression', async ({ loginPage }) => {
+  test('Should validate empty password with email filled in @regression', async ({ loginPage }) => {
     await loginPage.navigateToLogin();
     await loginPage.fillLoginForm({ email: generateUniqueEmail('login.empty-password') });
     await loginPage.submitLoginForm();
@@ -62,7 +62,7 @@ test.describe('Inicio de Sesión', () => {
     );
   });
 
-  test('Debería rechazar un email con formato inválido @regression', async ({ loginPage }) => {
+  test('Should reject an email with invalid format @regression', async ({ loginPage }) => {
     await loginPage.navigateToLogin();
 
     for (const invalidEmail of AUTH_DATA.invalidEmailFormats) {
@@ -76,7 +76,7 @@ test.describe('Inicio de Sesión', () => {
     }
   });
 
-  test('Debería rechazar credenciales con email inexistente @regression', async ({ loginPage }) => {
+  test('Should reject credentials with a non-existent email @regression', async ({ loginPage }) => {
     await loginPage.navigateToLogin();
     await loginPage.fillLoginForm({
       email: generateUniqueEmail('login.nonexistent'),
@@ -89,7 +89,7 @@ test.describe('Inicio de Sesión', () => {
     );
   });
 
-  test('Debería rechazar contraseña incorrecta para un usuario existente @regression', async ({ loginPage, registeredCustomer }) => {
+  test('Should reject wrong password for an existing user @regression', async ({ loginPage, registeredCustomer }) => {
     await loginPage.navigateToLogin();
     await loginPage.fillLoginForm({
       email: registeredCustomer.email,
@@ -102,14 +102,14 @@ test.describe('Inicio de Sesión', () => {
     );
   });
 
-  test('Debería navegar a la página de registro al hacer clic en el enlace correspondiente @regression', async ({ page }) => {
+  test('Should navigate to registration page when clicking the corresponding link @regression', async ({ page }) => {
     await page.goto('/login');
     await page.getByRole('link', { name: 'Regístrate aquí' }).click();
     await expect(page).toHaveURL(/\/register$/);
     await expect(page.getByRole('heading', { name: 'Crear Cuenta' })).toBeVisible();
   });
 
-  test('Debería alternar la visibilidad de la contraseña con el botón Mostrar/Ocultar @regression', async ({ loginPage, page }) => {
+  test('Should toggle password visibility with the Show/Hide button @regression', async ({ loginPage, page }) => {
     await loginPage.navigateToLogin();
     const passwordInput = page.locator('input#password');
     const toggleButton = page.getByRole('button', { name: /mostrar|ocultar/i });

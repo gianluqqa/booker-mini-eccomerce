@@ -1,8 +1,8 @@
 import { test, expect } from '../../fixtures/checkout-fixture';
 
-test.describe('Proceso de Compra (Checkout)', () => {
+test.describe('Checkout - Module - Purchase Flow', () => {
 
-  test('Debería completar el flujo de compra exitosamente @smoke', async ({ cartPage, checkoutPage, authenticatedCustomer, page }) => {
+  test('Should complete the purchase flow successfully @smoke', async ({ cartPage, checkoutPage, authenticatedCustomer, page }) => {
     // 1. Navegar al inicio y agregar un libro al carrito
     await cartPage.navigateToHome();
     await cartPage.addFirstBookToCart();
@@ -23,7 +23,7 @@ test.describe('Proceso de Compra (Checkout)', () => {
     // 6. Verificar que la compra fue exitosa (validación observable por el usuario)
     await checkoutPage.expectPaymentSuccess();
   });
-  test('Debería mostrar error de validación con tarjeta inválida @regression', async ({ cartPage, checkoutPage, authenticatedCustomer, page }) => {
+  test('Should show a validation error with an invalid card @regression', async ({ cartPage, checkoutPage, authenticatedCustomer, page }) => {
     await cartPage.navigateToHome();
     await cartPage.addFirstBookToCart();
     await cartPage.navigateToCart();
@@ -47,7 +47,7 @@ test.describe('Proceso de Compra (Checkout)', () => {
     await checkoutPage.expectValidationError('vencida');
   });
 
-  test('Debería cancelar el checkout y regresar al carrito exitosamente @regression', async ({ cartPage, checkoutPage, authenticatedCustomer, page }) => {
+  test('Should cancel checkout and return to the cart successfully @regression', async ({ cartPage, checkoutPage, authenticatedCustomer, page }) => {
     await cartPage.navigateToHome();
     await cartPage.addFirstBookToCart();
     

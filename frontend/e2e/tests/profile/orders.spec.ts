@@ -1,8 +1,8 @@
 import { test, expect } from '../../fixtures/profile-fixture';
 
-test.describe('Historial de Órdenes', () => {
+test.describe('Profile - Module - Order History', () => {
 
-  test('Debería reflejar una orden completada en el historial del perfil @smoke', async ({ cartPage, checkoutPage, profilePage, authenticatedCustomer, page }) => {
+  test('Should reflect a completed order in the profile history @smoke', async ({ cartPage, checkoutPage, profilePage, authenticatedCustomer, page }) => {
     // 1. Completar el proceso de compra
     await cartPage.navigateToHome();
     await cartPage.addFirstBookToCart();

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { test, expect } from '../../fixtures/cart-fixture';
 
-test.describe('Carrito de Compras', () => {
+test.describe('Cart - Module - Shopping Cart', () => {
 
-  test('Debería agregar un libro al carrito exitosamente @smoke', async ({ cartPage, authenticatedCustomer }) => {
+  test('Should add a book to the cart successfully @smoke', async ({ cartPage, authenticatedCustomer }) => {
     await cartPage.navigateToHome();
     const previousCount = await cartPage.getCartItemCount();
     await cartPage.addFirstBookToCart();
@@ -11,12 +11,12 @@ test.describe('Carrito de Compras', () => {
     expect(newCount).toBeGreaterThan(previousCount);
   });
 
-  test('Debería mostrar el carrito vacío inicialmente @regression', async ({ cartPage, authenticatedCustomer }) => {
+  test('Should display an empty cart initially @regression', async ({ cartPage, authenticatedCustomer }) => {
     await cartPage.navigateToCart();
     await cartPage.expectCartEmpty();
   });
 
-  test('Debería incrementar el contador del carrito al agregar un libro @regression', async ({ cartPage, authenticatedCustomer }) => {
+  test('Should increment the cart counter when adding a book @regression', async ({ cartPage, authenticatedCustomer }) => {
     await cartPage.navigateToHome();
     
     const previousCount = await cartPage.getCartItemCount();
@@ -25,14 +25,14 @@ test.describe('Carrito de Compras', () => {
     expect(newCount).toBeGreaterThan(previousCount);
   });
 
-  test('Debería mostrar el carrito con items después de agregar un libro @regression', async ({ cartPage, authenticatedCustomer }) => {
+  test('Should display cart with items after adding a book @regression', async ({ cartPage, authenticatedCustomer }) => {
     await cartPage.navigateToHome();
     await cartPage.addFirstBookToCart();
     await cartPage.navigateToCart();
     await cartPage.expectCartNotEmpty();
   });
 
-  test('Debería redirigir al login si un usuario no autenticado intenta ver el carrito @regression', async ({ page }) => {
+  test('Should redirect to login if an unauthenticated user tries to view the cart @regression', async ({ page }) => {
     await page.goto('/cart');
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.getByRole('heading', { name: 'Iniciar Sesión' })).toBeVisible();
