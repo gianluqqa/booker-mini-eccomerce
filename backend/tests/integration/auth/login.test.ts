@@ -3,9 +3,13 @@ import { app } from "../../../src/server";
 import { AppDataSource } from "../../../src/config/data-source";
 import { createTestUser } from "../../helpers/userActions";
 
-import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
+import {
+  initializeTestDb,
+  closeTestDb,
+  clearDatabase,
+} from "../../helpers/dbHelpers";
 
-describe("Authentication - Login", () => {
+describe("Auth Module - Login", () => {
   beforeAll(async () => {
     await initializeTestDb();
   });
@@ -18,20 +22,18 @@ describe("Authentication - Login", () => {
     await clearDatabase();
   });
 
-  describe("POST /users/login - Casos Exitosos (200)", () => {
-    it("1. debe permitir login de cliente con credenciales válidas", async () => {
+  describe("POST /users/login", () => {
+    it("should allow client login with valid credentials", async () => {
       const testUser = await createTestUser({
         email: `client_${Date.now()}@test.com`,
         name: "Client",
-        surname: "Test"
+        surname: "Test",
       });
 
-      const loginResponse = await request(app)
-        .post("/users/login")
-        .send({
-          email: testUser.email,
-          password: "Password123!"
-        });
+      const loginResponse = await request(app).post("/users/login").send({
+        email: testUser.email,
+        password: "Password123!",
+      });
 
       expect(loginResponse.status).toBe(200);
       expect(loginResponse.body.success).toBe(true);
@@ -43,20 +45,18 @@ describe("Authentication - Login", () => {
       expect(loginResponse.body.data.user).not.toHaveProperty("password");
     });
 
-    it("2. debe permitir login de administrador con credenciales válidas", async () => {
+    it("should allow admin login with valid credentials", async () => {
       const adminUser = await createTestUser({
         email: `admin_${Date.now()}@test.com`,
         name: "Admin",
         surname: "Test",
-        role: "admin"
+        role: "admin",
       });
 
-      const loginResponse = await request(app)
-        .post("/users/login")
-        .send({
-          email: adminUser.email,
-          password: "Password123!"
-        });
+      const loginResponse = await request(app).post("/users/login").send({
+        email: adminUser.email,
+        password: "Password123!",
+      });
 
       expect(loginResponse.status).toBe(200);
       expect(loginResponse.body.success).toBe(true);
@@ -65,80 +65,74 @@ describe("Authentication - Login", () => {
       expect(loginResponse.body.data).toHaveProperty("user");
       expect(loginResponse.body.data.user.role).toBe("admin"); //Nos aseguramos que el role sea ADMIN.
     });
-  });
 
-  describe("POST /users/login - Errores de Validación (400)", () => {
-    it("3. debe rechazar formulario vacío", async () => {
-      const response = await request(app)
-        .post("/users/login")
-        .send({});
+    it("should reject empty form", async () => {
+      const response = await request(app).post("/users/login").send({});
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Error de validación");
-      expect(response.body.errors).toContain("Los campos email y contraseña son obligatorios");
+      expect(response.body.errors).toContain(
+        "Los campos email y contraseña son obligatorios",
+      );
     });
 
-    it("4. debe rechazar email vacío", async () => {
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: "",
-          password: "Password123!"
-        });
+    it("should reject empty email", async () => {
+      const response = await request(app).post("/users/login").send({
+        email: "",
+        password: "Password123!",
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe("Los campos email y contraseña son obligatorios");
+      expect(response.body.message).toBe(
+        "Los campos email y contraseña son obligatorios",
+      );
     });
 
-    it("5. debe rechazar contraseña vacía", async () => {
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: "test@test.com",
-          password: ""
-        });
+    it("should reject empty password", async () => {
+      const response = await request(app).post("/users/login").send({
+        email: "test@test.com",
+        password: "",
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe("Los campos email y contraseña son obligatorios");
+      expect(response.body.message).toBe(
+        "Los campos email y contraseña son obligatorios",
+      );
     });
 
-    it("6. debe rechazar email con formato inválido", async () => {
+    it("should reject email with invalid format", async () => {
       const invalidEmails = [
         "email-sin-arroba",
         "email@sin-punto",
         "email con espacios@test.com",
         "@sin-usuario.com",
-        "usuario@.com"
+        "usuario@.com",
       ];
 
       // Iteramos sobre cada email de la lista 'invalidEmails'.
       // La sintaxis 'for...of' nos permite iterar sobre los elementos de un array.
       // En cada iteración, el bucle asigna el siguiente elemento a la variable 'email'.
       for (const email of invalidEmails) {
-        const response = await request(app)
-          .post("/users/login")
-          .send({
-            email,
-            password: "Password123!"
-          });
+        const response = await request(app).post("/users/login").send({
+          email,
+          password: "Password123!",
+        });
 
         expect(response.status).toBe(400);
         expect(response.body.success).toBe(false);
         expect(response.body.message).toBe("El formato del email es inválido");
       }
     });
-  });
 
-  describe("POST /users/login - Errores de Credenciales (401)", () => {
-    it("7. debe rechazar email inexistente", async () => {
+    it("should reject non-existent email", async () => {
       const response = await request(app)
         .post("/users/login")
         .send({
           email: `nonexistent_${Date.now()}@test.com`,
-          password: "Password123!"
+          password: "Password123!",
         });
 
       expect(response.status).toBe(401);
@@ -146,26 +140,24 @@ describe("Authentication - Login", () => {
       expect(response.body.message).toBe("Credenciales inválidas");
     });
 
-    it("8. debe rechazar contraseña incorrecta", async () => {
+    it("should reject incorrect password", async () => {
       const testUser = await createTestUser({
-        email: `wrongpass_${Date.now()}@test.com`
+        email: `wrongpass_${Date.now()}@test.com`,
       });
 
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: testUser.email,
-          password: "WrongPassword123!"
-        });
+      const response = await request(app).post("/users/login").send({
+        email: testUser.email,
+        password: "WrongPassword123!",
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Credenciales inválidas");
     });
 
-    it("9. debe mostrar mismo mensaje para email no existe y contraseña incorrecta", async () => {
+    it("should show same message for non-existent email and incorrect password", async () => {
       const testUser = await createTestUser({
-        email: `consistency_${Date.now()}@test.com`
+        email: `consistency_${Date.now()}@test.com`,
       });
 
       // Test 1: Email no existe
@@ -173,16 +165,14 @@ describe("Authentication - Login", () => {
         .post("/users/login")
         .send({
           email: `nonexistent_${Date.now()}@test.com`,
-          password: "Password123!"
+          password: "Password123!",
         });
 
       // Test 2: Contraseña incorrecta
-      const response2 = await request(app)
-        .post("/users/login")
-        .send({
-          email: testUser.email,
-          password: "WrongPassword123!"
-        });
+      const response2 = await request(app).post("/users/login").send({
+        email: testUser.email,
+        password: "WrongPassword123!",
+      });
 
       expect(response1.status).toBe(401);
       expect(response1.body.message).toBe("Credenciales inválidas");
@@ -190,24 +180,16 @@ describe("Authentication - Login", () => {
       expect(response2.body.message).toBe("Credenciales inválidas");
       expect(response1.body.message).toBe(response2.body.message);
     });
-  });
 
-  describe("POST /users/login - Casos Especiales y Edge Cases", () => {
-    it("10. debe rechazar email con caracteres especiales inválidos", async () => {
+    it("should reject email with invalid special characters", async () => {
       // Emails que realmente fallan la validación de regex (400)
-      const invalidEmails = [
-        "test@.com",
-        "test@com",
-        "test@te st.com"
-      ];
+      const invalidEmails = ["test@.com", "test@com", "test@te st.com"];
 
       for (const email of invalidEmails) {
-        const response = await request(app)
-          .post("/users/login")
-          .send({
-            email,
-            password: "Password123!"
-          });
+        const response = await request(app).post("/users/login").send({
+          email,
+          password: "Password123!",
+        });
 
         expect(response.status).toBe(400);
         expect(response.body.success).toBe(false);
@@ -220,16 +202,14 @@ describe("Authentication - Login", () => {
         "test@test.c",
         "test@test..com",
         "test@test.com.",
-        "test@test.corporate"
+        "test@test.corporate",
       ];
 
       for (const email of specialCaseEmails) {
-        const response = await request(app)
-          .post("/users/login")
-          .send({
-            email,
-            password: "Password123!"
-          });
+        const response = await request(app).post("/users/login").send({
+          email,
+          password: "Password123!",
+        });
 
         expect(response.status).toBe(401);
         expect(response.body.success).toBe(false);
@@ -237,67 +217,57 @@ describe("Authentication - Login", () => {
       }
     });
 
-    it("11. debe rechazar contraseña demasiado corta", async () => {
+    it("should reject password too short", async () => {
       const testUser = await createTestUser({
-        email: `shortpass_${Date.now()}@test.com`
+        email: `shortpass_${Date.now()}@test.com`,
       });
 
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: testUser.email,
-          password: "123" // Contraseña muy corta
-        });
+      const response = await request(app).post("/users/login").send({
+        email: testUser.email,
+        password: "123", // Contraseña muy corta
+      });
 
       expect(response.status).toBe(401);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Credenciales inválidas");
     });
 
-    it("12. debe rechazar email con espacios al inicio/final", async () => {
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: "  test@test.com  ",
-          password: "Password123!"
-        });
+    it("should reject email with spaces at start/end", async () => {
+      const response = await request(app).post("/users/login").send({
+        email: "  test@test.com  ",
+        password: "Password123!",
+      });
 
       expect(response.status).toBe(401); // Cambiado a 401 porque pasa la regex pero no existe
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Credenciales inválidas");
     });
 
-    it("13. debe manejar email con múltiples @ correctamente", async () => {
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: "test@@test.com",
-          password: "Password123!"
-        });
+    it("should handle email with multiple @ correctly", async () => {
+      const response = await request(app).post("/users/login").send({
+        email: "test@@test.com",
+        password: "Password123!",
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("El formato del email es inválido");
     });
-  });
 
-  describe("POST /users/login - Login con Firebase", () => {
-    it("14. debe permitir login con Firebase de usuario existente", async () => {
+    it("should allow Firebase login for existing user", async () => {
       // Primero creamos un usuario normal
       const existingUser = await createTestUser({
         email: `firebase_existing_${Date.now()}@test.com`,
         name: "Firebase",
-        surname: "User"
+        surname: "User",
       });
 
       // Ahora hacemos login con Firebase usando el mismo email
-      const response = await request(app)
-        .post("/users/firebase-login")
-        .send({
-          email: existingUser.email,
-          name: "Updated Name",
-          surname: "Updated Surname"
-        });
+      const response = await request(app).post("/users/firebase-login").send({
+        email: existingUser.email,
+        name: "Updated Name",
+        surname: "Updated Surname",
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -309,16 +279,14 @@ describe("Authentication - Login", () => {
       expect(response.body.data.user.email).toBe(existingUser.email);
     });
 
-    it("15. debe crear nuevo usuario con Firebase si no existe", async () => {
+    it("should create new user with Firebase if not exists", async () => {
       const newFirebaseEmail = `firebase_new_${Date.now()}@test.com`;
 
-      const response = await request(app)
-        .post("/users/firebase-login")
-        .send({
-          email: newFirebaseEmail,
-          name: "Firebase",
-          surname: "User"
-        });
+      const response = await request(app).post("/users/firebase-login").send({
+        email: newFirebaseEmail,
+        name: "Firebase",
+        surname: "User",
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
@@ -333,7 +301,7 @@ describe("Authentication - Login", () => {
       expect(response.body.data.user.role).toBe("customer");
     });
 
-    it("16. debe rechazar login con Firebase sin email", async () => {
+    it("should reject Firebase login without email", async () => {
       const response = await request(app)
         .post("/users/firebase-login")
         .send({});
@@ -341,38 +309,38 @@ describe("Authentication - Login", () => {
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("Error de validación");
-      expect(response.body.errors).toContain("Email es requerido para el login con Firebase");
+      expect(response.body.errors).toContain(
+        "Email es requerido para el login con Firebase",
+      );
     });
 
-    it("17. debe rechazar login con Firebase con email vacío", async () => {
-      const response = await request(app)
-        .post("/users/firebase-login")
-        .send({
-          email: ""
-        });
+    it("should reject Firebase login with empty email", async () => {
+      const response = await request(app).post("/users/firebase-login").send({
+        email: "",
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe("Email es requerido para el login con Firebase");
+      expect(response.body.message).toBe(
+        "Email es requerido para el login con Firebase",
+      );
     });
 
-    it("18. debe rechazar login con Firebase con email inválido", async () => {
-      const response = await request(app)
-        .post("/users/firebase-login")
-        .send({
-          email: "email-invalido"
-        });
+    it("should reject Firebase login with invalid email", async () => {
+      const response = await request(app).post("/users/firebase-login").send({
+        email: "email-invalido",
+      });
 
       expect(response.status).toBe(400);
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe("El formato del email es inválido");
     });
 
-    it("19. debe crear usuario con valores por defecto si no se proporcionan name/surname", async () => {
+    it("should create user with default values if name/surname not provided", async () => {
       const response = await request(app)
         .post("/users/firebase-login")
         .send({
-          email: `firebase_defaults_${Date.now()}@test.com`
+          email: `firebase_defaults_${Date.now()}@test.com`,
         });
 
       expect(response.status).toBe(200);
@@ -383,13 +351,13 @@ describe("Authentication - Login", () => {
       expect(response.body.data.user.role).toBe("customer");
     });
 
-    it("20. debe usar valores proporcionados en lugar de defaults", async () => {
+    it("should use provided values instead of defaults", async () => {
       const response = await request(app)
         .post("/users/firebase-login")
         .send({
           email: `firebase_custom_${Date.now()}@test.com`,
           name: "Custom Name",
-          surname: "Custom Surname"
+          surname: "Custom Surname",
         });
 
       expect(response.status).toBe(200);
@@ -397,73 +365,67 @@ describe("Authentication - Login", () => {
       expect(response.body.data.user.surname).toBe("Custom Surname");
     });
 
-    it("21. debe generar token JWT válido para login con Firebase", async () => {
+    it("should generate valid JWT token for Firebase login", async () => {
       const response = await request(app)
         .post("/users/firebase-login")
         .send({
           email: `firebase_token_${Date.now()}@test.com`,
           name: "Token",
-          surname: "Test"
+          surname: "Test",
         });
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveProperty("accessToken");
 
       const token = response.body.data.accessToken;
-      const tokenParts = token.split('.');
+      const tokenParts = token.split(".");
       expect(tokenParts).toHaveLength(3); // JWT tiene 3 partes
     });
 
-    it("22. debe manejar espacios en blanco en name/surname de Firebase", async () => {
+    it("should handle whitespace in Firebase name/surname", async () => {
       const response = await request(app)
         .post("/users/firebase-login")
         .send({
           email: `firebase_spaces_${Date.now()}@test.com`,
           name: "  ",
-          surname: "   "
+          surname: "   ",
         });
 
       expect(response.status).toBe(200);
       expect(response.body.data.user.name).toBe("Usuario");
       expect(response.body.data.user.surname).toBe("Google");
     });
-  });
 
-  describe("POST /users/login - Sanitización y Consistencia", () => {
-    it("23. debe permitir login con email en mayúsculas (case-insensitive)", async () => {
+    it("should allow login with uppercase email (case-insensitive)", async () => {
       const testUser = await createTestUser({
-        email: `case_${Date.now()}@test.com`
+        email: `case_${Date.now()}@test.com`,
       });
 
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: testUser.email.toUpperCase(), // EMAIL EN MAYÚSCULAS
-          password: "Password123!"
-        });
+      const response = await request(app).post("/users/login").send({
+        email: testUser.email.toUpperCase(), // EMAIL EN MAYÚSCULAS
+        password: "Password123!",
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
       expect(response.body.data.user.email).toBe(testUser.email.toLowerCase());
     });
 
-    it("24. debe generar token JWT válido", async () => {
+    it("should generate valid JWT token", async () => {
       const testUser = await createTestUser({
-        email: `token_${Date.now()}@test.com`
+        email: `token_${Date.now()}@test.com`,
       });
 
-      const response = await request(app)
-        .post("/users/login")
-        .send({
-          email: testUser.email,
-          password: "Password123!"
-        });
+      const response = await request(app).post("/users/login").send({
+        email: testUser.email,
+        password: "Password123!",
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.data).toHaveProperty("accessToken");
 
       const token = response.body.data.accessToken;
-      const tokenParts = token.split('.');
+      const tokenParts = token.split(".");
       expect(tokenParts).toHaveLength(3); // JWT tiene 3 partes: header.payload.signature
     });
   });

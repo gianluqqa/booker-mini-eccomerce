@@ -3,9 +3,13 @@ import { app } from "../../../src/server";
 import { AppDataSource } from "../../../src/config/data-source";
 import { createTestUser } from "../../helpers/userActions";
 
-import { initializeTestDb, closeTestDb, clearDatabase } from "../../helpers/dbHelpers";
+import {
+  initializeTestDb,
+  closeTestDb,
+  clearDatabase,
+} from "../../helpers/dbHelpers";
 
-describe("Authentication - Registro", () => {
+describe("Auth Module - Registration", () => {
   beforeAll(async () => {
     await initializeTestDb();
   });
@@ -18,11 +22,9 @@ describe("Authentication - Registro", () => {
     await clearDatabase();
   });
 
-  describe("POST /users/register - Casos Exitosos (201)", () => {
-    let registeredUserEmail: string;
-
-    it("1. debe registrar usuario con datos básicos exitosamente", async () => {
-      registeredUserEmail = `success_${Date.now()}@test.com`;
+  describe("POST /users/register", () => {
+    it("should register user with basic data successfully", async () => {
+      const registeredUserEmail = `success_${Date.now()}@test.com`;
 
       const registrationResponse = await request(app)
         .post("/users/register")
@@ -31,13 +33,15 @@ describe("Authentication - Registro", () => {
           surname: "Perez",
           email: registeredUserEmail,
           password: "Password123!",
-          confirmPassword: "Password123!"
+          confirmPassword: "Password123!",
         });
 
       // Verificar el contrato API completo
       expect(registrationResponse.status).toBe(201);
       expect(registrationResponse.body.success).toBe(true);
-      expect(registrationResponse.body.message).toBe("Usuario creado exitosamente");
+      expect(registrationResponse.body.message).toBe(
+        "Usuario creado exitosamente",
+      );
       expect(registrationResponse.body).toHaveProperty("data");
 
       // Verificar datos del usuario
@@ -51,7 +55,7 @@ describe("Authentication - Registro", () => {
       expect(newUser).not.toHaveProperty("confirmPassword");
     });
 
-    it("2. debe registrar usuario con campos opcionales correctamente", async () => {
+    it("should register user with optional fields correctly", async () => {
       const optionalFieldsResponse = await request(app)
         .post("/users/register")
         .send({
@@ -65,13 +69,15 @@ describe("Authentication - Registro", () => {
           city: "Buenos Aires",
           phone: "+541112345678",
           bio: "Usuario de prueba",
-          gender: "female"
+          gender: "female",
         });
 
       // Verificar el contrato API completo
       expect(optionalFieldsResponse.status).toBe(201);
       expect(optionalFieldsResponse.body.success).toBe(true);
-      expect(optionalFieldsResponse.body.message).toBe("Usuario creado exitosamente");
+      expect(optionalFieldsResponse.body.message).toBe(
+        "Usuario creado exitosamente",
+      );
       expect(optionalFieldsResponse.body).toHaveProperty("data");
 
       // Verificar campos opcionales
@@ -86,7 +92,7 @@ describe("Authentication - Registro", () => {
       expect(userWithOptionalFields).not.toHaveProperty("password");
     });
 
-    it("3. debe rechazar registro con email duplicado", async () => {
+    it("should reject registration with duplicate email", async () => {
       const email = `duplicate_${Date.now()}@test.com`;
       await createTestUser({ email });
 
@@ -102,134 +108,138 @@ describe("Authentication - Registro", () => {
 
       expect(duplicateResponse.status).toBe(409);
       expect(duplicateResponse.body.success).toBe(false);
-      expect(duplicateResponse.body.message).toBe("Ya existe un usuario con ese email");
+      expect(duplicateResponse.body.message).toBe(
+        "Ya existe un usuario con ese email",
+      );
     });
 
-    it("4. debe rechazar email duplicado sin importar mayúsculas/minúsculas", async () => {
+    it("should reject duplicate email regardless of case", async () => {
       const baseEmail = `consistency${Date.now()}@test.com`;
 
       // Primer registro con email en mayúsculas
       const firstRegistration = await createTestUser({
         email: baseEmail.toUpperCase(),
         name: "Usuario",
-        surname: "Uno"
+        surname: "Uno",
       });
 
       expect(firstRegistration.email).toBe(baseEmail.toLowerCase());
 
       // Segundo intento con mismo email en minúsculas (debería fallar)
-      const secondAttempt = await request(app)
-        .post("/users/register")
-        .send({
-          name: "Usuario",
-          surname: "Dos",
-          email: baseEmail.toLowerCase(),
-          password: "Password123!",
-          confirmPassword: "Password123!",
-        });
+      const secondAttempt = await request(app).post("/users/register").send({
+        name: "Usuario",
+        surname: "Dos",
+        email: baseEmail.toLowerCase(),
+        password: "Password123!",
+        confirmPassword: "Password123!",
+      });
 
       expect(secondAttempt.status).toBe(409);
-      expect(secondAttempt.body.message).toContain("Ya existe un usuario con ese email");
+      expect(secondAttempt.body.message).toContain(
+        "Ya existe un usuario con ese email",
+      );
     });
-  });
 
-  describe("POST /users/register - Errores de Validación (400)", () => {
-    it("5. debe rechazar registro con cuerpo vacío", async () => {
-      const emptyResponse = await request(app)
-        .post("/users/register")
-        .send({});
+    it("should reject registration with empty body", async () => {
+      const emptyResponse = await request(app).post("/users/register").send({});
 
       expect(emptyResponse.status).toBe(400);
       expect(emptyResponse.body.success).toBe(false);
       expect(emptyResponse.body.message).toBe("Error de validación");
       expect(emptyResponse.body).toHaveProperty("errors");
       expect(emptyResponse.body.errors).toContain(
-        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios"
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios",
       );
     });
 
-    it("6. debe rechazar registro sin email", async () => {
-      const noEmailResponse = await request(app)
-        .post("/users/register")
-        .send({
-          name: "Juan",
-          surname: "Perez",
-          password: "Password123!",
-          confirmPassword: "Password123!"
-        });
+    it("should reject registration without email", async () => {
+      const noEmailResponse = await request(app).post("/users/register").send({
+        name: "Juan",
+        surname: "Perez",
+        password: "Password123!",
+        confirmPassword: "Password123!",
+      });
 
       expect(noEmailResponse.status).toBe(400);
       expect(noEmailResponse.body.success).toBe(false);
-      expect(noEmailResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+      expect(noEmailResponse.body.message).toBe(
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios",
+      );
     });
 
-    it("7. debe rechazar registro sin contraseña", async () => {
+    it("should reject registration without password", async () => {
       const noPasswordResponse = await request(app)
         .post("/users/register")
         .send({
           name: "Juan",
           surname: "Perez",
           email: "test@test.com",
-          confirmPassword: "Password123!"
+          confirmPassword: "Password123!",
         });
 
       expect(noPasswordResponse.status).toBe(400);
       expect(noPasswordResponse.body.success).toBe(false);
-      expect(noPasswordResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+      expect(noPasswordResponse.body.message).toBe(
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios",
+      );
     });
 
-    it("8. debe rechazar registro sin confirmación de contraseña", async () => {
+    it("should reject registration without password confirmation", async () => {
       const noConfirmResponse = await request(app)
         .post("/users/register")
         .send({
           name: "Juan",
           surname: "Perez",
           email: "test@test.com",
-          password: "Password123!"
+          password: "Password123!",
         });
 
       expect(noConfirmResponse.status).toBe(400);
       expect(noConfirmResponse.body.success).toBe(false);
-      expect(noConfirmResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+      expect(noConfirmResponse.body.message).toBe(
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios",
+      );
     });
 
-    it("9. debe rechazar registro sin nombre", async () => {
-      const noNameResponse = await request(app)
-        .post("/users/register")
-        .send({
-          surname: "Perez",
-          email: "test@test.com",
-          password: "Password123!",
-          confirmPassword: "Password123!"
-        });
+    it("should reject registration without name", async () => {
+      const noNameResponse = await request(app).post("/users/register").send({
+        surname: "Perez",
+        email: "test@test.com",
+        password: "Password123!",
+        confirmPassword: "Password123!",
+      });
 
       expect(noNameResponse.status).toBe(400);
       expect(noNameResponse.body.success).toBe(false);
-      expect(noNameResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+      expect(noNameResponse.body.message).toBe(
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios",
+      );
     });
 
-    it("10. debe rechazar registro sin apellido", async () => {
+    it("should reject registration without surname", async () => {
       const noSurnameResponse = await request(app)
         .post("/users/register")
         .send({
           name: "Juan",
           email: "test@test.com",
           password: "Password123!",
-          confirmPassword: "Password123!"
+          confirmPassword: "Password123!",
         });
 
       expect(noSurnameResponse.status).toBe(400);
       expect(noSurnameResponse.body.success).toBe(false);
-      expect(noSurnameResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+      expect(noSurnameResponse.body.message).toBe(
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios",
+      );
     });
 
-    it("11. debe rechazar registro con formato de email inválido", async () => {
+    it("should reject registration with invalid email format", async () => {
       const invalidEmails = [
         "correo-sin-arroba",
         "email@sin-punto",
         "email con espacios@test.com",
         "@sin-usuario.com",
-        "usuario@.com"
+        "usuario@.com",
       ];
 
       for (const invalidEmail of invalidEmails) {
@@ -245,11 +255,13 @@ describe("Authentication - Registro", () => {
 
         expect(invalidEmailResponse.status).toBe(400);
         expect(invalidEmailResponse.body.success).toBe(false);
-        expect(invalidEmailResponse.body.message).toBe("El formato del email es inválido");
+        expect(invalidEmailResponse.body.message).toBe(
+          "El formato del email es inválido",
+        );
       }
     });
 
-    it("12. debe rechazar registro con email vacío", async () => {
+    it("should reject registration with empty email", async () => {
       const emptyEmailResponse = await request(app)
         .post("/users/register")
         .send({
@@ -262,10 +274,12 @@ describe("Authentication - Registro", () => {
 
       expect(emptyEmailResponse.status).toBe(400);
       expect(emptyEmailResponse.body.success).toBe(false);
-      expect(emptyEmailResponse.body.message).toBe("Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios");
+      expect(emptyEmailResponse.body.message).toBe(
+        "Los campos email, contraseña, confirmación de contraseña, nombre y apellido son obligatorios",
+      );
     });
 
-    it("13. debe rechazar registro con contraseña sin complejidad", async () => {
+    it("should reject registration with password without complexity", async () => {
       const simplePasswordResponse = await request(app)
         .post("/users/register")
         .send({
@@ -278,10 +292,12 @@ describe("Authentication - Registro", () => {
 
       expect(simplePasswordResponse.status).toBe(400);
       expect(simplePasswordResponse.body.success).toBe(false);
-      expect(simplePasswordResponse.body.message).toBe("La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número");
+      expect(simplePasswordResponse.body.message).toBe(
+        "La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número",
+      );
     });
 
-    it("14. debe rechazar registro con contraseña demasiado corta", async () => {
+    it("should reject registration with password too short", async () => {
       const shortPasswordResponse = await request(app)
         .post("/users/register")
         .send({
@@ -294,10 +310,12 @@ describe("Authentication - Registro", () => {
 
       expect(shortPasswordResponse.status).toBe(400);
       expect(shortPasswordResponse.body.success).toBe(false);
-      expect(shortPasswordResponse.body.message).toContain("al menos 8 caracteres");
+      expect(shortPasswordResponse.body.message).toContain(
+        "al menos 8 caracteres",
+      );
     });
 
-    it("15. debe rechazar registro con contraseñas que no coinciden", async () => {
+    it("should reject registration with mismatched passwords", async () => {
       const mismatchPasswordResponse = await request(app)
         .post("/users/register")
         .send({
@@ -310,10 +328,12 @@ describe("Authentication - Registro", () => {
 
       expect(mismatchPasswordResponse.status).toBe(400);
       expect(mismatchPasswordResponse.body.success).toBe(false);
-      expect(mismatchPasswordResponse.body.message).toBe("Las contraseñas no coinciden");
+      expect(mismatchPasswordResponse.body.message).toBe(
+        "Las contraseñas no coinciden",
+      );
     });
 
-    it("16. debe rechazar registro con nombre que contiene números", async () => {
+    it("should reject registration with name containing numbers", async () => {
       const numericNameResponse = await request(app)
         .post("/users/register")
         .send({
@@ -326,10 +346,12 @@ describe("Authentication - Registro", () => {
 
       expect(numericNameResponse.status).toBe(400);
       expect(numericNameResponse.body.success).toBe(false);
-      expect(numericNameResponse.body.message).toBe("El nombre solo puede contener letras y espacios");
+      expect(numericNameResponse.body.message).toBe(
+        "El nombre solo puede contener letras y espacios",
+      );
     });
 
-    it("17. debe rechazar registro con apellido que contiene números", async () => {
+    it("should reject registration with surname containing numbers", async () => {
       const numericSurnameResponse = await request(app)
         .post("/users/register")
         .send({
@@ -342,12 +364,12 @@ describe("Authentication - Registro", () => {
 
       expect(numericSurnameResponse.status).toBe(400);
       expect(numericSurnameResponse.body.success).toBe(false);
-      expect(numericSurnameResponse.body.message).toBe("El apellido solo puede contener letras y espacios");
+      expect(numericSurnameResponse.body.message).toBe(
+        "El apellido solo puede contener letras y espacios",
+      );
     });
-  });
 
-  describe("POST /users/register - Estructura y Tipos de Datos", () => {
-    it("18. debe verificar estructura de respuesta exitosa", async () => {
+    it("should verify successful response structure", async () => {
       const successStructureResponse = await request(app)
         .post("/users/register")
         .send({
@@ -359,13 +381,17 @@ describe("Authentication - Registro", () => {
         });
 
       expect(successStructureResponse.status).toBe(201);
-      expect(Object.keys(successStructureResponse.body)).toEqual(["success", "message", "data"]);
+      expect(Object.keys(successStructureResponse.body)).toEqual([
+        "success",
+        "message",
+        "data",
+      ]);
       expect(typeof successStructureResponse.body.success).toBe("boolean");
       expect(typeof successStructureResponse.body.message).toBe("string");
       expect(typeof successStructureResponse.body.data).toBe("object");
     });
 
-    it("19. debe verificar estructura de respuesta de error", async () => {
+    it("should verify error response structure", async () => {
       const errorStructureResponse = await request(app)
         .post("/users/register")
         .send({});
@@ -381,11 +407,11 @@ describe("Authentication - Registro", () => {
       }
     });
 
-    it("20. debe verificar tipos de datos correctos en respuesta", async () => {
+    it("should verify correct data types in response", async () => {
       const userWithCorrectTypes = await createTestUser({
         name: "Types",
         surname: "Test",
-        email: `types_${Date.now()}@test.com`
+        email: `types_${Date.now()}@test.com`,
       });
 
       expect(typeof userWithCorrectTypes.id).toBe("string");
@@ -397,11 +423,11 @@ describe("Authentication - Registro", () => {
       expect(userWithCorrectTypes.country).toBe(null);
     });
 
-    it("21. debe garantizar que las contraseñas no se expongan", async () => {
+    it("should ensure passwords are not exposed", async () => {
       const userWithSecurityTest = await createTestUser({
         name: "Security",
         surname: "Test",
-        email: `security_${Date.now()}@test.com`
+        email: `security_${Date.now()}@test.com`,
       });
 
       // Verificar que el helper no expone contraseñas
@@ -425,10 +451,8 @@ describe("Authentication - Registro", () => {
       expect(securityResponse.body.data).not.toHaveProperty("password");
       expect(securityResponse.body.data).not.toHaveProperty("confirmPassword");
     });
-  });
 
-  describe("POST /users/register - Sanitización y Consistencia", () => {
-    it("22. debe sanitizar datos correctamente", async () => {
+    it("should sanitize data correctly", async () => {
       const sanitizationResponse = await request(app)
         .post("/users/register")
         .send({
@@ -444,10 +468,12 @@ describe("Authentication - Registro", () => {
       // Verifica que los datos se sanitizan correctamente
       expect(sanitizationResponse.body.data.name).toBe("Juan");
       expect(sanitizationResponse.body.data.surname).toBe("Perez");
-      expect(sanitizationResponse.body.data.email).toMatch(/test\d+@test\.com$/);
+      expect(sanitizationResponse.body.data.email).toMatch(
+        /test\d+@test\.com$/,
+      );
     });
 
-    it("23. debe mantener consistencia de email y evitar duplicados", async () => {
+    it("should maintain email consistency and avoid duplicates", async () => {
       const baseEmail = `consistency${Date.now()}@test.com`;
 
       // Primer registro con email en mayúsculas
@@ -464,18 +490,18 @@ describe("Authentication - Registro", () => {
       expect(firstRegistration.status).toBe(201);
 
       // Segundo intento con mismo email en minúsculas (debería fallar)
-      const secondAttempt = await request(app)
-        .post("/users/register")
-        .send({
-          name: "Usuario",
-          surname: "Dos",
-          email: baseEmail.toLowerCase(),
-          password: "Password123!",
-          confirmPassword: "Password123!",
-        });
+      const secondAttempt = await request(app).post("/users/register").send({
+        name: "Usuario",
+        surname: "Dos",
+        email: baseEmail.toLowerCase(),
+        password: "Password123!",
+        confirmPassword: "Password123!",
+      });
 
       expect(secondAttempt.status).toBe(409);
-      expect(secondAttempt.body.message).toContain("Ya existe un usuario con ese email");
+      expect(secondAttempt.body.message).toContain(
+        "Ya existe un usuario con ese email",
+      );
     });
   });
 });

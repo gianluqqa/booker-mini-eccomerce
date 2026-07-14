@@ -176,3 +176,9 @@ export const cancelOrderExpiration = (orderId: string): void => {
 export const getActiveTimeouts = (): Map<string, NodeJS.Timeout> => {
   return new Map(activeTimeouts);
 };
+
+//? Limpiar todos los timeouts (útil para testing)
+export const clearAllOrderExpirations = (): void => {
+  activeTimeouts.forEach((timeout) => clearTimeout(timeout));
+  activeTimeouts.clear();
+};

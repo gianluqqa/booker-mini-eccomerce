@@ -8,6 +8,7 @@ import { Cart } from "../../src/entities/Cart";
 import { StockReservation } from "../../src/entities/StockReservation";
 import { Genre } from "../../src/entities/Genre";
 import { ILike } from "typeorm";
+import { clearAllOrderExpirations } from "../../src/services/order-expiration-service";
 
 /**
  * Inicializa la base de datos para los tests si no está inicializada.
@@ -61,6 +62,8 @@ export const clearDatabase = async () => {
       name: ILike("%TestGenre%")
     });
     
+    // Limpiar timeouts de expiración de órdenes para evitar "open handles" en Jest
+    clearAllOrderExpirations();
   } catch (error) {
     // En tests, a veces fallan las limpiezas por locks o procesos paralelos (como expiración)
     // Silenciamos para no ensuciar la salida del test a menos que sea crítico
