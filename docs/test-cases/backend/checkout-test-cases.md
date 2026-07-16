@@ -21,4 +21,21 @@
 | TC-CHECKOUT-017 | Integration | Update stock after successful payment | High | User authenticated, items in cart, payment processed | 1. Add book with quantity 3 (stock: 10)<br>2. Create reservation and PENDING order<br>3. Process payment successfully<br>4. Verify book stock is reduced to 7 | Book stock: 10, quantity: 3 | HTTP 200, payment successful, updated stock: 7 | |
 | TC-CHECKOUT-018 | Integration | Handle expired order during payment | High | User authenticated, PENDING order exists but has expired | 1. Create PENDING order<br>2. Modify order expiresAt to past date<br>3. Attempt to pay for order<br>4. Verify HTTP 410 response<br>5. Verify order expired error message | Valid token, expired PENDING order | HTTP 410, success: false, message: "La orden ha expirado. Por favor, inicia el proceso de nuevo." | |
 | TC-CHECKOUT-019 | Integration | Return same order if already paid (Idempotency) | Medium | User authenticated, order already in PAID status | 1. Create PENDING order<br>2. Process payment successfully<br>3. Attempt to pay again for same order<br>4. Verify same PAID order is returned | Valid token, PAID order, payment data | HTTP 200, success: true, returns same PAID order without processing payment again | |
-| TC-CHECKOUT-020 | Integration | Reject payment with incomplete payment data | High | User authenticated, PENDING order exists, incomplete payment data | 1. Create PENDING order<br>2. Send POST /checkout/pay with missing cardName<br>3. Verify HTTP 400 response<br>4. Verify incomplete payment data error message | Valid token, PENDING order, missing cardName | HTTP 400, success: false, message: "Datos de pago incompletos para procesar la orden pendiente" | |
+| TC-CHECKOUT-020 | Integration | Reject payment with incomplete payment data | High | User authenticated, PENDING order exists, incomplete payment data | 1. Create PENDING order<br>2. Send POST /checkout/pay with missing cardName<br>3. Verify HTTP 400 response<br>4. Verify incomplete payment data error message | Valid token, PENDING order, missing cardName | HTTP 400, success: false, message: "Datos de pago incompletos para procesar la orden pendiente" |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-CHECKOUT-001 | 2024-04-15 | ❌ Fail | Bug reported as BUG-CHECKOUT-001-stock-reservation. |
+| TC-CHECKOUT-001 | 2024-04-17 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CHECKOUT-008 | 2024-04-20 | ❌ Fail | Bug reported as BUG-CHECKOUT-002-process-payment. |
+| TC-CHECKOUT-008 | 2024-04-22 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CHECKOUT-012 | 2024-04-25 | ❌ Fail | Bug reported as BUG-CHECKOUT-003-cancel-checkout. |
+| TC-CHECKOUT-012 | 2024-04-27 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CHECKOUT-014 | 2024-04-30 | ❌ Fail | Bug reported as BUG-CHECKOUT-004-expired-reservation. |
+| TC-CHECKOUT-014 | 2024-05-02 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CHECKOUT-015 | 2024-05-05 | ❌ Fail | Bug reported as BUG-CHECKOUT-005-stock-concurrency. |
+| TC-CHECKOUT-015 | 2024-05-07 | ✅ Pass | Bug fixed and verified successfully. | |

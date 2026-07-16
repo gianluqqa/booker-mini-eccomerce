@@ -29,4 +29,19 @@
 | TC-AUTH-025 | Firebase Login | Reject invalid email format | High | No user exists with the provided email | 1. Send POST /users/firebase-login with invalid email<br>2. Verify HTTP 400 response<br>3. Verify format validation message | email: "email-invalido" | HTTP 400, success: false, message: "El formato del email es inválido" | |
 | TC-AUTH-026 | Firebase Login | Default values when name/surname not provided | Medium | No user exists with the provided email | 1. Send POST /users/firebase-login with only email<br>2. Verify HTTP 200 response<br>3. Verify default values are used | email: "defaults@test.com" (without name and surname) | HTTP 200, success: true, user.name: "Usuario", user.surname: "Google" | |
 | TC-AUTH-027 | Firebase Login | Use provided values instead of defaults | Medium | No user exists with the provided email | 1. Send POST /users/firebase-login with email, name and surname<br>2. Verify HTTP 200 response<br>3. Verify provided values are used | email: "custom@test.com", name: "Custom Name", surname: "Custom Surname" | HTTP 200, success: true, user.name: "Custom Name", user.surname: "Custom Surname" | |
-| TC-AUTH-028 | Firebase Login | Generate valid JWT token | High | No user exists with the provided email | 1. Send POST /users/firebase-login with valid data<br>2. Extract accessToken from response<br>3. Verify token has 3 parts (header.payload.signature) | email: "token@test.com", name: "Token", surname: "Test" | HTTP 200, accessToken present with valid JWT format (3 parts separated by dots) | |
+| TC-AUTH-028 | Firebase Login | Generate valid JWT token | High | No user exists with the provided email | 1. Send POST /users/firebase-login with valid data<br>2. Extract accessToken from response<br>3. Verify token has 3 parts (header.payload.signature) | email: "token@test.com", name: "Token", surname: "Test" | HTTP 200, accessToken present with valid JWT format (3 parts separated by dots) |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-AUTH-003 | 2024-01-15 | ❌ Fail | Bug reported as BUG-AUTH-001-user-registration. |
+| TC-AUTH-003 | 2024-01-18 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-AUTH-014 | 2024-01-20 | ❌ Fail | Bug reported as BUG-AUTH-002-user-login. |
+| TC-AUTH-014 | 2024-01-22 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-AUTH-021 | 2024-01-25 | ❌ Fail | Bug reported as BUG-AUTH-003-firebase-login. |
+| TC-AUTH-021 | 2024-01-27 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-AUTH-028 | 2024-01-30 | ❌ Fail | Bug reported as BUG-AUTH-004-jwt-token-generation. |
+| TC-AUTH-028 | 2024-02-01 | ✅ Pass | Bug fixed and verified successfully. | |

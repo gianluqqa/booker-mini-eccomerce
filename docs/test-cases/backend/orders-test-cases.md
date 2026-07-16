@@ -17,4 +17,19 @@
 | TC-ORD-013 | Orders | Reject getting pending orders without authentication | High | No authentication token provided | 1. Send GET /orders/pending without token<br>2. Verify HTTP 401 response<br>3. Verify authorization error message | No token | HTTP 401, success: false, message: "No autorizado: se requiere un token de autenticación" | |
 | TC-ORD-014 | Orders | Reject getting pending orders with invalid token | High | Invalid authentication token provided | 1. Send GET /orders/pending with invalid token<br>2. Verify HTTP 401 response<br>3. Verify invalid token error message | Token: "token-super-invalido" | HTTP 401, success: false, message: "No autorizado: token inválido o expirado" | |
 | TC-ORD-015 | Orders | Exclude PAID and CANCELLED orders from pending list | High | User authenticated, orders exist in different statuses | 1. Create PAID, PENDING, and CANCELLED orders for user<br>2. Send GET /orders/pending with valid token<br>3. Verify HTTP 200 response<br>4. Verify only PENDING order is returned<br>5. Verify PAID and CANCELLED are excluded | Valid token, user with PAID, PENDING, CANCELLED orders | HTTP 200, success: true, data contains only PENDING order, excludes PAID and CANCELLED | |
-| TC-ORD-016 | Orders | Ensure privacy: not return other users' pending orders | High | User authenticated, pending orders exist for multiple users | 1. Create PENDING order for authenticated user<br>2. Create PENDING order for different user<br>3. Send GET /orders/pending with authenticated user's token<br>4. Verify only authenticated user's pending order is returned | Valid token, mainUserPendingOrder, otherUserPendingOrder | HTTP 200, success: true, data contains only main user's PENDING order, excludes other user's PENDING order | |
+| TC-ORD-016 | Orders | Ensure privacy: not return other users' pending orders | High | User authenticated, pending orders exist for multiple users | 1. Create PENDING order for authenticated user<br>2. Create PENDING order for different user<br>3. Send GET /orders/pending with authenticated user's token<br>4. Verify only authenticated user's pending order is returned | Valid token, mainUserPendingOrder, otherUserPendingOrder | HTTP 200, success: true, data contains only main user's PENDING order, excludes other user's PENDING order |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-ORD-001 | 2024-05-25 | ❌ Fail | Bug reported as BUG-ORD-001-get-order-by-id. |
+| TC-ORD-001 | 2024-05-27 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ORD-006 | 2024-05-30 | ❌ Fail | Bug reported as BUG-ORD-002-get-confirmed-orders. |
+| TC-ORD-006 | 2024-06-01 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ORD-009 | 2024-06-05 | ❌ Fail | Bug reported as BUG-ORD-003-filter-orders-by-status. |
+| TC-ORD-009 | 2024-06-07 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ORD-012 | 2024-06-10 | ❌ Fail | Bug reported as BUG-ORD-004-get-pending-orders. |
+| TC-ORD-012 | 2024-06-12 | ✅ Pass | Bug fixed and verified successfully. | |

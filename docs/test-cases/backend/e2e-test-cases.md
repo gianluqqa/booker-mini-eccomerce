@@ -13,4 +13,19 @@
 | TC-E2E-009 | Complete Flow | Handle stock depletion between reservation and payment | High | System operational, user registered, stock changes externally | 1. Login with existing user<br>2. Add book to cart with quantity 8 (stock: 10)<br>3. Reserve stock and create PENDING order<br>4. Reduce book stock to 0 externally<br>5. Attempt payment<br>6. Verify HTTP 409 response<br>7. Verify insufficient final stock error<br>8. Verify order remains in PENDING status | User token, book: stock 10, cart quantity 8, external stock reduction to 0 | HTTP 200 login, HTTP 200 add to cart, HTTP 201 reserve, HTTP 201 checkout PENDING, HTTP 409 payment, error: "No hay stock suficiente", order still PENDING | |
 | TC-E2E-010 | Complete Flow | Verify order history after successful purchase | Medium | System operational, user with completed purchase | 1. Complete full purchase flow<br>2. Get user's confirmed orders<br>3. Verify purchased order appears in list<br>4. Verify order status is PAID<br>5. Verify order details are correct | User token, completed purchase with book: price 25.50, quantity 2 | HTTP 200 get orders, order appears in list, status: PAID, total: 51.00, items correct | |
 | TC-E2E-011 | Complete Flow | Verify favorite functionality in complete flow | Low | System operational, user registered, book available | 1. Login with existing user<br>2. Add book to favorites<br>3. Add same book to cart<br>4. Complete purchase flow<br>5. Verify book remains in favorites after purchase<br>6. Verify favorite status is independent of purchase | User token, book: price 25.50, quantity 1 | HTTP 200 add to favorites, HTTP 200 add to cart, purchase successful, book still in favorites | |
-| TC-E2E-012 | Complete Flow | Handle review creation after purchase | Medium | System operational, user with completed purchase | 1. Complete full purchase flow<br>2. Create review for purchased book<br>3. Verify review is created successfully<br>4. Verify review appears in book's reviews<br>5. Verify average rating is updated | User token, purchased book, review: rating 5, comment: "Excellent" | HTTP 200 purchase, HTTP 201 review, review appears in book reviews, average rating updated to 5 | |
+| TC-E2E-012 | Complete Flow | Handle review creation after purchase | Medium | System operational, user with completed purchase | 1. Complete full purchase flow<br>2. Create review for purchased book<br>3. Verify review is created successfully<br>4. Verify review appears in book's reviews<br>5. Verify average rating is updated | User token, purchased book, review: rating 5, comment: "Excellent" | HTTP 200 purchase, HTTP 201 review, review appears in book reviews, average rating updated to 5 |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-E2E-001 | 2024-07-10 | ❌ Fail | Bug reported as BUG-E2E-001-complete-purchase-flow. |
+| TC-E2E-001 | 2024-07-12 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-E2E-006 | 2024-07-15 | ❌ Fail | Bug reported as BUG-E2E-002-insufficient-stock. |
+| TC-E2E-006 | 2024-07-17 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-E2E-008 | 2024-07-20 | ❌ Fail | Bug reported as BUG-E2E-003-expired-reservation. |
+| TC-E2E-008 | 2024-07-22 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-E2E-009 | 2024-07-25 | ❌ Fail | Bug reported as BUG-E2E-004-stock-depletion. |
+| TC-E2E-009 | 2024-07-27 | ✅ Pass | Bug fixed and verified successfully. | |

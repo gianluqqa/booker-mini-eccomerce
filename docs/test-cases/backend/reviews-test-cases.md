@@ -17,4 +17,21 @@
 | TC-REV-013 | Reviews | Handle invalid UUID format for review ID | Medium | User authenticated, invalid UUID format provided | 1. Send DELETE /api/reviews/:invalidUuid with valid token<br>2. Verify HTTP 400+ response<br>3. Verify error message | Valid token, reviewId: "not-a-valid-uuid" | HTTP 400+, success: false, controlled error message | |
 | TC-REV-014 | Reviews | Handle SQL injection in comments (Security) | Medium | User authenticated, book exists | 1. Send POST /api/reviews with SQL injection attempt in comment<br>2. Verify HTTP 201 response<br>3. Verify comment is stored as text without SQL execution | Valid token, bookId: valid_book_id, comment: "'; DROP TABLE reviews; --" | HTTP 201, success: true, comment stored as text without SQL execution | |
 | TC-REV-015 | Reviews | Get user's own reviews | High | User authenticated, user has created reviews | 1. Create multiple reviews for user<br>2. Send GET /api/reviews/user with valid token<br>3. Verify HTTP 200 response<br>4. Verify only user's reviews are returned<br>5. Verify summary data is calculated correctly | Valid token, user with multiple reviews | HTTP 200, success: true, data array contains user's reviews only, summary with averageRating | |
-| TC-REV-016 | Reviews | Get all reviews (public endpoint) | Medium | Reviews exist in database | 1. Send GET /api/reviews without authentication<br>2. Verify HTTP 200 response<br>3. Verify reviews array with pagination metadata<br>4. Verify reviews include user and book data | No authentication required | HTTP 200, success: true, data array with reviews, meta with pagination, reviews include user and book details | |
+| TC-REV-016 | Reviews | Get all reviews (public endpoint) | Medium | Reviews exist in database | 1. Send GET /api/reviews without authentication<br>2. Verify HTTP 200 response<br>3. Verify reviews array with pagination metadata<br>4. Verify reviews include user and book data | No authentication required | HTTP 200, success: true, data array with reviews, meta with pagination, reviews include user and book details |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-REV-001 | 2024-06-15 | ❌ Fail | Bug reported as BUG-REV-001-create-review. |
+| TC-REV-001 | 2024-06-17 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-REV-004 | 2024-06-20 | ❌ Fail | Bug reported as BUG-REV-002-duplicate-review. |
+| TC-REV-004 | 2024-06-22 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-REV-008 | 2024-06-25 | ❌ Fail | Bug reported as BUG-REV-003-update-review. |
+| TC-REV-008 | 2024-06-27 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-REV-010 | 2024-06-30 | ❌ Fail | Bug reported as BUG-REV-004-delete-review. |
+| TC-REV-010 | 2024-07-02 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-REV-012 | 2024-07-05 | ❌ Fail | Bug reported as BUG-REV-005-xss-protection. |
+| TC-REV-012 | 2024-07-07 | ✅ Pass | Bug fixed and verified successfully. | |

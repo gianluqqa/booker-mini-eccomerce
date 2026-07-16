@@ -30,4 +30,23 @@
 | TC-ADMIN-026 | Users | Delete user as administrator | High | Admin user authenticated, non-admin user exists in database | 1. Send DELETE /users/:userId with admin token<br>2. Verify HTTP 200 response<br>3. Verify success is true<br>4. Verify user is deleted from database | Admin token, userId: existing_non_admin_user_id | HTTP 200, success: true, message: "Usuario eliminado exitosamente", user no longer exists in database | |
 | TC-ADMIN-027 | Users | Reject user deletion by normal user | High | Normal user authenticated | 1. Send DELETE /users/:userId with normal user token<br>2. Verify HTTP 403 response<br>3. Verify forbidden message | Normal user token, userId: existing_user_id | HTTP 403, success: false, message: "Prohibido: Solo los administradores pueden eliminar usuarios" | |
 | TC-ADMIN-028 | Users | Delete all non-admin users as administrator | High | Admin user authenticated, multiple non-admin users exist | 1. Send DELETE /users/ with admin token<br>2. Verify HTTP 200 response<br>3. Verify success is true<br>4. Verify all non-admin users are deleted, admin remains | Admin token | HTTP 200, success: true, message: "Se eliminaron todos los usuarios clientes exitosamente", data contains deletedCount, admin user remains | |
-| TC-ADMIN-029 | Users | Reject deleting all users by normal user | High | Normal user authenticated | 1. Send DELETE /users/ with normal user token<br>2. Verify HTTP 403 response<br>3. Verify forbidden message | Normal user token | HTTP 403, success: false, message: "Prohibido: Solo los administradores pueden realizar esta acción" | |
+| TC-ADMIN-029 | Users | Reject deleting all users by normal user | High | Normal user authenticated | 1. Send DELETE /users/ with normal user token<br>2. Verify HTTP 403 response<br>3. Verify forbidden message | Normal user token | HTTP 403, success: false, message: "Prohibido: Solo los administradores pueden realizar esta acción" |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-ADMIN-001 | 2024-02-05 | ❌ Fail | Bug reported as BUG-ADMIN-001-create-book. |
+| TC-ADMIN-001 | 2024-02-07 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ADMIN-009 | 2024-02-10 | ❌ Fail | Bug reported as BUG-ADMIN-002-cancel-order. |
+| TC-ADMIN-009 | 2024-02-12 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ADMIN-013 | 2024-02-15 | ❌ Fail | Bug reported as BUG-ADMIN-003-clear-all-orders. |
+| TC-ADMIN-013 | 2024-02-17 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ADMIN-020 | 2024-02-20 | ❌ Fail | Bug reported as BUG-ADMIN-004-delete-review. |
+| TC-ADMIN-020 | 2024-02-22 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ADMIN-026 | 2024-02-25 | ❌ Fail | Bug reported as BUG-ADMIN-005-delete-user. |
+| TC-ADMIN-026 | 2024-02-27 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-ADMIN-028 | 2024-03-01 | ❌ Fail | Bug reported as BUG-ADMIN-006-delete-all-users. |
+| TC-ADMIN-028 | 2024-03-03 | ✅ Pass | Bug fixed and verified successfully. | |

@@ -12,4 +12,17 @@
 | TC-FAV-008 | Favorites | Reject getting favorites without authentication | High | No authentication token provided | 1. Send GET /users/:userId/favorites without token<br>2. Verify HTTP 401 response<br>3. Verify authorization error message | userId: valid_user_id, no token | HTTP 401, success: false, message: "No autorizado: se requiere un token de autenticación" | |
 | TC-FAV-009 | Favorites | Reject viewing another user's favorites | High | User authenticated, attempting to view different user's favorites | 1. Send GET /users/:anotherUserId/favorites with authenticated user's token<br>2. Verify HTTP 403 response<br>3. Verify forbidden error message | Authenticated token, userId: different_user_id | HTTP 403, success: false, message: "Prohibido: Solo puedes ver tus propios favoritos" | |
 | TC-FAV-010 | Favorites | Reject viewing if userId does not match authenticated user | High | User authenticated, userId in URL does not match authenticated user | 1. Send GET /users/:nonExistentUserId/favorites with valid token<br>2. Verify HTTP 403 response<br>3. Verify forbidden error message (checks userId match before existence) | Valid token, userId: "non-existent-id" | HTTP 403, success: false, message: "Prohibido: Solo puedes ver tus propios favoritos" | |
-| TC-FAV-011 | Favorites | Correctly reflect favorites after adding and removing | Medium | User authenticated, books exist in database | 1. Get favorites (expect empty)<br>2. Add first book to favorites<br>3. Get favorites (expect 1 book)<br>4. Add second book to favorites<br>5. Get favorites (expect 2 books)<br>6. Remove first book from favorites<br>7. Get favorites (expect 1 book, second only)<br>8. Remove second book from favorites<br>9. Get favorites (expect empty) | Valid token, userId: authenticated_user_id, bookId1: valid_book_id, bookId2: valid_book_id2 | HTTP 200 for all operations, favorites list correctly reflects current state after each operation | |
+| TC-FAV-011 | Favorites | Correctly reflect favorites after adding and removing | Medium | User authenticated, books exist in database | 1. Get favorites (expect empty)<br>2. Add first book to favorites<br>3. Get favorites (expect 1 book)<br>4. Add second book to favorites<br>5. Get favorites (expect 2 books)<br>6. Remove first book from favorites<br>7. Get favorites (expect 1 book, second only)<br>8. Remove second book from favorites<br>9. Get favorites (expect empty) | Valid token, userId: authenticated_user_id, bookId1: valid_book_id, bookId2: valid_book_id2 | HTTP 200 for all operations, favorites list correctly reflects current state after each operation |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-FAV-001 | 2024-05-10 | ❌ Fail | Bug reported as BUG-FAV-001-add-favorite. |
+| TC-FAV-001 | 2024-05-12 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FAV-002 | 2024-05-15 | ❌ Fail | Bug reported as BUG-FAV-002-remove-favorite. |
+| TC-FAV-002 | 2024-05-17 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FAV-007 | 2024-05-20 | ❌ Fail | Bug reported as BUG-FAV-003-get-favorites. |
+| TC-FAV-007 | 2024-05-22 | ✅ Pass | Bug fixed and verified successfully. | |

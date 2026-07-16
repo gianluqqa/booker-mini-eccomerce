@@ -40,4 +40,27 @@
 | TC-CART-036 | Cart | Handle price changes in catalog correctly | Medium | User authenticated, item in cart, book price changes | 1. Add book to cart with original price<br>2. Update book price in catalog<br>3. Get cart and verify new price is reflected | Original price: 29.99, updated price: 99.99 | HTTP 200, cart shows updated price: 99.99, totalPrice reflects new price | |
 | TC-CART-037 | Cart | Cart persistence after logout and new login | Medium | User authenticated, items in cart | 1. Add books to cart<br>2. User logs out and logs in again<br>3. Get cart with new token<br>4. Verify cart items persist | Multiple books in cart, new login token | HTTP 200, cart contains same items with same quantities as before logout | |
 | TC-CART-038 | Cart | Allow re-adding book after clearing cart | Medium | User authenticated, cart was cleared | 1. Add book to cart with quantity 3<br>2. Clear cart completely<br>3. Add same book again with quantity 1<br>4. Verify book is added successfully | Same book added, cleared, then added again | HTTP 200, success: true, book added with quantity 1 | |
-| TC-CART-039 | Cart | Cart items ordered by creation date | Low | User authenticated, multiple items added at different times | 1. Add Book A, then Book B, then Book C<br>2. Get cart<br>3. Verify items are ordered by creation date (newest first) | Book A (first), Book B (second), Book C (third) | HTTP 200, items ordered: Book C, Book B, Book A (newest first) | |
+| TC-CART-039 | Cart | Cart items ordered by creation date | Low | User authenticated, multiple items added at different times | 1. Add Book A, then Book B, then Book C<br>2. Get cart<br>3. Verify items are ordered by creation date (newest first) | Book A (first), Book B (second), Book C (third) | HTTP 200, items ordered: Book C, Book B, Book A (newest first) |
+
+---
+
+## Execution History
+
+| Test Case ID | Date | Result | Notes |
+|---------------|------|--------|-------|
+| TC-CART-001 | 2024-03-05 | ❌ Fail | Bug reported as BUG-CART-001-add-product. |
+| TC-CART-001 | 2024-03-07 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CART-011 | 2024-03-10 | ❌ Fail | Bug reported as BUG-CART-002-stock-validation. |
+| TC-CART-011 | 2024-03-12 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CART-012 | 2024-03-15 | ❌ Fail | Bug reported as BUG-CART-003-pending-order-block. |
+| TC-CART-012 | 2024-03-17 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CART-018 | 2024-03-20 | ❌ Fail | Bug reported as BUG-CART-004-update-quantity. |
+| TC-CART-018 | 2024-03-22 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CART-027 | 2024-03-25 | ❌ Fail | Bug reported as BUG-CART-005-remove-item. |
+| TC-CART-027 | 2024-03-27 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CART-031 | 2024-03-30 | ❌ Fail | Bug reported as BUG-CART-006-clear-cart. |
+| TC-CART-031 | 2024-04-01 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CART-034 | 2024-04-05 | ❌ Fail | Bug reported as BUG-CART-007-cart-isolation. |
+| TC-CART-034 | 2024-04-07 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-CART-036 | 2024-04-10 | ❌ Fail | Bug reported as BUG-CART-008-price-update. |
+| TC-CART-036 | 2024-04-12 | ✅ Pass | Bug fixed and verified successfully. | |
