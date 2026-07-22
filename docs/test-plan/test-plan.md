@@ -114,8 +114,8 @@ Tests are executed sequentially using `--runInBand` to avoid parallel database c
 | Artifact | Location | Status |
 |----------|----------|--------|
 | Test Plan (this document) | `docs/test-plan/` | ✅ Available |
-| Test Cases | `docs/test-cases/` | Pending |
-| Bug Reports | `docs/bug-reports/` | Pending |
+| Test Cases | `docs/test-cases/` | ✅ Available |
+| Bug Reports | `docs/bug-reports/` | ✅ Available |
 | E2E Report (Playwright) | `docs/e2e-testing/playwright-report.pdf` | ✅ Available |
 | Test Evidence | `docs/evidence/` | Pending |
 | API Testing Docs | `docs/api-testing/` | Pending |
