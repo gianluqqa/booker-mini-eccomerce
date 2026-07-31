@@ -31,3 +31,11 @@
 
 | Test Case ID | Date | Result | Notes |
 |---------------|------|--------|-------|
+| TC-FRONT-AUTH-003 | 2026-06-01 | ❌ Fail | Bug reported as BUG-FRONT-AUTH-001-duplicate-email. |
+| TC-FRONT-AUTH-003 | 2026-06-03 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FRONT-AUTH-005 | 2026-06-05 | ❌ Fail | Bug reported as BUG-FRONT-AUTH-002-password-validation. |
+| TC-FRONT-AUTH-005 | 2026-06-07 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FRONT-AUTH-017 | 2026-06-10 | ❌ Fail | Bug reported as BUG-FRONT-AUTH-003-toggle-password. |
+| TC-FRONT-AUTH-017 | 2026-06-12 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FRONT-AUTH-019 | 2026-06-15 | ❌ Fail | Bug reported as BUG-FRONT-AUTH-004-google-login. |
+| TC-FRONT-AUTH-019 | 2026-06-17 | ✅ Pass | Bug fixed and verified successfully. |

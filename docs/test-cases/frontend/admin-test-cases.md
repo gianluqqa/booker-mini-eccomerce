@@ -60,11 +60,11 @@
 
 | Test Case ID | Date | Result | Notes |
 |---------------|------|--------|-------|
-| TC-FRONT-ADMIN-007 | 2024-06-01 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-001-delete-user. |
-| TC-FRONT-ADMIN-007 | 2024-06-03 | ✅ Pass | Bug fixed and verified successfully. |
-| TC-FRONT-ADMIN-020 | 2024-06-05 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-002-delete-book. |
-| TC-FRONT-ADMIN-020 | 2024-06-07 | ✅ Pass | Bug fixed and verified successfully. |
-| TC-FRONT-ADMIN-034 | 2024-06-10 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-003-create-book. |
-| TC-FRONT-ADMIN-034 | 2024-06-12 | ✅ Pass | Bug fixed and verified successfully. |
-| TC-FRONT-ADMIN-046 | 2024-06-15 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-004-filter-reviews. |
-| TC-FRONT-ADMIN-046 | 2024-06-17 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FRONT-ADMIN-007 | 2026-06-20 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-001-delete-user. |
+| TC-FRONT-ADMIN-007 | 2026-06-22 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FRONT-ADMIN-020 | 2026-07-02 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-002-delete-book. |
+| TC-FRONT-ADMIN-020 | 2026-07-05 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FRONT-ADMIN-034 | 2026-07-12 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-003-create-book. |
+| TC-FRONT-ADMIN-034 | 2026-07-15 | ✅ Pass | Bug fixed and verified successfully. |
+| TC-FRONT-ADMIN-046 | 2026-07-22 | ❌ Fail | Bug reported as BUG-FRONT-ADMIN-004-filter-reviews. |
+| TC-FRONT-ADMIN-046 | 2026-07-25 | ✅ Pass | Bug fixed and verified successfully. |
