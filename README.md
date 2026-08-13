@@ -1,6 +1,6 @@
 # Booker Mini E‑commerce 📚🛒
 
-![Main Application Screenshot or Demo GIF](<placeholder-image>)
+![Playwright Execution Report](docs/e2e-testing/screenshots/playwright-report.png)
 
 <!-- Badges -->
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue)
@@ -188,15 +188,15 @@ npm run test:regression # @regression tagged tests
 
 ## Reports & Evidence
 Generated test reports and evidence artifacts are organized as follows:
-- **API Testing Documentation & Reports**: [docs/api-testing/README.md](file:///c:/Users/hp/OneDrive/Desktop/Booker%20-%20Original/docs/api-testing/README.md)
-- **E2E Testing Documentation & HTML Report**: [docs/e2e-testing/README.md](file:///c:/Users/hp/OneDrive/Desktop/Booker%20-%20Original/docs/e2e-testing/README.md) (Report: `docs/e2e-testing/report/index.html`)
+- **API Testing Documentation & Reports**: [docs/api-testing/README.md](docs/api-testing/README.md)
+- **E2E Testing Documentation & HTML Report**: [docs/e2e-testing/README.md](docs/e2e-testing/README.md) (Report: `docs/e2e-testing/report/index.html`)
 - **Screenshots & Visual Evidence**: `docs/e2e-testing/screenshots/`
 
 ## QA Documentation
 All QA artifacts have been fully documented:
-- **Master Test Plan**: [docs/test-plan/test-plan.md](file:///c:/Users/hp/OneDrive/Desktop/Booker%20-%20Original/docs/test-plan/test-plan.md)
-- **Test Cases Suite**: [docs/test-cases/](file:///c:/Users/hp/OneDrive/Desktop/Booker%20-%20Original/docs/test-cases) (Backend & Frontend)
-- **Bug Reports Directory**: [docs/bug-reports/](file:///c:/Users/hp/OneDrive/Desktop/Booker%20-%20Original/docs/bug-reports) (Backend & Frontend)
+- **Master Test Plan**: [docs/test-plan/test-plan.md](docs/test-plan/test-plan.md)
+- **Test Cases Suite**: [docs/test-cases/](docs/test-cases/) (Backend & Frontend)
+- **Bug Reports Directory**: [docs/bug-reports/](docs/bug-reports/) (Backend & Frontend)
 
 ## Possible Future Improvements
 - Integrate performance testing with k6 or Gatling.
