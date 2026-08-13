@@ -28,6 +28,14 @@ This repository is **one of several QA Automation portfolio projects**. The mini
 ## Overview
 This repository is a **QA Automation portfolio project**. The mini e‑commerce application serves solely as a realistic backdrop to demonstrate comprehensive testing practices, including API automation, end‑to‑end UI testing, data validation, and reporting. The focus of this README is to highlight the testing strategies, tools, and competencies implemented throughout the project.
 
+## 📖 Business Domain & Application Features
+**Booker** is an online bookstore application designed to simulate a realistic e-commerce platform. The system includes the following core functional modules:
+
+- **Book Catalog & Search:** Users can browse, search, and filter books by title, category, or author.
+- **Shopping Cart & Checkout:** Ability to add/remove books, modify item quantities, and execute the checkout flow.
+- **Customer Account & Social Features:** User profile management, order history tracking, book ratings/reviews, and wishlist (favorites).
+- **Admin Dashboard:** Administrative management of book inventory (CRUD operations), customer orders, and user permissions.
+
 ## Project Objectives
 - Automate functional testing of the REST API and the user interface.
 - Achieve meaningful test coverage across critical user flows (authentication, CRUD operations, checkout).
