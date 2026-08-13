@@ -1,21 +1,21 @@
-# Test Plan — Booker Backend (v1.0)
+# Master Test Plan — Booker Mini E-commerce (v2.0) 📚🛒
 
 ## 1. Document Information
 
 | Field | Value |
 |-------|-------|
 | **Project** | Booker Mini E-commerce |
-| **Version** | 1.0 — Backend Only |
+| **Version** | 2.0 — Full-Stack (Backend API & Frontend E2E) |
 | **Author** | Gian Luca Caravone |
-| **Last Update** | July 2026 |
+| **Last Update** | August 2026 |
 
 ---
 
 ## 2. Introduction
 
-Booker is a mini e-commerce REST API built with Node.js, Express, TypeORM, and PostgreSQL. This document describes the backend testing strategy applied to the project.
+Booker is a full-stack mini e-commerce application consisting of a Node.js/Express REST API (backed by TypeORM and PostgreSQL) and a modern Next.js frontend interface.
 
-This version covers the backend API exclusively. A separate Test Plan for the Frontend will be produced in a future revision.
+This Master Test Plan documents the comprehensive quality assurance strategy applied across the entire system, encompassing **Backend API Integration Testing** (Jest + Supertest) and **Frontend End-to-End Automation** (Playwright + TypeScript).
 
 ---
 
@@ -23,108 +23,100 @@ This version covers the backend API exclusively. A separate Test Plan for the Fr
 
 | In Scope | Out of Scope |
 |----------|--------------|
-| REST API endpoints | Frontend UI |
-| Business rule validation | Browser-based E2E testing |
-| Authentication and authorization | Performance testing |
-| Database integrity | Security testing |
-| Error handling and edge cases | |
+| REST API endpoints & business logic validation | Performance / Load testing (k6/Gatling) |
+| JWT Authentication & role-based permissions (Admin vs Customer) | Penetration / Security testing (OWASP ZAP) |
+| Database state integrity & relational constraints | Accessibility testing (axe-core) |
+| Frontend UI End-to-End user journeys (Browsing, Cart, Checkout, Profile) | Mobile native app testing |
+| Cross-layer contract validation & error handling | |
+| Smoke (`@smoke`) & Regression (`@regression`) test execution | |
 
 ---
 
 ## 4. Testing Stack
 
-| Tool | Role |
-|------|------|
-| **Jest** | Test runner, assertions, suite lifecycle hooks |
-| **Supertest** | HTTP request simulation against the live Express app |
-| **TypeORM** | Database access for test data setup and teardown |
-| **PostgreSQL** | Real relational database used during test execution |
-
-> Tests run against a real PostgreSQL instance configured via environment variables. No mocking layer is used.
+| Layer | Tool / Technology | Role |
+|-------|-------------------|------|
+| **API Testing** | **Jest** | Test runner, assertion library, lifecycle hooks |
+| | **Supertest** | HTTP assertions against Express endpoints |
+| **E2E UI Testing** | **Playwright** | Browser automation engine (Chromium) |
+| | **TypeScript** | Type-safe test scripts & Page Object Models |
+| **Database** | **PostgreSQL & TypeORM** | Real relational database storage & entity management |
+| **Design Pattern** | **Page Object Model (POM)** | UI encapsulation & locators separation |
+| **Reporting** | **Jest HTML Reporter & Playwright HTML Server** | Execution logs, metrics, trace viewer & HTML artifacts |
 
 ---
 
 ## 5. Test Strategy
 
-### 5.1 Testing Approach
+### 5.1 Backend API Strategy
+- **Approach**: All API tests are integration tests running against a live PostgreSQL database instance.
+- **Pattern**: Tests follow the **AAA pattern** (Arrange, Act, Assert).
+- **Isolation**: `beforeEach` and `afterEach` hooks guarantee test data setup and cleanup, preventing cross-test contamination.
+- **Contract Enforcement**: Specialized validation helpers enforce strict JSON schema contracts across API responses.
 
-All backend tests are **integration tests**: each test starts the Express application, performs real HTTP requests via Supertest, and validates the response against the live database. This validates the full request lifecycle — middleware, controller, service, and database — in a single test run.
-
-### 5.2 Test Structure Convention
-
-Tests follow the **AAA pattern** (Arrange, Act, Assert) and are organized using a two-level `describe` hierarchy:
-
-```
-describe("Module - Feature")         ← top-level: module and feature under test
-  describe("HTTP_METHOD /endpoint")  ← inner: the specific endpoint being tested
-    it("should ...")                  ← individual test case
-```
-
-### 5.3 Data Isolation
-
-Each test file manages its own lifecycle through Jest hooks:
-
-- `beforeAll` — initializes the database connection.
-- `beforeEach` — creates fresh test data (users, books, etc.) for each test.
-- `afterEach` — cleans the database to eliminate cross-test contamination.
-- `afterAll` — closes the database connection.
-
-### 5.4 Reusable Helpers
-
-All test files share a common set of helpers located in `backend/tests/helpers/`:
-
-- **Action helpers** (`authActions`, `cartActions`, `orderActions`, etc.) — encapsulate HTTP calls so tests stay readable.
-- **Validation helpers** (`cartValidationHelpers`, `orderValidationHelpers`, etc.) — enforce JSON contract assertions reused across multiple tests.
-- **`dbHelpers`** — provides `initializeTestDb`, `clearDatabase`, and `closeTestDb` utilities.
-- **`validateErrorResponse`** — standardized assertion for API error responses.
+### 5.2 Frontend E2E Strategy
+- **Approach**: Playwright scripts simulate realistic user interactions on the Next.js frontend interface.
+- **Page Object Model (POM)**: Component locators and UI actions are encapsulated in dedicated page classes under `frontend/e2e/pages/`.
+- **Suite Tagging**:
+  - `@smoke`: Critical happy-path execution (e.g. successful login, book creation, order checkout).
+  - `@regression`: Extensive boundary checks, form validations, and negative error scenarios.
+- **Automated WebServer Orchestration**: `playwright.config.ts` automatically initializes both the Express backend API (port 5000) and Next.js frontend (port 3000) prior to test suite execution.
 
 ---
 
 ## 6. Modules Covered
 
-The following backend modules currently have active integration test coverage:
+The testing strategy provides complete coverage across both backend and frontend layers for the following core business modules:
 
-| Module | Tests Cover |
-|--------|------------|
-| **Auth** | Registration and login flows, validation rules, token issuance |
-| **Cart** | Add, update, remove, get, and clear cart items |
-| **Checkout** | Stock reservation, payment processing, cancellation |
-| **Orders** | Listing pending orders, order history, order detail by ID |
-| **Favorites** | Toggle and retrieve user favorites |
-| **Reviews** | Create, update, delete, and retrieve book reviews |
-| **Admin** | Admin-only access to users, orders, books, and reviews |
+| Module | API Integration Coverage | Frontend E2E Coverage |
+|--------|:------------------------:|:--------------------:|
+| **Auth** | Registration, login, JWT validation | Login/Logout flows, registration forms, input validations |
+| **Cart** | Item CRUD, item counters, stock check | Add to cart, counter updates, unauthenticated redirects |
+| **Checkout** | Payment simulation, stock reservation | Full purchase flow, invalid card handling, cancel flow |
+| **Orders** | Order history, order by ID retrieval | Order history reflection in user profile after checkout |
+| **Admin** | Role-restricted book CRUD & management | Admin panel access restrictions, book creation form |
+| **Reviews** | Book review submission, ratings calculation | Review creation form, character limit validations |
+| **Favorites** | Favorite toggle & retrieval | User favorites list interaction |
 
 ---
 
 ## 7. Test Execution
 
-Tests are executed sequentially using `--runInBand` to avoid parallel database conflicts. The primary commands from the `backend/` directory are:
+### 7.1 Backend API Execution
+From the `backend/` directory:
+```bash
+npm test                    # Run all Jest API integration tests
+npm run test:coverage       # Generate API code coverage metrics
+```
 
-| Command | Description |
-|---------|-------------|
-| `npm run test` | Runs the full test suite |
-| `npm run test:watch` | Watch mode for development |
-| `npm run test:coverage` | Generates a coverage report |
-| `npm run test:verbose` | Prints individual test results |
+### 7.2 Frontend E2E Execution
+From the `frontend/` directory:
+```bash
+npx playwright test         # Run all 32 E2E UI tests
+npm run test:smoke          # Run @smoke tagged tests
+npm run test:regression     # Run @regression tagged tests
+npm run test:report         # Launch HTML report server (docs/e2e-testing/report)
+```
 
 ---
 
-## 8. QA Deliverables
+## 8. QA Deliverables & Documentation
 
 | Artifact | Location | Status |
-|----------|----------|--------|
-| Test Plan (this document) | `docs/test-plan/` | ✅ Available |
-| Test Cases | `docs/test-cases/` | ✅ Available |
-| Bug Reports | `docs/bug-reports/` | ✅ Available |
-| E2E Report (Playwright) | `docs/e2e-testing/playwright-report.pdf` | ✅ Available |
-| Test Evidence | `docs/evidence/` | Pending |
-| API Testing Docs | `docs/api-testing/` | Pending |
+|----------|----------|:------:|
+| **Master Test Plan** | `docs/test-plan/test-plan.md` | ✅ Complete |
+| **Test Cases Suite** | `docs/test-cases/` (Backend & Frontend) | ✅ Complete |
+| **Bug Reports Directory** | `docs/bug-reports/` (Backend & Frontend) | ✅ Complete |
+| **API Testing Documentation** | `docs/api-testing/README.md` | ✅ Complete |
+| **E2E Testing Documentation** | `docs/e2e-testing/README.md` | ✅ Complete |
+| **E2E HTML Report** | `docs/e2e-testing/report/index.html` | ✅ Complete |
+| **Screenshots & Visual Evidence** | `docs/e2e-testing/screenshots/` | ✅ Complete |
 
 ---
 
-## 9. Future Scope
+## 9. Future Roadmap
 
-The following areas are **out of scope for this version** and will be documented in separate Test Plans:
-
-- Frontend component testing
-- Playwright End-to-End UI automation
+Potential future QA enhancements:
+- Integrate automated E2E and API test suites into **GitHub Actions CI/CD pipelines**.
+- Implement load and performance benchmarking using **k6**.
+- Add automated accessibility testing with **axe-core**.

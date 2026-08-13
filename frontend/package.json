@@ -12,7 +12,7 @@
     "test:regression": "playwright test --grep @regression",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report ../docs/e2e-testing/report"
   },
   "dependencies": {
     "axios": "^1.13.2",

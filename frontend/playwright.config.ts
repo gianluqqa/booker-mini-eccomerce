@@ -29,7 +29,7 @@ export default defineConfig({
   reporter: [
     ['html', { 
       open: 'never',
-      outputFolder: 'e2e/reports/html'
+      outputFolder: '../docs/e2e-testing/report'
     }],
     ['list']
   ],
